@@ -1,0 +1,26 @@
+<template>
+  <header class="header">
+    <h3>我的 Nuxt 项目</h3>
+  </header>
+</template>
+
+<script setup></script>
+
+<style scoped>
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  backdrop-filter: blur(5px);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  display: flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  z-index: 10;
+  padding: 0 20px;
+}
+</style>

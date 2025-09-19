@@ -1,0 +1,14 @@
+/* 全局重置样式 */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    overflow: hidden; /* 阻止 body 全局滚动 */
+    background: #7a9581;
+}
+
+*, *::before, *::after {
+    box-sizing: inherit;
+}
