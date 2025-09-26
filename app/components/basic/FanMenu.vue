@@ -1,15 +1,20 @@
 <template>
-  <div class="menu" :class="{ active: isActive }">
+  <div
+      class="menu"
+      :class="{ active: isActive }"
+      ref="menuRef"
+      @mousedown="onMouseDown"
+  >
     <!-- trigger 按钮 -->
     <div class="btn trigger" @click="toggleMenu">
-      <img src="~/assets/images/icons8-shark-96.png" alt="菜单" :style="{ opacity: isActive ? 1 : 0.5 }" />
+      <img src="../../assets/images/icons8-shark-96.png" alt="菜单" :style="{ opacity: isActive ? 1 : 0.5 }" />
     </div>
 
     <!-- 菜单图标 -->
     <div class="icons">
       <div class="rotater" v-for="(item, i) in menuItems" :key="i">
         <NuxtLink :to="item.to" class="btn-icon">
-          <i :class="item.icon"></i>  <!-- 图标 -->
+          <i :class="item.icon"></i>
           <span class="label">{{ item.label }}</span>
         </NuxtLink>
       </div>
@@ -18,17 +23,79 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 const isActive = ref(false)
 const toggleMenu = () => isActive.value = !isActive.value
 
 const menuItems = [
   { to: '/', icon: 'ri-home-9-line', label: '首页' },
-  { to: '/cards2', icon: 'ri-user-line', label: '个人' },
+  { to: '/markdown-page', icon: 'ri-user-line', label: '个人' },
   { to: '/cards3', icon: 'ri-information-line', label: '关于' }
 ]
 
+// 拖拽逻辑
+const menuRef = ref<HTMLElement | null>(null)
+const dragging = ref(false)
+const startX = ref(0)
+const startY = ref(0)
+const offsetX = ref(0)
+const offsetY = ref(0)
+
+const onMouseDown = (e: MouseEvent) => {
+  dragging.value = true
+  if (menuRef.value) {
+    // 读取当前 left/top，转成数字
+    const rect = menuRef.value.getBoundingClientRect()
+    offsetX.value = rect.left
+    offsetY.value = rect.top
+  }
+  startX.value = e.clientX
+  startY.value = e.clientY
+  e.preventDefault()
+}
+
+const onMouseMove = (e: MouseEvent) => {
+  if (!dragging.value || !menuRef.value) return
+
+  const dx = e.clientX - startX.value
+  const dy = e.clientY - startY.value
+
+  // 新位置
+  let newX = offsetX.value + dx
+  let newY = offsetY.value + dy
+
+  // 获取菜单尺寸
+  const menuRect = menuRef.value.getBoundingClientRect()
+  const menuWidth = menuRect.width
+  const menuHeight = menuRect.height
+
+  // 获取窗口尺寸
+  const windowWidth = window.innerWidth
+  const windowHeight = window.innerHeight
+
+  // 限制拖拽范围
+  newX = Math.min(Math.max(0, newX), windowWidth - menuWidth)
+  newY = Math.min(Math.max(0, newY), windowHeight - menuHeight)
+
+  // 应用位置
+  menuRef.value.style.left = newX + 'px'
+  menuRef.value.style.top = newY + 'px'
+}
+
+const onMouseUp = () => {
+  dragging.value = false
+}
+
+onMounted(() => {
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('mousemove', onMouseMove)
+  window.removeEventListener('mouseup', onMouseUp)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -86,7 +153,7 @@ const menuItems = [
     flex-direction: row;  // 横向排列
     padding: 0 0.8em;
     border-radius: 1.5em;
-    color: #fff;
+    color: black;
     font-weight: normal;
     text-decoration: none;
     background: transparent;
@@ -98,6 +165,7 @@ const menuItems = [
     }
 
     .label {
+      margin-top: -2px;
       display: inline-block;       // 保证文字在一行
       writing-mode: horizontal-tb; // 强制水平方向
       white-space: nowrap;         // 不换行

@@ -1,43 +1,28 @@
 <template>
-  <div class="card">内容 A</div>
 </template>
 
-<script setup></script>
+<script setup lang="ts">
+import { useSidebarStore, useSidebar } from '~/stores/sidebar'
+
+useSidebar('SidebarIndex', null)
+</script>
 
 <style scoped>
-.card {
-  position: relative;
+
+.card-container {
   width: 100%;
-
-  height: 4000px;
-  max-width: 600px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 28px;
-  font-weight: bold;
-  color: #2c3e50;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.9); /* 半透明白色 */
+  /*border-radius: 16px;  圆角 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* 阴影 */
+  padding: 15px 20px;
+  box-sizing: border-box;
+  backdrop-filter: blur(8px); /* 毛玻璃效果，可选 */
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-/* 四角直角标记 */
-.card::before,
-.card::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  background:
-      linear-gradient(to right, #2c3e50 4px, transparent 0) top left no-repeat,
-      linear-gradient(to bottom, #2c3e50 4px, transparent 0) top left no-repeat,
-      linear-gradient(to left, #2c3e50 4px, transparent 0) top right no-repeat,
-      linear-gradient(to bottom, #2c3e50 4px, transparent 0) top right no-repeat,
-      linear-gradient(to right, #2c3e50 4px, transparent 0) bottom left no-repeat,
-      linear-gradient(to top, #2c3e50 4px, transparent 0) bottom left no-repeat,
-      linear-gradient(to left, #2c3e50 4px, transparent 0) bottom right no-repeat,
-      linear-gradient(to top, #2c3e50 4px, transparent 0) bottom right no-repeat;
-  background-size: 20px 4px, 4px 20px;
+
+.card-container:hover {
+  transform: translateY(-4px); /* 稍微浮起来 */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
 </style>

@@ -19,7 +19,6 @@
 
 /* Footer 固定 */
 .footer {
-  position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
@@ -32,6 +31,7 @@
   justify-content: center;
   align-items: center;
   z-index: 10;
+  flex-shrink: 0;
 }
 
 .footer div {

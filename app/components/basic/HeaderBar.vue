@@ -8,13 +8,12 @@
 
 <style scoped>
 .header {
-  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 60px;
   backdrop-filter: blur(5px);
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgb(115, 103, 103);
   color: white;
   display: flex;
   align-items: center;
