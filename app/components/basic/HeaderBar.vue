@@ -13,7 +13,7 @@
   width: 100%;
   height: 60px;
   backdrop-filter: blur(5px);
-  background-color: rgb(115, 103, 103);
+  background-color: rgba(255, 255, 255, 0.6);
   color: white;
   display: flex;
   align-items: center;

@@ -39,7 +39,7 @@ import HeaderBar from '~/components/basic/HeaderBar.vue'
 import FooterBar from '~/components/basic/FooterBar.vue'
 import FanMenu from '~/components/basic/FanMenu.vue'
 import {useSidebarStore} from "~/stores/sidebar.ts";
-import {SidebarMarkdownMenu, SidebarIndex} from "#components";
+import {SidebarMarkdownMenu, SidebarIndex, SidebarBlogMenu} from "#components";
 import {computed, ref} from "vue";
 const sidebar = useSidebarStore()
 
@@ -50,6 +50,7 @@ const currentComponent = computed(() => {
   const curr = sidebar.current  // 存到普通变量
   if (curr === 'SidebarMarkdownMenu') return SidebarMarkdownMenu
   if (curr === 'SidebarIndex') return SidebarIndex
+  if (curr === 'SidebarBlogMenu') return SidebarBlogMenu
   return null
 })
 

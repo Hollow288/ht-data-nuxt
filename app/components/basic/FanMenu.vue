@@ -30,7 +30,7 @@ const toggleMenu = () => isActive.value = !isActive.value
 
 const menuItems = [
   { to: '/', icon: 'ri-home-9-line', label: '首页' },
-  { to: '/markdown-page', icon: 'ri-user-line', label: '个人' },
+  { to: '/blog-page', icon: 'ri-user-line', label: '文章' },
   { to: '/cards3', icon: 'ri-information-line', label: '关于' }
 ]
 
@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
 .menu {
   position: fixed;
   bottom: 120px;
-  left: 60px;
+  right: 150px;
   width: 3em;
   height: 3em;
   z-index: 1000;

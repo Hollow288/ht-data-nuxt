@@ -3,16 +3,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import {computed, ref} from 'vue'
 import MarkdownContent from '~/components/MarkdownContent.vue'
 import { useSidebarStore, useSidebar } from '~/stores/sidebar'
 import MarkdownIt from 'markdown-it'
+import {useRoute} from "#vue-router";
+const route = useRoute()
+debugger
+const articleId = computed(() => route.query.articleId || '')
 
 // 1️⃣ 模拟 Markdown 内容
 const markdown = `
 # 我的 Markdown 示例
 
-这是一个演示用的 **Markdown 文本**，包含各种常用元素。
+这是一个演示用的 **Markdown 文本**，包含各种常用元素。${articleId.value}
 
 ---
 
