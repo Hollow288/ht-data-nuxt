@@ -58,8 +58,8 @@ watch(() => props.content, () => Prism.highlightAll())
 <style>
 /* 保留原 card-container 样式 */
 .card-container{
-  margin-bottom: 15px;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
+  padding: 20px;
 }
 .card-container:hover{
   transform: translateY(-4px);
@@ -75,6 +75,8 @@ watch(() => props.content, () => Prism.highlightAll())
 /* Markdown 样式 */
 .markdown-body {
   background: transparent;
+  width: 100%;
+  min-height: calc(100vh - 180px);
 }
 
 pre[class*="language-"],

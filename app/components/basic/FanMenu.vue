@@ -43,15 +43,16 @@ const offsetX = ref(0)
 const offsetY = ref(0)
 
 const onMouseDown = (e: MouseEvent) => {
+  if (!menuRef.value) return
   dragging.value = true
-  if (menuRef.value) {
-    // 读取当前 left/top，转成数字
-    const rect = menuRef.value.getBoundingClientRect()
-    offsetX.value = rect.left
-    offsetY.value = rect.top
-  }
+
+  // 读取 style.left/top 而不是 getBoundingClientRect
+  offsetX.value = parseFloat(menuRef.value.style.left || '0')
+  offsetY.value = parseFloat(menuRef.value.style.top || '0')
+
   startX.value = e.clientX
   startY.value = e.clientY
+
   e.preventDefault()
 }
 
@@ -74,9 +75,14 @@ const onMouseMove = (e: MouseEvent) => {
   const windowWidth = window.innerWidth
   const windowHeight = window.innerHeight
 
+  const marginTop = 100
+  const marginRight = 100
+  const marginBottom = 100
+  const marginLeft = 20 // 如果左边也想限制，可以改这里
+
   // 限制拖拽范围
-  newX = Math.min(Math.max(0, newX), windowWidth - menuWidth)
-  newY = Math.min(Math.max(0, newY), windowHeight - menuHeight)
+  newX = Math.min(Math.max(marginLeft, newX), windowWidth - menuWidth - marginRight)
+  newY = Math.min(Math.max(marginTop, newY), windowHeight - menuHeight - marginBottom)
 
   // 应用位置
   menuRef.value.style.left = newX + 'px'
@@ -87,14 +93,59 @@ const onMouseUp = () => {
   dragging.value = false
 }
 
+const adjustMenuPosition = () => {
+  if (!menuRef.value) return
+
+  const menuRect = menuRef.value.getBoundingClientRect()
+  const windowWidth = window.innerWidth
+  const windowHeight = window.innerHeight
+
+  let left = menuRect.left
+  let top = menuRect.top
+
+  const marginRight = 100
+  const marginBottom = 100
+  const marginLeft = 20
+  const marginTop = 100
+
+  if (left + menuRect.width + marginRight > windowWidth) {
+    left = windowWidth - menuRect.width - marginRight
+  }
+  if (top + menuRect.height + marginBottom > windowHeight) {
+    top = windowHeight - menuRect.height - marginBottom
+  }
+  if (left < marginLeft) left = marginLeft
+  if (top < marginTop) top = marginTop
+
+  menuRef.value.style.left = left + 'px'
+  menuRef.value.style.top = top + 'px'
+}
+
+
+
+
 onMounted(() => {
+  // 初始化 left/top
+  if (menuRef.value) {
+    const menu = menuRef.value
+    const rect = menu.getBoundingClientRect()
+
+    // 把 right/bottom 转成 left/top
+    menu.style.left = rect.left + 'px'
+    menu.style.top = rect.top + 'px'
+    menu.style.right = 'auto'
+    menu.style.bottom = 'auto'
+  }
+
   window.addEventListener('mousemove', onMouseMove)
   window.addEventListener('mouseup', onMouseUp)
+  window.addEventListener('resize', adjustMenuPosition)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('mousemove', onMouseMove)
   window.removeEventListener('mouseup', onMouseUp)
+  window.removeEventListener('resize', adjustMenuPosition)
 })
 </script>
 
@@ -181,7 +232,7 @@ onBeforeUnmount(() => {
 }
 
 $icon-count: 5;
-$distance: 80px;
+$distance: 70px;
 
 @for $i from 1 through $icon-count {
   $deg: calc(360deg / $icon-count) * ($i - 1);

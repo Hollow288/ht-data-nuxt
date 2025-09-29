@@ -1,14 +1,32 @@
 /* 全局重置样式 */
-html, body {
+html {
     margin: 0;
     padding: 0;
-    height: 100%;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
-    overflow: hidden; /* 阻止 body 全局滚动 */
-    background: #7a9581;
+    /*font-family: Arial, sans-serif;*/
+    background: #9eb4ed;
 }
 
-*, *::before, *::after {
-    box-sizing: inherit;
+
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /*font-family: Arial, sans-serif;*/
+    background: #9eb4ed;
+}
+
+
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
 }

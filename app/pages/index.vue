@@ -2,9 +2,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSidebarStore, useSidebar } from '~/stores/sidebar'
 
-useSidebar('SidebarIndex', null)
 </script>
 
 <style scoped>
