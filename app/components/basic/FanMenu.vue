@@ -14,7 +14,7 @@
     <div class="icons">
       <div class="rotater" v-for="(item, i) in menuItems" :key="i">
         <NuxtLink :to="item.to" class="btn-icon">
-          <i :class="item.icon"></i>
+<!--          <i :class="item.icon"></i>-->
           <span class="label">{{ item.label }}</span>
         </NuxtLink>
       </div>
@@ -29,9 +29,9 @@ const isActive = ref(false)
 const toggleMenu = () => isActive.value = !isActive.value
 
 const menuItems = [
-  { to: '/', icon: 'ri-home-9-line', label: '首页' },
-  { to: '/blog-page', icon: 'ri-user-line', label: '文章' },
-  { to: '/cards3', icon: 'ri-information-line', label: '关于' }
+  { to: '/', icon: 'ri-home-9-line', label: 'Index' },
+  { to: '/blog-page', icon: 'ri-blogger-line', label: 'Blog' },
+  { to: '/cards3', icon: 'ri-information-line', label: 'About' }
 ]
 
 // 拖拽逻辑
@@ -150,6 +150,16 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap');
+
+.bungee-regular {
+  font-family: "Bungee", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
 *,
 *::before,
 *::after {
@@ -180,7 +190,7 @@ onBeforeUnmount(() => {
     &.trigger {
       z-index: 100;
       transform: scale(0.8);
-      &:hover { transform: scale(1); }
+      &:hover { transform: scale(0.9); }
     }
   }
 
@@ -204,7 +214,7 @@ onBeforeUnmount(() => {
     flex-direction: row;  // 横向排列
     padding: 0 0.8em;
     border-radius: 1.5em;
-    color: black;
+    color: #888787;
     font-weight: normal;
     text-decoration: none;
     background: transparent;
@@ -216,10 +226,10 @@ onBeforeUnmount(() => {
     }
 
     .label {
-      margin-top: -2px;
       display: inline-block;       // 保证文字在一行
       writing-mode: horizontal-tb; // 强制水平方向
       white-space: nowrap;         // 不换行
+      font-family: "Bungee", sans-serif;
     }
 
 

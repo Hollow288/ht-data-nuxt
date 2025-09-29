@@ -8,6 +8,12 @@ html {
 }
 
 
+* {
+    outline: none;
+    -webkit-tap-highlight-color: transparent; /* 手机/触控板 */
+}
+
+
 body {
     margin: 0;
     padding: 0;
