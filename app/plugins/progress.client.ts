@@ -8,10 +8,10 @@ export default defineNuxtPlugin((nuxtApp) => {
 
 
     router.beforeEach((to, from, next) => {
-        progress.start()
+        progress.requestStart()
         next()
     })
     router.afterEach(() => {
-        progress.finish()
+        progress.requestEnd()
     })
 })
