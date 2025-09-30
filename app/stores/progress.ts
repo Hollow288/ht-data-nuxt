@@ -12,7 +12,7 @@ export const useProgressStore = defineStore('progress', () => {
         active.value = true
         width.value = 0
         if (timer) clearInterval(timer)
-        timer = setInterval(() => {
+        timer = window.setInterval(() => {
             // 模拟进度条缓慢增加
             if (width.value < 90) {
                 width.value += Math.random() * 3
@@ -31,7 +31,6 @@ export const useProgressStore = defineStore('progress', () => {
 
     // 对外统一方法：增加/减少请求计数
     const requestStart = () => {
-        debugger
         requestCount++
         if (requestCount === 1) start()
     }

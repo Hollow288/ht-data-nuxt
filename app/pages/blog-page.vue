@@ -1,5 +1,5 @@
 <template>
-  <div class="page-layout" >
+  <div class="page-layout">
     <!-- 左侧栏 -->
     <aside class="left-sidebar">
       <ul class="menu-wrapper">
@@ -20,17 +20,17 @@
     </aside>
 
     <!-- 文章区域 -->
-    <div class="card-container">
-      <div v-if="loading" class="loading">加载中...</div>
-      <div v-else>
-        <div v-if="articles.length === 0" class="empty">该日期没有文章</div>
-        <div v-for="article in articles" :key="article.blogId" class="article-item" @click="toMarkdownPage(article.blogId)">
-          <h3 class="title">{{ article.title }}</h3>
-          <p class="summary">{{ article.summary }}</p>
-          <div class="date">{{ formatDate(article.createdAt) }}</div>
-        </div>
+    <div class="card-container" v-if="loading || articles.length === 0">
+      <div v-if="loading" class="loading">{{ loading ? '加载中...' : '该日期没有文章' }}</div>
+    </div>
+    <div v-else class="cards-grid">
+      <div v-for="article in articles" :key="article.blogId" class="card-item" @click="toMarkdownPage(article.blogId)">
+        <h1 class="title">{{ article.title }}</h1>
+        <p class="summary">{{ article.summary }}</p>
+        <div class="date">{{ formatDate(article.createdAt) }}</div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -83,7 +83,7 @@ const selectDate = async (selectedDate: string) => {
 const fetchArticles = async () => {
   loading.value = true
   try {
-    const res : BlogDateMenuRes = await apiFetch('http://127.0.0.1:5777/api/v1/blog/blog-date-menu', {
+    const res: BlogDateMenuRes = await apiFetch('http://127.0.0.1:5777/api/v1/blog/blog-date-menu', {
       headers: {
         'Content-Type': 'application/json',
         'X-API-KEY': 'AIzaSyBWlLk7GqJ-6sNOjFY2ZKWy2IJd7evlhAY'
@@ -97,7 +97,7 @@ const fetchArticles = async () => {
     dateList.value.forEach(item => {
       const year = item.yearMonth.split('-')[0] ?? '其他'
       if (!grouped[year]) grouped[year] = []
-        grouped[year].push(item)
+      grouped[year].push(item)
     })
     groupedDates.value = grouped
 
@@ -121,7 +121,6 @@ const fetchArticles = async () => {
 }
 
 
-
 // ===================== 年份折叠 =====================
 const toggleYear = (year: string) => {
   if (expandedYears.value.includes(year)) {
@@ -133,7 +132,7 @@ const toggleYear = (year: string) => {
 
 // ===================== 跳转文章 =====================
 const toMarkdownPage = (articleId: number) => {
-  router.push({ path: '/markdown-page', query: { articleId } })
+  router.push({path: '/markdown-page', query: {articleId}})
 }
 
 // ===================== 生命周期 =====================
@@ -150,6 +149,41 @@ watch(date, fetchArticles)
   gap: 20px;
   margin: 20px;
   flex-direction: row;
+}
+
+
+.card-item {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  }
+
+  .title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+  }
+
+  .summary {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 6px;
+  }
+
+  .date {
+    font-size: 0.9rem;
+    color: #999;
+    margin: 10px 0;
+
+  }
 }
 
 .left-sidebar {
@@ -173,6 +207,7 @@ watch(date, fetchArticles)
   }
 
   .menu-wrapper {
+    min-height: calc(100vh - 140px);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -199,13 +234,17 @@ watch(date, fetchArticles)
         cursor: pointer;
         transition: background 0.25s;
 
-        &:hover { background: #eaeaea; }
+        &:hover {
+          background: #eaeaea;
+        }
 
         .arrow {
           font-size: 0.9em;
           transition: transform 0.3s;
 
-          &.expanded { transform: rotate(90deg); }
+          &.expanded {
+            transform: rotate(90deg);
+          }
         }
       }
 
@@ -249,11 +288,18 @@ watch(date, fetchArticles)
             }
           }
 
-          .count { font-size: 0.8em; color: #888; }
+          .count {
+            font-size: 0.8em;
+            color: #888;
+          }
         }
       }
     }
   }
+}
+
+.cards-grid {
+  width: clamp(300px, 60%, 1000px);
 }
 
 .card-container {
@@ -280,30 +326,5 @@ watch(date, fetchArticles)
     font-size: 1rem;
   }
 
-  .article-item {
-    padding: 15px 20px;
-    border-bottom: 1px solid #eee;
-    transition: background 0.2s;
-
-    &:hover { background: rgba(77, 166, 255, 0.05); }
-
-    .title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 5px;
-    }
-
-    .summary {
-      font-size: 0.95rem;
-      color: #666;
-      margin-bottom: 8px;
-    }
-
-    .date {
-      font-size: 0.85rem;
-      color: #999;
-    }
-  }
 }
 </style>
