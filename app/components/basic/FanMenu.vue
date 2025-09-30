@@ -13,10 +13,21 @@
     <!-- 菜单图标 -->
     <div class="icons">
       <div class="rotater" v-for="(item, i) in menuItems" :key="i">
-        <NuxtLink :to="item.to" class="btn-icon">
-<!--          <i :class="item.icon"></i>-->
+        <NuxtLink
+            v-if="item.to"
+            :to="item.to"
+            class="btn-icon"
+        >
           <span class="label">{{ item.label }}</span>
         </NuxtLink>
+
+        <div
+            v-else
+            class="btn-icon"
+            @click="item.action && item.action()"
+        >
+          <span class="label">{{ item.label }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -24,14 +35,16 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const isActive = ref(false)
 const toggleMenu = () => isActive.value = !isActive.value
 
 const menuItems = [
   { to: '/', icon: 'ri-home-9-line', label: 'Index' },
   { to: '/blog-page', icon: 'ri-blogger-line', label: 'Blog' },
-  { to: '/cards3', icon: 'ri-information-line', label: 'About' }
+  { action: () => router.back(), icon: 'ri-arrow-left-line', label: 'Back' }
 ]
 
 // 拖拽逻辑
@@ -78,7 +91,7 @@ const onMouseMove = (e: MouseEvent) => {
   const marginTop = 100
   const marginRight = 100
   const marginBottom = 100
-  const marginLeft = 20 // 如果左边也想限制，可以改这里
+  const marginLeft = 60 // 如果左边也想限制，可以改这里
 
   // 限制拖拽范围
   newX = Math.min(Math.max(marginLeft, newX), windowWidth - menuWidth - marginRight)

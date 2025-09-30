@@ -6,7 +6,7 @@
       </button>
 
     <div style="margin-right: 30px">
-      <h3>我的 Nuxt 项目</h3>
+      <h3>Nuxt</h3>
     </div>
 
   </header>
