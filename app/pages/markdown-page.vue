@@ -24,152 +24,42 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from '#vue-router'
 import MarkdownContent from '~/components/MarkdownContent.vue'
 import MarkdownIt from 'markdown-it'
+import type { BlogPostRes } from '~/types/api'
+import { apiFetch } from '~/utils/apiFetch'
 
+// 路由参数
 const route = useRoute()
 const articleId = computed(() => route.query.articleId || '')
 
-const markdown = `
-# 我的 Markdown 示例
+// markdown 内容用 ref
+const markdown = ref<string>(`
+# 加载中...
 
-这里是示例内容，文章 ID: ${articleId.value}
-
----
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-## 1. 列表示例
-- 苹果
-- 香蕉
-- 草莓
-
-
-## 2. 链接与图片
-[访问 Vue 官方网站](https://vuejs.org)
-
-![示例图片](https://via.placeholder.com/150)
-
-## 3. 代码块
-\`\`\`javascript
-function greet(name) {
-  console.log(\`Hello, \${name}!\`);
-}
-greet('Alice');
-\`\`\`
-`
+请稍等，正在获取文章 ID: ${articleId.value}
+`)
 
 const md = new MarkdownIt()
-const tokens: any[] = md.parse(markdown, {})
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/\s+/g, '-')
 }
 
-const toc = tokens
-    .filter(t => t.type === 'heading_open')
-    .map(t => {
-      const level = Number(t.tag.slice(1))
-      const content = tokens[tokens.indexOf(t) + 1].content
-      const id = slugify(content)
-      return { level, content, id }
-    })
+// 目录（从 markdown 里解析出来）
+const toc = computed(() => {
+  const tokens = md.parse(markdown.value, {})
+  return tokens
+      .filter(t => t.type === 'heading_open')
+      .map(t => {
+        const level = Number(t.tag.slice(1))
+        const content = tokens[tokens.indexOf(t) + 1].content
+        const id = slugify(content)
+        return { level, content, id }
+      })
+})
 
 function scrollTo(id: string) {
   const el = document.getElementById(id)
@@ -177,6 +67,26 @@ function scrollTo(id: string) {
     el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 }
+
+// 请求文章内容
+const selectDate = async () => {
+  try {
+    const res: BlogPostRes = await apiFetch(`http://127.0.0.1:5777/api/v1/blog/${articleId.value}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': 'AIzaSyBWlLk7GqJ-6sNOjFY2ZKWy2IJd7evlhAY'
+      }
+    })
+    markdown.value = res.data.content  // ✅ 更新响应式变量
+  } catch (error) {
+    console.error('获取文章失败', error)
+    markdown.value = '# 获取文章失败'
+  }
+}
+
+// 首次挂载 & 监听文章 ID 变化
+onMounted(selectDate)
+watch(articleId, selectDate)
 </script>
 
 <style scoped lang="scss">

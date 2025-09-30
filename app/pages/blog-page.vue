@@ -9,10 +9,10 @@
             <span class="arrow" :class="{ expanded: expandedYears.includes(year) }">▶</span>
           </div>
           <ul v-show="expandedYears.includes(year)" class="date-list">
-            <li v-for="item in items" :key="item.date"
-                :class="{ active: activeDate === item.date }"
-                @click="selectDate(item.date)">
-              {{ item.date }} <span class="count">({{ item.count }})</span>
+            <li v-for="item in items" :key="item.yearMonth"
+                :class="{ active: activeDate === item.yearMonth }"
+                @click="selectDate(item.yearMonth)">
+              {{ item.yearMonth.split('-')[1] }}月 <span class="count">({{ item.count }})</span>
             </li>
           </ul>
         </li>
@@ -24,10 +24,10 @@
       <div v-if="loading" class="loading">加载中...</div>
       <div v-else>
         <div v-if="articles.length === 0" class="empty">该日期没有文章</div>
-        <div v-for="article in articles" :key="article.id" class="article-item" @click="toMarkdownPage(article.id)">
+        <div v-for="article in articles" :key="article.blogId" class="article-item" @click="toMarkdownPage(article.blogId)">
           <h3 class="title">{{ article.title }}</h3>
           <p class="summary">{{ article.summary }}</p>
-          <div class="date">{{ formatDate(article.date) }}</div>
+          <div class="date">{{ formatDate(article.createdAt) }}</div>
         </div>
       </div>
     </div>
@@ -35,70 +35,94 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+// ===================== 路由相关 =====================
+import type {BlogDateListRes, BlogDateMenuItem, BlogDateMenuRes, BlogItem} from "~/types/api";
 
 const route = useRoute()
 const router = useRouter()
-const date = computed(() => route.query.date || '')
+const date = computed(() => route.query.date as string || '')
 
-// 文章列表
-const articles = ref<Array<{ id: number, title: string, summary: string, date: string }>>([])
-const allArticles = [
-  { id: 1, title: 'Vue 3 新特性详解', summary: 'Vue 3 带来了 Composition API、Teleport、Suspense 等新特性……', date: '2025-09-28' },
-  { id: 2, title: 'Nuxt 3 入门指南', summary: 'Nuxt 3 支持全新的 server engine、Nitro、Vue 3 特性……', date: '2025-09-28' },
-  { id: 3, title: 'TypeScript 基础语法', summary: 'TypeScript 是 JavaScript 的超集，支持静态类型检查……', date: '2025-09-27' },
-  { id: 4, title: 'Pinia 状态管理实战', summary: 'Pinia 是 Vue 官方推荐的新一代状态管理工具……', date: '2025-09-27' },
-  { id: 5, title: 'Markdown 高级用法', summary: '通过 markdown-it 可以实现自定义渲染、代码高亮……', date: '2025-09-26' },
-  { id: 6, title: 'Markdown 高级用法', summary: '通过 markdown-it 可以实现自定义渲染、代码高亮……', date: '2025-09-26' },
-  { id: 7, title: 'Markdown 高级用法', summary: '通过 markdown-it 可以实现自定义渲染、代码高亮……', date: '2025-09-26' },
-  { id: 8, title: 'Markdown 高级用法', summary: '通过 markdown-it 可以实现自定义渲染、代码高亮……', date: '2025-09-26' }
-]
-
+// ===================== 数据状态 =====================
+const articles = ref<BlogItem[]>([])
+const dateList = ref<BlogDateMenuItem[]>([])
+const groupedDates = ref<Record<string, BlogDateMenuItem[]>>({})
 const loading = ref(false)
-const fetchArticles = async () => {
-  if (!date.value) return
-  loading.value = true
-  // 模拟 API
-  articles.value = allArticles
-  loading.value = false
-}
-
-onMounted(fetchArticles)
-watch(date, fetchArticles)
-
-const formatDate = (d: string) => {
-  const dt = new Date(d)
-  return dt.toLocaleDateString()
-}
-
-const toMarkdownPage = (articleId: string) => {
-  router.push({ path: '/markdown-page', query: { articleId } })
-}
-
-// 模拟日期数据
-const dateList = [
-  { date: '2025-09-26', count: 5 }, { date: '2025-09-27', count: 2 },
-  { date: '2025-09-28', count: 1 }, { date: '2024-08-01', count: 4 }
-]
-
-// 按年份分组
-const groupedDates = dateList.reduce((acc, item) => {
-  const year = item.date.split('-')[0]
-  if (!acc[year]) acc[year] = []
-  acc[year].push(item)
-  return acc
-}, {} as Record<string, { date: string, count: number }[]>)
 
 const activeDate = ref('')
 const expandedYears = ref<string[]>([])
 
-const selectDate = (date: string) => {
-  debugger
-  activeDate.value = date
-  articles.value = allArticles.filter(n=>n.date === date);
+// ===================== 工具函数 =====================
+const formatDate = (d: string) => {
+  const dt = new Date(d)
+  const yyyy = dt.getFullYear()
+  const mm = String(dt.getMonth() + 1).padStart(2, '0')
+  const dd = String(dt.getDate()).padStart(2, '0')
+  return `${yyyy}-${mm}-${dd}`
 }
 
+// ===================== 点击日期加载文章 =====================
+const selectDate = async (selectedDate: string) => {
+  activeDate.value = selectedDate
+  loading.value = true
+  try {
+    const res: BlogDateListRes = await apiFetch(`http://127.0.0.1:5777/api/v1/blog/blog-date-list/${selectedDate}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': 'AIzaSyBWlLk7GqJ-6sNOjFY2ZKWy2IJd7evlhAY'
+      }
+    })
+    articles.value = res.data
+  } catch (error) {
+    console.error('获取文章列表失败', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// ===================== 数据请求 =====================
+const fetchArticles = async () => {
+  loading.value = true
+  try {
+    const res : BlogDateMenuRes = await apiFetch('http://127.0.0.1:5777/api/v1/blog/blog-date-menu', {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': 'AIzaSyBWlLk7GqJ-6sNOjFY2ZKWy2IJd7evlhAY'
+      }
+    })
+
+    dateList.value = res.data
+
+    // 按年份分组
+    const grouped: Record<string, BlogDateMenuItem[]> = {}
+    dateList.value.forEach(item => {
+      const year = item.yearMonth.split('-')[0] ?? '其他'
+      if (!grouped[year]) grouped[year] = []
+        grouped[year].push(item)
+    })
+    groupedDates.value = grouped
+
+    // 自动选中第一个分组的第一个日期
+    const years = Object.keys(grouped)
+    if (years.length > 0) {
+      const firstYear = years[0] as string
+      const firstGroup = grouped[firstYear]
+      if (firstGroup && firstGroup.length > 0) {
+        const firstDate = firstGroup[0]!.yearMonth  // 非空断言
+        expandedYears.value.push(firstYear)
+        selectDate(firstDate)
+      }
+    }
+
+  } catch (error) {
+    console.error('获取日期数据失败', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+
+
+// ===================== 年份折叠 =====================
 const toggleYear = (year: string) => {
   if (expandedYears.value.includes(year)) {
     expandedYears.value = expandedYears.value.filter(y => y !== year)
@@ -106,6 +130,15 @@ const toggleYear = (year: string) => {
     expandedYears.value.push(year)
   }
 }
+
+// ===================== 跳转文章 =====================
+const toMarkdownPage = (articleId: number) => {
+  router.push({ path: '/markdown-page', query: { articleId } })
+}
+
+// ===================== 生命周期 =====================
+onMounted(fetchArticles)
+watch(date, fetchArticles)
 </script>
 
 <style scoped lang="scss">
