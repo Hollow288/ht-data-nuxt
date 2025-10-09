@@ -27,7 +27,7 @@
       <div v-for="article in articles" :key="article.blogId" class="card-item" @click="toMarkdownPage(article.blogId)">
         <h1 class="title">{{ article.title }}</h1>
         <p class="summary">{{ article.summary }}</p>
-        <div class="date">{{ formatDate(article.createdAt) }}</div>
+        <div class="date"><i class="ri-calendar-2-line"></i>{{ formatDate(article.createdAt) }}</div>
       </div>
     </div>
 
@@ -153,6 +153,7 @@ watch(date, fetchArticles)
 
 
 .card-item {
+  margin-bottom: 20px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(6px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
@@ -181,7 +182,14 @@ watch(date, fetchArticles)
   .date {
     font-size: 0.9rem;
     color: #999;
-    margin: 10px 0;
+    margin: 20px 0 10px;
+    display: flex;
+    align-items: center;
+
+    i{
+      font-size: 1.5rem;
+      margin-right: 10px;
+    }
 
   }
 }
@@ -300,6 +308,7 @@ watch(date, fetchArticles)
 
 .cards-grid {
   width: clamp(300px, 60%, 1000px);
+  margin-bottom: -20px;
 }
 
 .card-container {

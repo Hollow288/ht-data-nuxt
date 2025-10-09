@@ -7,7 +7,7 @@
           <li
               v-for="item in toc"
               :key="item.id"
-              :style="{ marginLeft: (item.level - 1) * 12 + 'px' }"
+              :style="{ marginLeft: (item.level - 3) * 5 + 'px' }"
               @click="scrollTo(item.id)"
           >
             {{ item.content }}
@@ -64,7 +64,12 @@ const toc = computed(() => {
 function scrollTo(id: string) {
   const el = document.getElementById(id)
   if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const rect = el.getBoundingClientRect()
+    const offsetTop = window.scrollY + rect.top - 100
+    window.scrollTo({
+      top: offsetTop,
+      behavior: 'smooth'
+    })
   }
 }
 
@@ -164,6 +169,19 @@ watch(articleId, selectDate)
   min-height: calc(100vh - 140px);
   overflow-y: auto;
   width: clamp(300px, 60%, 1000px);
-
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  backdrop-filter: blur(8px);
 }
+
+.content:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
+
+
 </style>

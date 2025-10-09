@@ -50,27 +50,13 @@ watch(() => props.content, () => Prism.highlightAll())
 </script>
 
 <template>
-  <div class="card-container">
+<!--  <div class="card-container">-->
     <div class="markdown-body" v-html="rendered"></div>
-  </div>
+<!--  </div>-->
 </template>
 
 <style>
 /* 保留原 card-container 样式 */
-.card-container{
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
-  padding: 20px;
-}
-.card-container:hover{
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-}
-.card-container{
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box;
-  backdrop-filter: blur(8px);
-}
 
 /* Markdown 样式 */
 .markdown-body {
