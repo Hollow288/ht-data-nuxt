@@ -24,10 +24,22 @@
       <div v-if="loading" class="loading">{{ loading ? '加载中...' : '该日期没有文章' }}</div>
     </div>
     <div v-else class="cards-grid">
-      <div v-for="article in articles" :key="article.blogId" class="card-item" @click="toMarkdownPage(article.blogId)">
-        <h1 class="title">{{ article.title }}</h1>
-        <p class="summary">{{ article.summary }}</p>
-        <div class="date"><i class="ri-calendar-2-line"></i>{{ formatDate(article.createdAt) }}</div>
+      <div v-for="article in articles" :key="article.blogId" class="card-item">
+        <div style="display: flex; justify-content: space-between; align-items: stretch;">
+          <div style="flex: 1;">
+            <p class="title">{{ article.title }}</p>
+            <p class="summary">{{ article.summary }}</p>
+            <div class="date"><i class="ri-calendar-2-line"></i>{{ formatDate(article.createdAt) }}</div>
+          </div>
+
+          <!-- 美化按钮 -->
+          <div style="width: 40px; padding: 5px;">
+            <button class="right-btn" @click="toMarkdownPage(article.blogId)">
+              <i class="ri-arrow-right-line"></i>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -158,7 +170,6 @@ watch(date, fetchArticles)
   backdrop-filter: blur(6px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   padding: 12px 15px;
-  cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 
   &:hover {
@@ -167,16 +178,27 @@ watch(date, fetchArticles)
   }
 
   .title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     font-size: 1.25rem;
     font-weight: 600;
     color: #333;
     margin-bottom: 4px;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 5px;
+      height: 1.25em;
+      background: #6e4040;
+    }
   }
 
   .summary {
     font-size: 1rem;
     color: #666;
-    margin-bottom: 6px;
+    margin: 30px 0;
   }
 
   .date {
@@ -274,14 +296,14 @@ watch(date, fetchArticles)
           white-space: normal;
 
           &:hover {
-            background: rgba(0, 123, 255, 0.05);
-            color: #007bff;
+            background: rgba(225, 158, 186, 0.05);
+            color: #df1c5f;
           }
 
           &.active {
-            background: rgba(0, 123, 255, 0.1);
+            background: rgba(225, 158, 186, 0.1);
             font-weight: 600;
-            color: #007bff;
+            color: #df1c5f;
             position: relative;
 
             &::before {
@@ -291,7 +313,7 @@ watch(date, fetchArticles)
               top: 4px;
               bottom: 4px;
               width: 3px;
-              background: #007bff;
+              background: #e19eba;
               border-radius: 2px;
             }
           }
@@ -336,4 +358,30 @@ watch(date, fetchArticles)
   }
 
 }
+
+
+.right-btn {
+  width: 100%;
+  height: 100%;
+  background-color: #e19eba;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    background-color: #df1c5f;
+    color: #fff;
+  }
+
+  i {
+    transition: color 0.25s ease;
+  }
+}
+
 </style>
