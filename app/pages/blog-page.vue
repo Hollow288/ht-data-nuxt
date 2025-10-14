@@ -12,7 +12,7 @@
             <li v-for="item in items" :key="item.yearMonth"
                 :class="{ active: activeDate === item.yearMonth }"
                 @click="selectDate(item.yearMonth)">
-              {{ item.yearMonth.split('-')[1] }}月 <span class="count">({{ item.count }})</span>
+              {{ item.yearMonth.split('-')[1] }}月 <span class="count">{{ item.count }}</span>
             </li>
           </ul>
         </li>
@@ -32,8 +32,8 @@
             <div class="date"><i class="ri-calendar-2-line"></i>{{ formatDate(article.createdAt) }}</div>
           </div>
 
-          <!-- 美化按钮 -->
-          <div style="width: 40px; padding: 5px;">
+
+          <div style="width: 40px; margin: 5px;">
             <button class="right-btn" @click="toMarkdownPage(article.blogId)">
               <i class="ri-arrow-right-line"></i>
             </button>
@@ -178,6 +178,7 @@ watch(date, fetchArticles)
   }
 
   .title {
+    margin-top: 5px;
     display: flex;
     align-items: center;
     gap: 10px;

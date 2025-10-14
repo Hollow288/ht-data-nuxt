@@ -44,6 +44,7 @@ const toggleMenu = () => isActive.value = !isActive.value
 const menuItems = [
   { to: '/', icon: 'ri-home-9-line', label: 'Index' },
   { to: '/blog-page', icon: 'ri-blogger-line', label: 'Blog' },
+  { to: '/hotta-page', icon: 'ri-blogger-line', label: 'Hotta' },
   { action: () => router.back(), icon: 'ri-arrow-left-line', label: 'Back' }
 ]
 
@@ -254,7 +255,7 @@ onBeforeUnmount(() => {
 
 }
 
-$icon-count: 5;
+$icon-count: 7;
 $distance: 70px;
 
 @for $i from 1 through $icon-count {
