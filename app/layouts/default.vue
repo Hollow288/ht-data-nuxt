@@ -83,7 +83,7 @@ function onTransitionEnd(e) {
 <style scoped>
 /* 原有 layout 样式保持不变 */
 .layout { display:flex; flex-direction:column; min-height:100vh; }
-.body-wrapper { box-sizing:border-box; background-color:transparent; width:100%; min-height:calc(100vh - 100px); }
+.body-wrapper { box-sizing:border-box; background-color:transparent; width:100%; min-height:calc(100vh - 120px); }
 
 /* fade-scale */
 .fade-scale-enter-active, .fade-scale-leave-active { transition: all 0.3s ease; }

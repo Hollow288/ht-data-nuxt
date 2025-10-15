@@ -12,6 +12,11 @@ export interface BaseRes<T> {
     data: T
 }
 
+export interface ImageInfo {
+    url: string
+    name: string
+}
+
 export interface BlogItem {
     blogId: number
     title: string

@@ -22,7 +22,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 40px;
+  height: 60px;
   backdrop-filter: blur(5px);
   background-color: rgba(255, 255, 255, 0.1);
   text-align: center;

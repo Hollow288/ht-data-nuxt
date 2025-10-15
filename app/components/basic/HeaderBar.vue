@@ -1,15 +1,15 @@
 <template>
   <header class="header">
-    <!-- 返回按钮 -->
-      <button class="back-btn" @click="goBack" aria-label="返回">
-        <i class="ri-arrow-left-line"></i>
-      </button>
-
-    <div style="margin-right: 30px">
-      <h3>Nuxt</h3>
-    </div>
-
-  </header>
+      <nav>
+        <ul class="main-menu">
+          <li><a href="#section-2">Index</a></li>
+          <li><a href="#section-5">Blog</a></li>
+          <li><a href="#section-7">Work</a></li>
+          <li><a href="#section-9">Blog</a></li>
+          <li><a href="#main-footer">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
 </template>
 
 <script setup lang="ts">
@@ -24,7 +24,7 @@ const goBack = () => {
 <style scoped>
 .header {
   position: sticky;
-  top: 0;
+  top: -60px;
   left: 0;
   width: 100%;
   height: 60px;
@@ -33,10 +33,9 @@ const goBack = () => {
   color: white;
   display: flex;
   align-items: center;
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1rem;
   z-index: 10;
-  justify-content: space-between; /* 左对齐返回按钮 */
+  justify-content: center;
 }
 
 
@@ -59,6 +58,35 @@ const goBack = () => {
   color: #4da6ff;
 }
 
+
+.main-menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.main-menu li {
+  display: inline-block;
+  padding: 0.75em 1.875em;
+}
+
+.main-menu li a {
+  text-transform: uppercase;
+  font-size: 0.875em;
+  text-decoration: none;
+  padding-bottom: 0.75em;
+  transition: color 0.2s, border-bottom 0.2s;
+}
+
+.main-menu li a:hover {
+  color: #fce38a;
+  border-bottom: 0.1875em solid #fce38a;
+}
+
+.main-menu li a span {
+  font-size: 1.2em;
+}
 
 
 </style>

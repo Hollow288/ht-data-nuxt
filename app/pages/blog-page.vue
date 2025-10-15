@@ -1,22 +1,33 @@
 <template>
   <div class="page-layout">
     <!-- 左侧栏 -->
-    <aside class="left-sidebar">
-      <ul class="menu-wrapper">
-        <li v-for="(items, year) in groupedDates" :key="year" class="year-group">
-          <div class="year-header" @click="toggleYear(year)">
-            <span>{{ year }}</span>
-            <span class="arrow" :class="{ expanded: expandedYears.includes(year) }">▶</span>
+    <aside class="basic-aside">
+      <div style="display: flex;flex-direction: column;height: 100%">
+        <div class="left-sidebar-name">
+          <div style="min-height: 80px">
+            Date
           </div>
-          <ul v-show="expandedYears.includes(year)" class="date-list">
-            <li v-for="item in items" :key="item.yearMonth"
-                :class="{ active: activeDate === item.yearMonth }"
-                @click="selectDate(item.yearMonth)">
-              {{ item.yearMonth.split('-')[1] }}月 <span class="count">{{ item.count }}</span>
+        </div>
+        <div class="left-sidebar">
+          <ul class="menu-wrapper">
+            <li v-for="(items, year) in groupedDates" :key="year" class="year-group">
+              <div class="year-header" @click="toggleYear(year)">
+                <span>{{ year }}</span>
+                <span class="arrow" :class="{ expanded: expandedYears.includes(year) }">▶</span>
+              </div>
+              <ul v-show="expandedYears.includes(year)" class="date-list">
+                <li v-for="item in items" :key="item.yearMonth"
+                    :class="{ active: activeDate === item.yearMonth }"
+                    @click="selectDate(item.yearMonth)">
+                  {{ item.yearMonth.split('-')[1] }}月 <span class="count">{{ item.count }}</span>
+                </li>
+              </ul>
             </li>
           </ul>
-        </li>
-      </ul>
+        </div>
+      </div>
+
+
     </aside>
 
     <!-- 文章区域 -->
@@ -217,15 +228,40 @@ watch(date, fetchArticles)
   }
 }
 
-.left-sidebar {
-  flex: 0 0 25%;
-  min-width: 180px;
-  max-width: 300px;
+.basic-aside{
+  flex: 0 0 25%;  min-width: 180px;max-width: 300px;
+  box-sizing: border-box;
+  position: sticky;
+  top: 40px;
+  height: calc(100vh - 100px );
+}
+
+.left-sidebar-name {
+
   padding: 15px;
   box-sizing: border-box;
   position: sticky;
-  top: 80px;
-  max-height: calc(100vh - 140px);
+  top: 20px;
+  max-height: calc(100vh - 100px);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.left-sidebar {
+  margin-top: 20px;
+  flex: 1;
+  max-height: calc(100vh - 170px);
+  padding: 15px;
+  box-sizing: border-box;
+  position: sticky;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -238,14 +274,12 @@ watch(date, fetchArticles)
   }
 
   .menu-wrapper {
-    min-height: calc(100vh - 140px);
+    height: 100%;
     margin: 0;
     padding: 0;
     list-style: none;
-    max-height: 100%;
     scrollbar-width: none;
     -ms-overflow-style: none;
-
     &::-webkit-scrollbar {
       width: 0;
       height: 0;
