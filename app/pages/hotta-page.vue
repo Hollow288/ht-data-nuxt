@@ -12,7 +12,7 @@
             <img src="/favicon.ico">
             <div class="user-details">
               <h4>Tower of Fantasy</h4>
-              <p >Hollow288/hotta-data-builder</p>
+              <a href="https://github.com/Hollow288/hotta-data-builder" target="_blank">Hollow288/hotta-data-builder</a>
             </div>
           </div>
         </div>
@@ -68,19 +68,72 @@
       </div>
     </div>
     <aside class="left-sidebar">
+      <div class="right-main">
+        <header class="header">
+          <h4 class="title">Search</h4>
+          <small class="subtitle">Search by name and/or type</small>
+          <div class="input-wrapper">
+
+            <n-popover
+                trigger="click"
+                placement="bottom"
+                v-model:show="popoverVisible"
+                :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }"
+                style="max-width: 200px; background-color: rgba(255, 255, 255, 0.5);box-sizing: border-box;padding:0"
+            >
+              <template #trigger>
+                <i class="ri-filter-3-line" :class="{ 'active': popoverVisible }"></i>
+              </template>
+
+              <template #header >
+                <n-text strong depth="1">Type filter</n-text>
+              </template>
+
+
+              <div class="filter-group">
+                <p>Rarity:</p>
+                <div class="button-group">
+                  <NButton color="#9E8BA8" :dashed="artifactRarity!=='SSR'" size="tiny" @click="changeArtifactRarity('SSR')">SSR</NButton>
+                  <NButton color="#9E8BA8" :dashed="artifactRarity!=='SR'" size="tiny" @click="changeArtifactRarity('SR')">SR</NButton>
+                </div>
+              </div>
+
+            </n-popover>
+            <input type="text" name="filter" id="filter" placeholder="Search" />
+          </div>
+        </header>
+        <div class="bottom">
+          <n-virtual-list style="max-height: 240px" :item-size="42" :items="items">
+            <template #default="{ item }">
+              <div :key="item.key" class="item" style="height: 42px">
+                <img class="avatar" :src="item.avatar" alt="">
+                <span> {{ item.value }}</span>
+              </div>
+            </template>
+          </n-virtual-list>
+        </div>
+      </div>
+
+
+
     </aside>
   </div>
 </template>
 
 <script setup lang="ts">
 
-
+import {NButton, NPopover, NText, NVirtualList} from 'naive-ui'
 import {apiFetch} from "~/utils/apiFetch";
 import type {ImageInfo} from "~/types/api";
+import { ref } from 'vue'
 
+// n-popover是否打开
+const popoverVisible = ref(false)
 const loading = ref(false)
 const thisPageName = ref<string>('artifact')
 const images = ref<ImageInfo[]>([])
+// artifact filter
+const artifactRarity = ref<string>('')
 
 const toCorrespondingPage = async (pageName: string) => {
   thisPageName.value = pageName
@@ -89,6 +142,29 @@ const toCorrespondingPage = async (pageName: string) => {
   images.value = await apiFetch('/api/artifacts')
   debugger
 }
+
+const changeArtifactRarity = async (rarity: string) => {
+  if (artifactRarity.value === rarity) {
+    artifactRarity.value = ''
+  }else{
+    artifactRarity.value = rarity
+  }
+}
+
+
+const avatars = [
+  'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
+  'https://avatars.githubusercontent.com/u/20943608?s=60&v=4',
+  'https://avatars.githubusercontent.com/u/46394163?s=60&v=4',
+  'https://avatars.githubusercontent.com/u/39197136?s=60&v=4',
+  'https://avatars.githubusercontent.com/u/19239641?s=60&v=4'
+]
+
+const items = Array.from({ length: 10000 }, (_, i) => ({
+  key: `${i}`,
+  value: i,
+  avatar: avatars[i % avatars.length]
+}))
 
 
 
@@ -121,6 +197,8 @@ const toCorrespondingPage = async (pageName: string) => {
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+  cursor: default;
 
   &:hover {
     transform: translateY(-4px);
@@ -209,8 +287,13 @@ const toCorrespondingPage = async (pageName: string) => {
       font-size: 18px;
     }
 
-    p {
+    a {
       font-size: 11px;
+      color: white;
+    }
+
+    a:hover{
+      color: #4da6ff;;
     }
   }
 
@@ -350,6 +433,104 @@ const toCorrespondingPage = async (pageName: string) => {
       background: rgba(71, 32, 84, 0.5);
     }
   }
+}
+
+
+.right-main{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+
+.title {
+  margin: 0;
+}
+
+.subtitle {
+  display: inline-block;
+  margin: 5px 0 20px;
+  opacity: 0.8;
+}
+
+.header {
+  background-color: #9E8BA8;
+  color: #fff;
+  padding: 30px 20px;
+}
+
+.header input {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 0;
+  border-radius: 50px;
+  color: #fff;
+  font-size: 14px;
+  padding: 10px 15px;
+  width: 100%;
+}
+
+.header input:focus {
+  outline: none;
+}
+
+
+
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-wrapper i {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.input-wrapper i:hover{
+  color: #FFF;
+}
+
+
+.filter-group {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  flex: 1;
+}
+
+
+.filter-group p {
+  width: 60px;
+  margin: 0;
+  line-height: 24px;
+  font-weight: 500;
+}
+
+.input-wrapper i.active {
+  color: #fff;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+}
+.avatar {
+  width: 28px;
+  border-radius: 50%;
+  margin-right: 10px;
 }
 
 @media (max-height: 600px) {

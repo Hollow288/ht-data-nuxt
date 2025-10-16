@@ -1,15 +1,30 @@
 <template>
   <header class="header">
+      <button class="back-btn" @click="goBack" aria-label="返回">
+        <i class="ri-arrow-left-line"></i>
+      </button>
       <nav>
         <ul class="main-menu">
-          <li><a href="#section-2">Index</a></li>
-          <li><a href="#section-5">Blog</a></li>
-          <li><a href="#section-7">Work</a></li>
-          <li><a href="#section-9">Blog</a></li>
-          <li><a href="#main-footer">Contact</a></li>
+          <li>
+            <NuxtLink to="/" active-class="active-link">Index</NuxtLink>
+          </li>
+          <li>
+            <NuxtLink to="/blog-page" active-class="active-link">Blog</NuxtLink>
+          </li>
+          <li>
+            <NuxtLink to="/hotta-page" active-class="active-link">Hotta</NuxtLink>
+          </li>
+          <li>
+            <NuxtLink to="/about" active-class="active-link">About</NuxtLink>
+          </li>
         </ul>
+
       </nav>
-    </header>
+    <div class="title">
+      1234
+    </div>
+    <ProgressBar />
+  </header>
 </template>
 
 <script setup lang="ts">
@@ -35,7 +50,9 @@ const goBack = () => {
   align-items: center;
   font-size: 1rem;
   z-index: 10;
-  justify-content: center;
+  justify-content: space-between;
+  user-select: none;
+  cursor: default;
 }
 
 
@@ -76,16 +93,48 @@ const goBack = () => {
   font-size: 0.875em;
   text-decoration: none;
   padding-bottom: 0.75em;
-  transition: color 0.2s, border-bottom 0.2s;
+  transition: color 0.2s;
+  position: relative;
+  color: white;
+  cursor: pointer;
 }
 
+
+.main-menu li a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0.1875em;
+  background-color: #4da6ff;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+
 .main-menu li a:hover {
-  color: #fce38a;
-  border-bottom: 0.1875em solid #fce38a;
+  color: #4da6ff;
+}
+
+.main-menu li a:hover::after {
+  transform: scaleX(1);
 }
 
 .main-menu li a span {
   font-size: 1.2em;
+}
+
+.title{
+  font-size: 25px;
+  font-weight: bold;
+  margin-right: 15px;
+}
+
+
+.main-menu li a.active-link {
+  color: #4da6ff;
 }
 
 

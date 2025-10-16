@@ -9,7 +9,7 @@
     <FooterBar/>
     <FanMenu/>
     <PaintClickEffect />
-    <ProgressBar />
+
 
     <!-- Loading 层始终在最上层 -->
     <div

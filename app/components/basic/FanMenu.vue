@@ -17,6 +17,7 @@
             v-if="item.to"
             :to="item.to"
             class="btn-icon"
+            exact-active-class="active-link"
         >
           <span class="label">{{ item.label }}</span>
         </NuxtLink>
@@ -189,6 +190,8 @@ onBeforeUnmount(() => {
   width: 3em;
   height: 3em;
   z-index: 1000;
+  user-select: none;
+  cursor: default;
 
   .btn {
     position: absolute;
@@ -246,6 +249,11 @@ onBeforeUnmount(() => {
       font-family: "Bungee", sans-serif;
     }
 
+    &.active-link {
+      .label {
+        color: #4da6ff;
+      }
+    }
 
   }
 
@@ -254,6 +262,8 @@ onBeforeUnmount(() => {
   }
 
 }
+
+
 
 $icon-count: 7;
 $distance: 70px;

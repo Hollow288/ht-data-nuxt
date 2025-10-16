@@ -9,9 +9,9 @@ const store = useProgressStore()
 
 <style scoped>
 .progress-bar {
-  height: 4px;
+  height: 3px;
   position: fixed;
-  top: 60px; /* Header 高度 */
+  top: 60px;
   left: 0;
   z-index: 9999;
   width: 0;

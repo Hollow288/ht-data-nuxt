@@ -132,7 +132,7 @@ const fetchArticles = async () => {
       if (firstGroup && firstGroup.length > 0) {
         const firstDate = firstGroup[0]!.yearMonth  // 非空断言
         expandedYears.value.push(firstYear)
-        selectDate(firstDate)
+        await selectDate(firstDate)
       }
     }
 
@@ -234,6 +234,8 @@ watch(date, fetchArticles)
   position: sticky;
   top: 40px;
   height: calc(100vh - 100px );
+  user-select: none;
+  cursor: default;
 }
 
 .left-sidebar-name {

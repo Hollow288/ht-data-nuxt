@@ -111,8 +111,8 @@ watch(articleId, selectDate)
   padding: 15px;
   box-sizing: border-box;
   position: sticky;
-  top: 80px;
-  max-height: calc(100vh - 140px);
+  top: 20px;
+  max-height: calc(100vh - 100px);
 
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);

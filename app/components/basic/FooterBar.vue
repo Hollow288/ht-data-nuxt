@@ -51,7 +51,7 @@
 }
 
 .footer a:hover {
-  color: #8e8c8c;
+  color: #4da6ff;
 }
 
 .footer span {
