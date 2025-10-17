@@ -1,79 +1,73 @@
 <template>
   <div class="page-layout">
-    <!-- 左侧栏 -->
-    <aside class="left-sidebar">
-      <div class="muck-up">
-        <div class="overlay"></div>
-        <div class="top">
-          <div class="nav">
+
+    <aside class="sidebar sidebar--left">
+      <div class="menu-panel">
+        <div class="menu-panel__overlay"></div>
+        <div class="profile-card">
+          <div class="profile-card__nav">
             <p>Hotta</p>
           </div>
-          <div class="user-profile">
-            <img src="/favicon.ico">
-            <div class="user-details">
+          <div class="profile-card__user">
+            <img src="/favicon.ico" class="profile-card__avatar">
+            <div class="profile-card__details">
               <h4>Tower of Fantasy</h4>
               <a href="https://github.com/Hollow288/hotta-data-builder" target="_blank">Hollow288/hotta-data-builder</a>
             </div>
           </div>
         </div>
-        <div class="bottom">
-          <div class="title">
+
+        <div class="menu">
+          <div class="menu__header">
             <h3>MENU</h3>
             <small>Updated: 8,2025</small>
           </div>
-          <ul class="tasks">
-            <li class="one red" @click="toCorrespondingPage('artifact')">
+          <ul class="menu__list">
+            <li class="menu__item menu__item--red" @click="toCorrespondingPage('artifact')">
               <span class="task-title">源器</span>
               <span class="task-cat">图片、星级效果</span>
-
             </li>
-            <li class="one red">
+            <li class="menu__item menu__item--red">
               <span class="task-title">Catch up with Brian</span>
               <span class="task-cat">Mobile Project</span>
-
             </li>
-            <li class="two green">
+            <li class="menu__item menu__item--green">
               <span class="task-title">Design Explorations</span>
               <span class="task-cat">Company Web site</span>
-
             </li>
-            <li class="tow green">
+            <li class="menu__item menu__item--green">
               <span class="task-title">Team Meeting</span>
               <span class="task-cat">Hangouts</span>
             </li>
-            <li class="tow green">
+            <li class="menu__item menu__item--green">
               <span class="task-title">Team Meeting</span>
               <span class="task-cat">Hangouts</span>
             </li>
-            <li class="tow green">
+            <li class="menu__item menu__item--green">
               <span class="task-title">Team Meeting</span>
               <span class="task-cat">Hangouts</span>
             </li>
-
-
-
           </ul>
         </div>
       </div>
     </aside>
 
-
-    <div class="card-container" v-if="loading">
-      <div v-if="loading" class="loading">{{'加载中...'}}</div>
-    </div>
-    <div v-else class="card-container">
-      <div v-for="img in images" :key="img.name" class="card">
-        <img :src="img.url" :alt="img.name" loading="lazy" />
-        <div class="caption">{{ img.name }}</div>
+    <div class="gallery-container">
+      <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
+      <div v-else class="gallery-grid">
+        <div v-for="img in images" :key="img.name" class="gallery-card">
+          <img :src="img.url" :alt="img.name" class="gallery-card__image" loading="lazy"/>
+          <div class="gallery-card__caption">{{ img.name }}</div>
+        </div>
       </div>
     </div>
-    <aside class="left-sidebar">
-      <div class="right-main">
-        <header class="header">
-          <h4 class="title">Search</h4>
-          <small class="subtitle">Search by name and/or type</small>
-          <div class="input-wrapper">
 
+    <aside class="sidebar sidebar--right">
+      <div class="search-panel">
+        <header class="search-panel__header">
+          <h4 class="search-panel__title">Search</h4>
+          <small class="search-panel__subtitle">Search by name and/or type</small>
+          <div class="search-panel__input-wrapper">
             <n-popover
                 trigger="click"
                 placement="bottom"
@@ -84,12 +78,9 @@
               <template #trigger>
                 <i class="ri-filter-3-line" :class="{ 'active': popoverVisible }"></i>
               </template>
-
-              <template #header >
+              <template #header>
                 <n-text strong depth="1">Type filter</n-text>
               </template>
-
-
               <div class="filter-group">
                 <p>Rarity:</p>
                 <div class="button-group">
@@ -97,82 +88,87 @@
                   <NButton color="#9E8BA8" :dashed="artifactRarity!=='SR'" size="tiny" @click="changeArtifactRarity('SR')">SR</NButton>
                 </div>
               </div>
-
             </n-popover>
-            <input type="text" name="filter" id="filter" placeholder="Search" />
+            <input type="text" name="filter" id="filter" placeholder="Search"/>
           </div>
         </header>
-        <div class="bottom">
-          <n-virtual-list style="max-height: 240px" :item-size="42" :items="items">
+        <div class="search-panel__content">
+          <n-virtual-list style="height: 100%" :item-size="50" :items="items">
             <template #default="{ item }">
-              <div :key="item.key" class="item" style="height: 42px">
-                <img class="avatar" :src="item.avatar" alt="">
-                <span> {{ item.value }}</span>
+              <div :key="item.artifactKey" class="result-item" >
+                <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt="">
+                <div class="result-item__details">
+                  <span class="task-title">{{ item.artifactName }}</span>
+                  <span class="task-cat">{{ item.artifactRarity }}</span>
+                </div>
               </div>
             </template>
           </n-virtual-list>
         </div>
       </div>
-
-
-
     </aside>
   </div>
 </template>
 
 <script setup lang="ts">
-
 import {NButton, NPopover, NText, NVirtualList} from 'naive-ui'
-import {apiFetch} from "~/utils/apiFetch";
-import type {ImageInfo} from "~/types/api";
+// import {apiFetch} from "~/utils/apiFetch"; // 假设的 API 调用
+// import type {ImageInfo} from "~/types/api"; // 假设的类型
 import { ref } from 'vue'
+import type {BlogDateMenuItem, BlogDateMenuRes} from "~/types/api";
+
+// 假设的类型定义
+interface ImageInfo {
+  name: string;
+  url: string;
+}
 
 // n-popover是否打开
 const popoverVisible = ref(false)
 const loading = ref(false)
 const thisPageName = ref<string>('artifact')
 const images = ref<ImageInfo[]>([])
+const items = ref([])
 // artifact filter
 const artifactRarity = ref<string>('')
 
 const toCorrespondingPage = async (pageName: string) => {
   thisPageName.value = pageName
-  console.log(thisPageName.value)
+debugger
+  loading.value = true
+  try {
+    const artifactList: BlogDateMenuRes = await apiFetch('http://127.0.0.1:5777/api/v1/artifact', {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-KEY': 'AIzaSyBWlLk7GqJ-6sNOjFY2ZKWy2IJd7evlhAY'
+      }
+    })
+    items.value = artifactList.data
 
-  images.value = await apiFetch('/api/artifacts')
-  debugger
+
+
+
+  } catch (error) {
+    console.error('获取日期数据失败', error)
+  } finally {
+    loading.value = false
+  }
+
 }
 
 const changeArtifactRarity = async (rarity: string) => {
   if (artifactRarity.value === rarity) {
     artifactRarity.value = ''
-  }else{
+  } else {
     artifactRarity.value = rarity
   }
 }
 
 
-const avatars = [
-  'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
-  'https://avatars.githubusercontent.com/u/20943608?s=60&v=4',
-  'https://avatars.githubusercontent.com/u/46394163?s=60&v=4',
-  'https://avatars.githubusercontent.com/u/39197136?s=60&v=4',
-  'https://avatars.githubusercontent.com/u/19239641?s=60&v=4'
-]
-
-const items = Array.from({ length: 10000 }, (_, i) => ({
-  key: `${i}`,
-  value: i,
-  avatar: avatars[i % avatars.length]
-}))
-
-
-
 </script>
 
+
 <style scoped lang="scss">
-
-
 
 .page-layout {
   display: flex;
@@ -182,17 +178,15 @@ const items = Array.from({ length: 10000 }, (_, i) => ({
   flex-direction: row;
 }
 
-
-
-.left-sidebar {
+.sidebar {
   flex: 0 0 25%;
   min-height: calc(100vh - 160px);
+  max-height: calc(100vh - 160px);
   min-width: 180px;
   max-width: 300px;
   box-sizing: border-box;
   position: sticky;
   top: 80px;
-  max-height: calc(100vh - 160px);
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -206,7 +200,19 @@ const items = Array.from({ length: 10000 }, (_, i) => ({
   }
 }
 
-.card-container {
+/* Reusable text styles */
+.task-title {
+  font-size: 13px;
+  display: inline-block;
+}
+
+.task-cat {
+  font-size: 10px;
+  display: block;
+  color: #888;
+}
+
+.gallery-container {
   min-height: calc(100vh - 160px);
   overflow-y: auto;
   width: clamp(300px, 60%, 1000px);
@@ -220,7 +226,7 @@ const items = Array.from({ length: 10000 }, (_, i) => ({
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
   }
 
-  .loading, .empty {
+  &__status {
     text-align: center;
     color: #999;
     margin-top: 50px;
@@ -228,101 +234,94 @@ const items = Array.from({ length: 10000 }, (_, i) => ({
   }
 }
 
-
-
-.muck-up {
+.menu-panel {
   display: flex;
   flex-direction: column;
   height: 100%;
   position: relative;
 
-
-  > .top {
-    position: relative;
-    min-height: 200px;
-    max-height: 200px;
-    padding: 15px;
-    color: #fff;
-    overflow: hidden;
-
+  &__overlay {
+    background: url() no-repeat top / contain;
+    position: absolute;
+    inset: 0;
 
     &:after {
       content: '';
       position: absolute;
-      top: 170px;
-      background: #fff;
-      left: -22px;
-      right: 0;
-      height: 60px;
-      transform: rotate(10deg);
-      width: 388px;
-      z-index: 2;
+      inset: 0;
+      background: rgba(71, 32, 84, 0.5);
     }
   }
+}
 
-  .nav p {
+.profile-card {
+  position: relative;
+  min-height: 200px;
+  max-height: 200px;
+  padding: 15px;
+  color: #fff;
+  overflow: hidden;
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 170px;
+    background: #fff;
+    left: -22px;
+    height: 60px;
+    transform: rotate(10deg);
+    width: 388px;
+    z-index: 2;
+  }
+
+  &__nav p {
     margin: 2px 0 0 0;
     display: inline-block;
     vertical-align: bottom;
   }
 
-  .user-profile {
+  &__user {
     margin-left: 10px;
-
-    img {
-      height: 45px;
-      width: 45px;
-      border-radius: 50%;
-      float: left;
-      margin-right: 24px;
-      margin-top: 19px;
-    }
   }
 
-  .user-details {
+  &__avatar {
+    height: 45px;
+    width: 45px;
+    border-radius: 50%;
+    float: left;
+    margin-right: 24px;
+    margin-top: 19px;
+  }
+
+  &__details {
     float: left;
     vertical-align: bottom;
-
-    h4 {
-      font-size: 18px;
-    }
-
+    h4 { font-size: 18px; }
     a {
       font-size: 11px;
       color: white;
-    }
-
-    a:hover{
-      color: #4da6ff;;
+      &:hover { color: #4da6ff; }
     }
   }
+}
 
+.menu {
+  background-color: #fff;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+  position: relative;
+  color: #222;
+  min-height: 0;
+  height: 100%;
 
-  .bottom {
-    background-color: #fff;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    z-index: 1;
-    position: relative;
-    color: #222;
-    min-height: 0;
-    height: 100%;
-
-    ul, ol {
-      list-style: none;
-      padding-left: 0;
-      margin-left: 0;
-    }
-  }
-
-  .title {
+  &__header {
     h3 {
       font-size: 22px;
       margin-bottom: 5px;
       margin-left: 35px;
     }
-
     small {
       font-size: 10px;
       color: #888;
@@ -332,15 +331,13 @@ const items = Array.from({ length: 10000 }, (_, i) => ({
     }
   }
 
-
-  ul.tasks {
+  &__list {
     flex: 1;
     overflow-y: auto;
-    padding-bottom: 20px;
+    padding: 0 0 20px 0;
     margin: 0;
-    padding-left: 0;
+    list-style: none;
     position: relative;
-
 
     &::after {
       content: '';
@@ -351,158 +348,97 @@ const items = Array.from({ length: 10000 }, (_, i) => ({
       left: 20px;
       top: 30px;
     }
-
-    .task-title {
-      font-size: 13px;
-      display: inline-block;
-    }
-
-    .task-time {
-      float: right;
-      font-size: 10px;
-      color: #888;
-    }
-
-    .task-cat {
-      font-size: 10px;
-      display: block;
-      color: #888;
-    }
-
-    li {
-      padding: 8px 35px;
-      position: relative;
-      z-index: 8;
-      cursor: pointer;
-      transition: background 0.3s;
-      flex: 1 1 auto;
-      overflow-y: auto;
-      padding-right: 12px;
-      margin: 0;
-      list-style: none;
-
-      &:hover {
-        background-color: rgba(128, 128, 128, 0.1);
-      }
-
-
-      &:after {
-        content: '';
-        position: absolute;
-        left: 17px;
-        top: 24px;
-        height: 8px;
-        width: 8px;
-        border-radius: 50%;
-      }
-
-      &.red:after { background: #FF3163; }
-      &.green:after { background: #54D6C7; }
-      &.yellow:after { background: #EAB429; }
-
-      &.hang {
-        margin-bottom: 48px;
-
-        img {
-          float: left;
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          margin-right: 8px;
-        }
-      }
-    }
   }
 
+  &__item {
+    padding: 8px 12px 8px 35px;
+    position: relative;
+    z-index: 8;
+    cursor: pointer;
+    transition: background 0.3s;
 
-  .overlay {
-    background: url() no-repeat top / contain;
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
+    &:hover { background-color: rgba(128, 128, 128, 0.1); }
 
     &:after {
       content: '';
       position: absolute;
-      left: 0;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(71, 32, 84, 0.5);
+      left: 17px;
+      top: 24px;
+      height: 8px;
+      width: 8px;
+      border-radius: 50%;
     }
+
+    &--red:after { background: #FF3163; }
+    &--green:after { background: #54D6C7; }
+    &--yellow:after { background: #EAB429; }
   }
 }
 
-
-.right-main{
+.search-panel {
   display: flex;
   flex-direction: column;
   height: 100%;
+
+  &__header {
+    background-color: #9E8BA8;
+    color: #fff;
+    padding: 30px 20px;
+  }
+
+  &__title { margin: 0; }
+  &__subtitle {
+    display: inline-block;
+    margin: 5px 0 20px;
+    opacity: 0.8;
+  }
+
+  &__input-wrapper {
+    position: relative;
+    width: 100%;
+
+    input {
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 0;
+      border-radius: 50px;
+      color: #fff;
+      font-size: 14px;
+      padding: 10px 15px;
+      width: 100%;
+      &:focus { outline: none; }
+    }
+
+    i {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 18px;
+      cursor: pointer;
+      &:hover, &.active { color: #FFF; }
+    }
+  }
+
+  &__content {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+  }
 }
-
-
-.title {
-  margin: 0;
-}
-
-.subtitle {
-  display: inline-block;
-  margin: 5px 0 20px;
-  opacity: 0.8;
-}
-
-.header {
-  background-color: #9E8BA8;
-  color: #fff;
-  padding: 30px 20px;
-}
-
-.header input {
-  background-color: rgba(0, 0, 0, 0.3);
-  border: 0;
-  border-radius: 50px;
-  color: #fff;
-  font-size: 14px;
-  padding: 10px 15px;
-  width: 100%;
-}
-
-.header input:focus {
-  outline: none;
-}
-
-
-
-
-.input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.input-wrapper i {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.input-wrapper i:hover{
-  color: #FFF;
-}
-
 
 .filter-group {
   display: flex;
   align-items: flex-start;
   margin-bottom: 10px;
   gap: 8px;
+  p {
+    width: 60px;
+    margin: 0;
+    line-height: 24px;
+    font-weight: 500;
+  }
 }
-
 
 .button-group {
   display: flex;
@@ -511,32 +447,34 @@ const items = Array.from({ length: 10000 }, (_, i) => ({
   flex: 1;
 }
 
-
-.filter-group p {
-  width: 60px;
-  margin: 0;
-  line-height: 24px;
-  font-weight: 500;
-}
-
-.input-wrapper i.active {
-  color: #fff;
-}
-
-.item {
+.result-item {
   display: flex;
   align-items: center;
-}
-.avatar {
-  width: 28px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
+  height: 50px;
+  box-sizing: border-box;
 
-@media (max-height: 600px) {
-  .muck-up > .top {
-    display: none;
+  &:hover {
+    background-color: rgba(128, 128, 128, 0.1);
+    cursor: pointer;
+  }
+
+  &__avatar {
+    margin-left: 10px;
+    width: 28px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
   }
 }
 
+
+@media (max-height: 600px) {
+  .profile-card {
+    display: none;
+  }
+}
 </style>

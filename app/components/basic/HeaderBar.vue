@@ -14,9 +14,6 @@
           <li>
             <NuxtLink to="/hotta-page" active-class="active-link">Hotta</NuxtLink>
           </li>
-          <li>
-            <NuxtLink to="/about" active-class="active-link">About</NuxtLink>
-          </li>
         </ul>
 
       </nav>

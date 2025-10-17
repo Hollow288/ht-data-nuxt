@@ -7,8 +7,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@pinia/nuxt'],
   vite: {
-    plugins: [tsconfigPaths()]
+    plugins: [tsconfigPaths()],
   },
   css: ['~/assets/css/global.css',
-    'remixicon/fonts/remixicon.css'],
+    'remixicon/fonts/remixicon.css']
 })
