@@ -4,8 +4,10 @@ import {NButton, NPopover, NText, NVirtualList} from "naive-ui";
 import {ref} from "vue";
 import type {ImageInfo} from "~/types/api";
 import type {ArtifactListDto, ArtifactListDtoRes} from "~/types/artifact";
+import { onMounted } from 'vue'
 
 const searchText = ref<string>('')
+const thisShowKey = ref<string>('')
 const images = ref<ImageInfo[]>([])
 const popoverVisible = ref(false)
 const loading = ref(false)
@@ -18,13 +20,10 @@ const artifactRarity = ref<string>('')
 const changeArtifactRarity = async (rarity: string) => {
   if (artifactRarity.value === rarity) {
     artifactRarity.value = ''
-
-    await queryArtifactList()
   } else {
     artifactRarity.value = rarity
-
-    await queryArtifactList()
   }
+  await queryArtifactList()
 }
 
 const onInputArtifactSearch = () => {
@@ -50,6 +49,20 @@ const queryArtifactList = async() =>{
 
   onInputArtifactSearch()
 }
+
+const showThisArtifactInfo = async (artifactKey : string) => {
+  thisShowKey.value = artifactKey
+
+}
+
+const initializePage = async() => {
+  await queryArtifactList()
+
+};
+
+onMounted(async () => {
+  await initializePage();
+});
 
 </script>
 
@@ -97,7 +110,7 @@ const queryArtifactList = async() =>{
       <div class="search-panel__content">
         <n-virtual-list style="height: 100%" :item-size="50" :items="items">
           <template #default="{ item }">
-            <div :key="item.artifactKey" class="result-item" >
+            <div :key="item.artifactKey" class="result-item" :class="{'active': thisShowKey === item.artifactKey}" @click="showThisArtifactInfo(item.artifactKey)">
               <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt="">
               <div class="result-item__details">
                 <span class="task-title">{{ item.artifactName }}</span>
@@ -167,6 +180,10 @@ const queryArtifactList = async() =>{
   &:hover {
     background-color: rgba(128, 128, 128, 0.1);
     cursor: pointer;
+  }
+
+  .active{
+    background-color: rgba(128, 128, 128, 0.1);
   }
 
   &__avatar {

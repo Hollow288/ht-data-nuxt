@@ -23,10 +23,16 @@
             <small>Updated: 8,2025</small>
           </div>
           <ul class="menu__list">
-            <li class="menu__item menu__item--red" @click="navigateTo('/hotta-page/artifact')">
-              <span class="task-title">源器</span>
-              <span class="task-cat">图片、星级效果</span>
-            </li>
+
+
+              <NuxtLink to="/hotta-page/artifact" active-class="active-link">
+                <li class="menu__item menu__item--red">
+                <span class="task-title">源器</span>
+                <span class="task-cat">图片、星级效果</span>
+                </li>
+              </NuxtLink>
+
+
             <li class="menu__item menu__item--red">
               <span class="task-title">Catch up with Brian</span>
               <span class="task-cat">Mobile Project</span>
@@ -59,7 +65,15 @@
 
 <script setup lang="ts">
 
+import {onMounted} from "vue";
 
+const initializePage = ()=> {
+  navigateTo('/hotta-page/artifact')
+}
+
+onMounted(() => {
+  initializePage();
+});
 </script>
 
 
@@ -229,6 +243,16 @@
       background: #eee;
       left: 20px;
       top: 30px;
+    }
+
+    a{
+      display: block;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .active-link{
+      background-color: rgba(128, 128, 128, 0.1);
     }
   }
 

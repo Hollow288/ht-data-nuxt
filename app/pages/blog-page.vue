@@ -59,7 +59,8 @@
 
 <script setup lang="ts">
 // ===================== 路由相关 =====================
-import type {BlogDateListRes, BlogDateMenuItem, BlogDateMenuRes, BlogItem} from "~/types/api";
+
+import type {BlogDateListRes, BlogDateMenuItem, BlogDateMenuRes, BlogItem} from "~/types/blog";
 
 const route = useRoute()
 const router = useRouter()
