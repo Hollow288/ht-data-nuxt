@@ -8,3 +8,14 @@ export interface ArtifactListDto {
     artifactThumbnail: string
 }
 export type ArtifactListDtoRes = BaseRes<ArtifactListDto[]>
+
+
+export interface Artifact {
+    artifactKey: string
+    artifactName: string
+    artifactRarity: string
+    useDescription: string
+    artifactIcon: string
+    artifactDetail: string[]
+}
+export type ArtifactRes = BaseRes<Artifact>

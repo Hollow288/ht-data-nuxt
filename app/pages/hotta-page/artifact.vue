@@ -3,16 +3,18 @@
 import {NButton, NPopover, NText, NVirtualList} from "naive-ui";
 import {ref} from "vue";
 import type {ImageInfo} from "~/types/api";
-import type {ArtifactListDto, ArtifactListDtoRes} from "~/types/artifact";
+import type {Artifact, ArtifactListDto, ArtifactListDtoRes, ArtifactRes} from "~/types/artifact";
 import { onMounted } from 'vue'
 
 const searchText = ref<string>('')
-const thisShowKey = ref<string>('')
+const thisShowKey = ref<string | undefined>()
 const images = ref<ImageInfo[]>([])
 const popoverVisible = ref(false)
 const loading = ref(false)
 const items = ref<ArtifactListDto[]>([])
 const allItems = ref<ArtifactListDto[]>([])
+const thisArtifactInfo = ref<Artifact>()
+const artifactRes = ref<ArtifactRes>()
 
 // artifact filter
 const artifactRarity = ref<string>('')
@@ -50,14 +52,33 @@ const queryArtifactList = async() =>{
   onInputArtifactSearch()
 }
 
-const showThisArtifactInfo = async (artifactKey : string) => {
-  thisShowKey.value = artifactKey
+const findArtifactInfoByKey = async() =>{
+  const artifactRes : ArtifactRes = await apiFetch(
+      `http://127.0.0.1:5777/api/v1/artifact/${thisShowKey.value}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': 'AIzaSyBWlLk7GqJ-6sNOjFY2ZKWy2IJd7evlhAY'
+        }
+      }
+  );
 
+  thisArtifactInfo.value = artifactRes.data
+
+  debugger
+}
+
+const showThisArtifactInfo = async (artifactKey : string) => {
+  debugger
+  thisShowKey.value = artifactKey
 }
 
 const initializePage = async() => {
   await queryArtifactList()
-
+  if (allItems.value.length > 0) {
+    thisShowKey.value = allItems.value[0]?.artifactKey
+  }
+  await findArtifactInfoByKey()
 };
 
 onMounted(async () => {
@@ -69,10 +90,19 @@ onMounted(async () => {
 <template>
   <div class="gallery-container">
     <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
-    <div v-else class="gallery-grid">
-      <div v-for="img in images" :key="img.name" class="gallery-card">
-        <img :src="img.url" :alt="img.name" class="gallery-card__image" loading="lazy"/>
-        <div class="gallery-card__caption">{{ img.name }}</div>
+    <div v-else class="gallery-container__content">
+      <div class="gallery-container__content__left">
+          <img width="150" :src="thisArtifactInfo?.artifactIcon" :alt="thisArtifactInfo?.artifactName" class="gallery-card__image" loading="lazy"/>
+          <div class="level">{{thisArtifactInfo?.artifactRarity}}</div>
+          <div class="name">{{thisArtifactInfo?.artifactName}}</div>
+          <div class="description">
+            &nbsp;{{thisArtifactInfo?.useDescription}}
+          </div>
+
+
+      </div>
+      <div style="width: 60%;background-color: #eab429">
+
       </div>
     </div>
   </div>
@@ -168,6 +198,38 @@ onMounted(async () => {
     margin-top: 50px;
     font-size: 1rem;
   }
+
+  &__content {
+    display: flex;
+    height: 100%;
+
+    &__left {
+      width: 40%; display: flex; justify-content: center; align-items: center; flex-direction: column; height: 100%;
+
+
+      .level {
+        text-transform: uppercase;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 3px;
+        color: #EC9B3B;
+      }
+
+      .name {
+        font-size: 26px;
+        color: black;
+        font-weight: 900;
+        margin-bottom: 5px;
+      }
+
+      .description {
+        position: relative;
+        padding: 20px 20px 15px;
+      }
+    }
+
+
+  }
 }
 
 
@@ -182,7 +244,7 @@ onMounted(async () => {
     cursor: pointer;
   }
 
-  .active{
+  &.active{
     background-color: rgba(128, 128, 128, 0.1);
   }
 
@@ -281,6 +343,13 @@ onMounted(async () => {
   font-size: 10px;
   display: block;
   color: #888;
+}
+
+
+@media (max-height: 600px) {
+  .search-panel__header {
+    display: none;
+  }
 }
 
 </style>
