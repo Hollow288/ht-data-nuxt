@@ -89,13 +89,13 @@ onMounted(() => {
 
 .sidebar {
   flex: 0 0 25%;
-  min-height: calc(100vh - 160px);
-  max-height: calc(100vh - 160px);
+  min-height: calc(100vh - 100px);
+  max-height: calc(100vh - 100px);
   min-width: 180px;
   max-width: 300px;
   box-sizing: border-box;
   position: sticky;
-  top: 80px;
+  top: 40px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);

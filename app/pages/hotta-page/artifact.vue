@@ -4,7 +4,8 @@ import {NButton, NPopover, NText, NVirtualList} from "naive-ui";
 import {ref} from "vue";
 import type {ImageInfo} from "~/types/api";
 import type {Artifact, ArtifactListDto, ArtifactListDtoRes, ArtifactRes} from "~/types/artifact";
-import { onMounted } from 'vue'
+import {onMounted} from 'vue'
+import {replaceTagWithColor} from "~/utils/common";
 
 const searchText = ref<string>('')
 const thisShowKey = ref<string | undefined>()
@@ -29,16 +30,16 @@ const changeArtifactRarity = async (rarity: string) => {
 }
 
 const onInputArtifactSearch = () => {
-  if(searchText.value == '') {
+  if (searchText.value == '') {
     items.value = allItems.value
-  }else{
-    items.value = allItems.value.filter(n=>n.artifactName.indexOf(searchText.value) > -1)
+  } else {
+    items.value = allItems.value.filter(n => n.artifactName.indexOf(searchText.value) > -1)
   }
 }
 
 
-const queryArtifactList = async() =>{
-  const artifactList : ArtifactListDtoRes  = await apiFetch(
+const queryArtifactList = async () => {
+  const artifactList: ArtifactListDtoRes = await apiFetch(
       `http://127.0.0.1:5777/api/v1/artifact/search?artifactRarity=${encodeURIComponent(artifactRarity.value)}`,
       {
         headers: {
@@ -52,8 +53,8 @@ const queryArtifactList = async() =>{
   onInputArtifactSearch()
 }
 
-const findArtifactInfoByKey = async() =>{
-  const artifactRes : ArtifactRes = await apiFetch(
+const findArtifactInfoByKey = async () => {
+  const artifactRes: ArtifactRes = await apiFetch(
       `http://127.0.0.1:5777/api/v1/artifact/${thisShowKey.value}`,
       {
         headers: {
@@ -64,16 +65,17 @@ const findArtifactInfoByKey = async() =>{
   );
 
   thisArtifactInfo.value = artifactRes.data
-
+  // thisArtifactInfo.value.useDescription = replaceTagWithColor(thisArtifactInfo.value.useDescription,'shuzhi','C94F4F')
   debugger
 }
 
-const showThisArtifactInfo = async (artifactKey : string) => {
+const showThisArtifactInfo = async (artifactKey: string) => {
   debugger
   thisShowKey.value = artifactKey
+  await findArtifactInfoByKey()
 }
 
-const initializePage = async() => {
+const initializePage = async () => {
   await queryArtifactList()
   if (allItems.value.length > 0) {
     thisShowKey.value = allItems.value[0]?.artifactKey
@@ -92,17 +94,20 @@ onMounted(async () => {
     <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
     <div v-else class="gallery-container__content">
       <div class="gallery-container__content__left">
-          <img width="150" :src="thisArtifactInfo?.artifactIcon" :alt="thisArtifactInfo?.artifactName" class="gallery-card__image" loading="lazy"/>
-          <div class="level">{{thisArtifactInfo?.artifactRarity}}</div>
-          <div class="name">{{thisArtifactInfo?.artifactName}}</div>
-          <div class="description">
-            &nbsp;{{thisArtifactInfo?.useDescription}}
-          </div>
-
-
+                  <img width="150" :src="thisArtifactInfo?.artifactIcon" :alt="thisArtifactInfo?.artifactName" class="gallery-card__image" loading="lazy"/>
+        <div class="level">{{ thisArtifactInfo?.artifactRarity }}</div>
+        <div class="name">{{ thisArtifactInfo?.artifactName }}</div>
+        <div class="description" v-html="replaceTagWithColor(thisArtifactInfo?.useDescription,'shuzhi','C94F4F')"></div>
       </div>
-      <div style="width: 60%;background-color: #eab429">
+      <div class="gallery-container__content__right">
 
+        <div class="artifact-detail">
+          <span class="level">星级效果：</span>
+          <div v-for="(items,index) in thisArtifactInfo?.artifactDetail" style="margin-bottom: 5px">
+            <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>
+            <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -129,18 +134,24 @@ onMounted(async () => {
             <div class="filter-group">
               <p>Rarity:</p>
               <div class="button-group">
-                <NButton color="#9E8BA8" :dashed="artifactRarity!=='SSR'" size="tiny" @click="changeArtifactRarity('SSR')">SSR</NButton>
-                <NButton color="#9E8BA8" :dashed="artifactRarity!=='SR'" size="tiny" @click="changeArtifactRarity('SR')">SR</NButton>
+                <NButton color="#9E8BA8" :dashed="artifactRarity!=='SSR'" size="tiny"
+                         @click="changeArtifactRarity('SSR')">SSR
+                </NButton>
+                <NButton color="#9E8BA8" :dashed="artifactRarity!=='SR'" size="tiny"
+                         @click="changeArtifactRarity('SR')">SR
+                </NButton>
               </div>
             </div>
           </n-popover>
-          <input type="text" name="filter" id="filter" v-model="searchText" @input="onInputArtifactSearch()" placeholder="Search"/>
+          <input type="text" name="filter" id="filter" v-model="searchText" @input="onInputArtifactSearch()"
+                 placeholder="Search"/>
         </div>
       </header>
       <div class="search-panel__content">
         <n-virtual-list style="height: 100%" :item-size="50" :items="items">
           <template #default="{ item }">
-            <div :key="item.artifactKey" class="result-item" :class="{'active': thisShowKey === item.artifactKey}" @click="showThisArtifactInfo(item.artifactKey)">
+            <div :key="item.artifactKey" class="result-item" :class="{'active': thisShowKey === item.artifactKey}"
+                 @click="showThisArtifactInfo(item.artifactKey)">
               <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt="">
               <div class="result-item__details">
                 <span class="task-title">{{ item.artifactName }}</span>
@@ -154,16 +165,16 @@ onMounted(async () => {
   </aside>
 </template>
 
-<style scoped  lang="scss">
+<style scoped lang="scss">
 .sidebar {
   flex: 0 0 25%;
-  min-height: calc(100vh - 160px);
-  max-height: calc(100vh - 160px);
+  min-height: calc(100vh - 100px);
+  max-height: calc(100vh - 100px);
   min-width: 180px;
   max-width: 300px;
   box-sizing: border-box;
   position: sticky;
-  top: 80px;
+  top: 40px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -179,7 +190,7 @@ onMounted(async () => {
 
 
 .gallery-container {
-  min-height: calc(100vh - 160px);
+  min-height: calc(100vh - 100px);
   overflow-y: auto;
   width: clamp(300px, 60%, 1000px);
   background: rgba(255, 255, 255, 0.9);
@@ -203,9 +214,25 @@ onMounted(async () => {
     display: flex;
     height: 100%;
 
-    &__left {
-      width: 40%; display: flex; justify-content: center; align-items: center; flex-direction: column; height: 100%;
 
+    &__left {
+      width: 40%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+
+      ::after {
+        content: "";
+        position: absolute;
+        top: 10%; /* 控制分割线上下的位置 */
+        bottom: 10%;
+        right: 0;
+        width: 1px;
+        background-image: linear-gradient(to bottom, transparent, #ccc, transparent);
+      }
 
       .level {
         text-transform: uppercase;
@@ -225,7 +252,46 @@ onMounted(async () => {
       .description {
         position: relative;
         padding: 20px 20px 15px;
+        word-break: break-all;
       }
+    }
+
+    &__right {
+      width: 60%;
+      padding: 20px 20px 15px;
+      display: flex;
+
+      .artifact-detail {
+        display: flex;
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: center;
+
+
+        .level {
+          text-transform: uppercase;
+          font-size: 15px;
+          font-weight: 700;
+          margin-bottom: 3px;
+          color: #EC9B3B;
+        }
+
+        .stars {
+          font-size: 12px;
+          width: 80px;
+          display: inline-block;
+          line-height: 1.2;
+          user-select: none;
+        }
+
+        .desc {
+          color: #555;
+          flex: 1;
+          word-break: break-word;
+          align-items: flex-start;
+        }
+      }
+
     }
 
 
@@ -244,7 +310,7 @@ onMounted(async () => {
     cursor: pointer;
   }
 
-  &.active{
+  &.active {
     background-color: rgba(128, 128, 128, 0.1);
   }
 
@@ -273,7 +339,10 @@ onMounted(async () => {
     padding: 30px 20px;
   }
 
-  &__title { margin: 0; }
+  &__title {
+    margin: 0;
+  }
+
   &__subtitle {
     display: inline-block;
     margin: 5px 0 20px;
@@ -292,7 +361,10 @@ onMounted(async () => {
       font-size: 14px;
       padding: 10px 15px;
       width: 100%;
-      &:focus { outline: none; }
+
+      &:focus {
+        outline: none;
+      }
     }
 
     i {
@@ -303,7 +375,10 @@ onMounted(async () => {
       color: rgba(255, 255, 255, 0.7);
       font-size: 18px;
       cursor: pointer;
-      &:hover, &.active { color: #FFF; }
+
+      &:hover, &.active {
+        color: #FFF;
+      }
     }
   }
 
@@ -319,6 +394,7 @@ onMounted(async () => {
   align-items: flex-start;
   margin-bottom: 10px;
   gap: 8px;
+
   p {
     width: 60px;
     margin: 0;
