@@ -50,9 +50,7 @@ watch(() => props.content, () => Prism.highlightAll())
 </script>
 
 <template>
-<!--  <div class="card-container">-->
     <div class="markdown-body" v-html="rendered"></div>
-<!--  </div>-->
 </template>
 
 <style>

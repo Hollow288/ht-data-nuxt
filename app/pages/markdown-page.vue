@@ -28,8 +28,8 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from '#vue-router'
 import MarkdownContent from '~/components/MarkdownContent.vue'
 import MarkdownIt from 'markdown-it'
-import type { BlogPostRes } from '~/types/api'
-import { apiFetch } from '~/utils/apiFetch'
+import {BaseAPI} from '~/utils/api'
+import type {BlogPostRes} from "~/types/blog";
 
 // 路由参数
 const route = useRoute()
@@ -50,7 +50,7 @@ function slugify(text: string) {
 
 // 目录（从 markdown 里解析出来）
 const toc = computed(() => {
-  const tokens = md.parse(markdown.value, {})
+  const tokens : any[] = md.parse(markdown.value, {})
   return tokens
       .filter(t => t.type === 'heading_open')
       .map(t => {
@@ -76,12 +76,7 @@ function scrollTo(id: string) {
 // 请求文章内容
 const selectDate = async () => {
   try {
-    const res: BlogPostRes = await apiFetch(`http://127.0.0.1:5777/api/v1/blog/${articleId.value}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': 'AIzaSyBWlLk7GqJ-6sNOjFY2ZKWy2IJd7evlhAY'
-      }
-    })
+    const res: BlogPostRes = await BaseAPI.apiGet(`blog/${articleId.value}`)
     markdown.value = res.data.content  // ✅ 更新响应式变量
   } catch (error) {
     console.error('获取文章失败', error)

@@ -2,20 +2,18 @@
 
 import {NButton, NPopover, NText, NVirtualList} from "naive-ui";
 import {ref} from "vue";
-import type {ImageInfo} from "~/types/api";
 import type {Artifact, ArtifactListDto, ArtifactListDtoRes, ArtifactRes} from "~/types/artifact";
 import {onMounted} from 'vue'
 import {replaceTagWithColor} from "~/utils/common";
+import {BaseAPI} from "~/utils/api";
 
 const searchText = ref<string>('')
 const thisShowKey = ref<string | undefined>()
-const images = ref<ImageInfo[]>([])
 const popoverVisible = ref(false)
 const loading = ref(false)
 const items = ref<ArtifactListDto[]>([])
 const allItems = ref<ArtifactListDto[]>([])
 const thisArtifactInfo = ref<Artifact>()
-const artifactRes = ref<ArtifactRes>()
 
 // artifact filter
 const artifactRarity = ref<string>('')
@@ -39,38 +37,23 @@ const onInputArtifactSearch = () => {
 
 
 const queryArtifactList = async () => {
-  const artifactList: ArtifactListDtoRes = await apiFetch(
-      `http://127.0.0.1:5777/api/v1/artifact/search?artifactRarity=${encodeURIComponent(artifactRarity.value)}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-KEY': 'AIzaSyBWlLk7GqJ-6sNOjFY2ZKWy2IJd7evlhAY'
-        }
-      }
-  );
+  const artifactList: ArtifactListDtoRes = await BaseAPI.apiGet("artifact/search",{'artifactRarity':encodeURIComponent(artifactRarity.value)})
   allItems.value = artifactList.data
-
   onInputArtifactSearch()
 }
 
 const findArtifactInfoByKey = async () => {
-  const artifactRes: ArtifactRes = await apiFetch(
-      `http://127.0.0.1:5777/api/v1/artifact/${thisShowKey.value}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-KEY': 'AIzaSyBWlLk7GqJ-6sNOjFY2ZKWy2IJd7evlhAY'
-        }
-      }
-  );
+  try {
+    loading.value = true
+    const artifactRes: ArtifactRes = await BaseAPI.apiGet(`artifact/${thisShowKey.value}`)
+    thisArtifactInfo.value = artifactRes.data
+  }finally {
+    loading.value = false
+  }
 
-  thisArtifactInfo.value = artifactRes.data
-  // thisArtifactInfo.value.useDescription = replaceTagWithColor(thisArtifactInfo.value.useDescription,'shuzhi','C94F4F')
-  debugger
 }
 
 const showThisArtifactInfo = async (artifactKey: string) => {
-  debugger
   thisShowKey.value = artifactKey
   await findArtifactInfoByKey()
 }
@@ -94,7 +77,7 @@ onMounted(async () => {
     <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
     <div v-else class="gallery-container__content">
       <div class="gallery-container__content__left">
-                  <img width="150" :src="thisArtifactInfo?.artifactIcon" :alt="thisArtifactInfo?.artifactName" class="gallery-card__image" loading="lazy"/>
+        <img width="150" :src="thisArtifactInfo?.artifactIcon" :alt="thisArtifactInfo?.artifactName" class="gallery-card__image" loading="lazy"/>
         <div class="level">{{ thisArtifactInfo?.artifactRarity }}</div>
         <div class="name">{{ thisArtifactInfo?.artifactName }}</div>
         <div class="description" v-html="replaceTagWithColor(thisArtifactInfo?.useDescription,'shuzhi','C94F4F')"></div>
@@ -204,10 +187,12 @@ onMounted(async () => {
   }
 
   &__status {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: #999;
-    margin-top: 50px;
     font-size: 1rem;
+    min-height: 100%;
   }
 
   &__content {
@@ -223,6 +208,7 @@ onMounted(async () => {
       flex-direction: column;
       height: 100%;
       position: relative;
+      padding-top: 20px;
 
       ::after {
         content: "";
@@ -250,8 +236,7 @@ onMounted(async () => {
       }
 
       .description {
-        position: relative;
-        padding: 20px 20px 15px;
+        padding: 20px 20px 30px;
         word-break: break-all;
       }
     }

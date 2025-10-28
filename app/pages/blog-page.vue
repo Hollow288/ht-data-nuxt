@@ -4,8 +4,10 @@
     <aside class="basic-aside">
       <div style="display: flex;flex-direction: column;height: 100%">
         <div class="left-sidebar-name">
-          <div style="min-height: 80px">
-            Date
+          <div class="twelve">
+            <h2>
+              <span style="color: #9eb4ed;">//</span> 日期 <span style="color: #e19eba;">//</span>
+            </h2>
           </div>
         </div>
         <div class="left-sidebar">
@@ -61,6 +63,7 @@
 // ===================== 路由相关 =====================
 
 import type {BlogDateListRes, BlogDateMenuItem, BlogDateMenuRes, BlogItem} from "~/types/blog";
+import {BaseAPI} from "~/utils/api";
 
 const route = useRoute()
 const router = useRouter()
@@ -89,12 +92,7 @@ const selectDate = async (selectedDate: string) => {
   activeDate.value = selectedDate
   loading.value = true
   try {
-    const res: BlogDateListRes = await apiFetch(`http://127.0.0.1:5777/api/v1/blog/blog-date-list/${selectedDate}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': 'AIzaSyBWlLk7GqJ-6sNOjFY2ZKWy2IJd7evlhAY'
-      }
-    })
+    const res: BlogDateListRes = await BaseAPI.apiGet(`blog/blog-date-list/${selectedDate}`)
     articles.value = res.data
   } catch (error) {
     console.error('获取文章列表失败', error)
@@ -107,12 +105,7 @@ const selectDate = async (selectedDate: string) => {
 const fetchArticles = async () => {
   loading.value = true
   try {
-    const res: BlogDateMenuRes = await apiFetch('http://127.0.0.1:5777/api/v1/blog/blog-date-menu', {
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-KEY': 'AIzaSyBWlLk7GqJ-6sNOjFY2ZKWy2IJd7evlhAY'
-      }
-    })
+    const res: BlogDateMenuRes = await BaseAPI.apiGet('blog/blog-date-menu')
 
     dateList.value = res.data
 
@@ -221,7 +214,7 @@ watch(date, fetchArticles)
     display: flex;
     align-items: center;
 
-    i{
+    i {
       font-size: 1.5rem;
       margin-right: 10px;
     }
@@ -229,18 +222,23 @@ watch(date, fetchArticles)
   }
 }
 
-.basic-aside{
-  flex: 0 0 25%;  min-width: 180px;max-width: 300px;
+.basic-aside {
+  flex: 0 0 25%;
+  min-width: 180px;
+  max-width: 300px;
   box-sizing: border-box;
   position: sticky;
   top: 40px;
-  height: calc(100vh - 100px );
+  height: calc(100vh - 100px);
   user-select: none;
   cursor: default;
 }
 
 .left-sidebar-name {
-
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 15px;
   box-sizing: border-box;
   position: sticky;
@@ -251,6 +249,40 @@ watch(date, fetchArticles)
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: auto;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  .twelve h2 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    width: 160px;
+    text-align: center;
+    margin: auto;
+    white-space: nowrap;
+    padding-bottom: 13px;
+    position: relative;
+  }
+
+  .twelve h2:before {
+    background-color: #9eb4ed;
+    content: '';
+    display: block;
+    height: 3px;
+    width: 75px;
+    margin-bottom: 5px;
+  }
+
+  .twelve h2:after {
+    background-color: #e19eba;
+    content: '';
+    display: block;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    width: 75px;
+    margin-bottom: 0.25em;
+  }
 
   &:hover {
     transform: translateY(-4px);
@@ -283,6 +315,7 @@ watch(date, fetchArticles)
     list-style: none;
     scrollbar-width: none;
     -ms-overflow-style: none;
+
     &::-webkit-scrollbar {
       width: 0;
       height: 0;

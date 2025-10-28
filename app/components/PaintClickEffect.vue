@@ -72,7 +72,7 @@ onMounted(() => {
   const animate = () => {
     ctx.clearRect(0, 0, canvas.value!.width, canvas.value!.height)
     for (let i = particles.length - 1; i >= 0; i--) {
-      const p = particles[i]
+      const p = particles[i] as Particle
       p.update()
       p.draw(ctx)
       if (p.alpha <= 0) particles.splice(i, 1)
