@@ -7,7 +7,7 @@
           <li
               v-for="item in toc"
               :key="item.id"
-              :style="{ marginLeft: (item.level - 3) * 5 + 'px' }"
+              :style="{ marginLeft: item.relativeLevel * 5 + 'px' }"
               @click="scrollTo(item.id)"
           >
             {{ item.content }}
@@ -50,8 +50,8 @@ function slugify(text: string) {
 
 // 目录（从 markdown 里解析出来）
 const toc = computed(() => {
-  const tokens : any[] = md.parse(markdown.value, {})
-  return tokens
+  const tokens: any[] = md.parse(markdown.value, {})
+  const headings = tokens
       .filter(t => t.type === 'heading_open')
       .map(t => {
         const level = Number(t.tag.slice(1))
@@ -59,6 +59,14 @@ const toc = computed(() => {
         const id = slugify(content)
         return { level, content, id }
       })
+
+  const uniqueLevels = [...new Set(headings.map(h => h.level))].sort((a, b) => a - b)
+
+  return headings.map(h => ({
+    ...h,
+    relativeLevel: uniqueLevels.indexOf(h.level)
+  }))
+
 })
 
 function scrollTo(id: string) {
