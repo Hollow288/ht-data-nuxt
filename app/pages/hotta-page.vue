@@ -25,33 +25,40 @@
           <ul class="menu__list">
 
 
-              <NuxtLink to="/hotta-page/artifact" active-class="active-link">
-                <li class="menu__item menu__item--red">
+            <NuxtLink to="/hotta-page/artifact" active-class="active-link">
+              <li class="menu__item menu__item--red">
                 <span class="task-title">源器</span>
                 <span class="task-cat">图片、星级效果</span>
-                </li>
-              </NuxtLink>
+              </li>
+            </NuxtLink>
+
+            <NuxtLink to="/hotta-page/food" active-class="active-link">
+              <li class="menu__item menu__item--green">
+                <span class="task-title">食物</span>
+                <span class="task-cat">非烹饪的食物来源、效果</span>
+              </li>
+            </NuxtLink>
 
 
             <li class="menu__item menu__item--red">
-              <span class="task-title">Catch up with Brian</span>
-              <span class="task-cat">Mobile Project</span>
+              <span class="task-title">食谱</span>
+              <span class="task-cat">待制作...</span>
             </li>
             <li class="menu__item menu__item--green">
-              <span class="task-title">Design Explorations</span>
-              <span class="task-cat">Company Web site</span>
+              <span class="task-title">武器</span>
+              <span class="task-cat">待制作...</span>
             </li>
             <li class="menu__item menu__item--green">
-              <span class="task-title">Team Meeting</span>
-              <span class="task-cat">Hangouts</span>
+              <span class="task-title">意志</span>
+              <span class="task-cat">待制作...</span>
             </li>
             <li class="menu__item menu__item--green">
-              <span class="task-title">Team Meeting</span>
-              <span class="task-cat">Hangouts</span>
+              <span class="task-title">点了也没用</span>
+              <span class="task-cat">no yong...</span>
             </li>
             <li class="menu__item menu__item--green">
-              <span class="task-title">Team Meeting</span>
-              <span class="task-cat">Hangouts</span>
+              <span class="task-title">点了也没用</span>
+              <span class="task-cat">no yong...</span>
             </li>
           </ul>
         </div>
@@ -245,13 +252,13 @@ onMounted(() => {
       top: 30px;
     }
 
-    a{
+    a {
       display: block;
       color: inherit;
       text-decoration: none;
     }
 
-    .active-link{
+    .active-link {
       background-color: rgba(128, 128, 128, 0.1);
     }
   }
