@@ -8,6 +8,7 @@
               v-for="item in toc"
               :key="item.id"
               :style="{ marginLeft: item.relativeLevel * 5 + 'px' }"
+              :class="{ 'active': item.id === activeTocId }"
               @click="scrollTo(item.id)"
           >
             {{ item.content }}
@@ -24,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from '#vue-router'
 import MarkdownContent from '~/components/MarkdownContent.vue'
 import MarkdownIt from 'markdown-it'
@@ -69,7 +70,12 @@ const toc = computed(() => {
 
 })
 
+const activeTocId = ref('')
+
 function scrollTo(id: string) {
+
+  activeTocId.value = id
+
   const el = document.getElementById(id)
   if (el) {
     const rect = el.getBoundingClientRect()
@@ -81,19 +87,55 @@ function scrollTo(id: string) {
   }
 }
 
-// 请求文章内容
+
 const selectDate = async () => {
   try {
     const res: BlogPostRes = await BaseAPI.apiGet(`blog/${articleId.value}`)
-    markdown.value = res.data.content  // ✅ 更新响应式变量
+    markdown.value = res.data.content
   } catch (error) {
     console.error('获取文章失败', error)
     markdown.value = '# 获取文章失败'
   }
 }
 
-// 首次挂载 & 监听文章 ID 变化
-onMounted(selectDate)
+const handleScroll = () => {
+  if (toc.value.length === 0) return;
+
+  const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 5;
+
+  if (atBottom) {
+    const lastTocItem = toc.value[toc.value.length - 1];
+    if (lastTocItem) {
+      activeTocId.value = lastTocItem.id;
+    }
+    return;
+  }
+
+  const headings = toc.value
+      .map(item => document.getElementById(item.id))
+      .filter((el): el is HTMLElement => el !== null);
+
+  const activeHeading = headings
+      .reverse()
+      .find(el => el.getBoundingClientRect().top <= 101);
+
+  if (activeHeading) {
+    activeTocId.value = activeHeading.id;
+  } else {
+    activeTocId.value = '';
+  }
+}
+
+
+onMounted(() => {
+  selectDate()
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+
 watch(articleId, selectDate)
 </script>
 
@@ -149,8 +191,8 @@ watch(articleId, selectDate)
     }
 
     li {
-      padding: 6px 8px;
-      font-size: 0.95rem;
+      padding: 5px;
+      font-size: 0.85rem;
       border-radius: 4px;
       cursor: pointer;
       transition: all 0.2s;
@@ -159,11 +201,16 @@ watch(articleId, selectDate)
       white-space: normal;
 
       &:hover {
-        background: rgba(0, 123, 255, 0.05);
-        color: #007bff;
+        background: rgba(225, 158, 186, 0.05);
+        color: #df1c5f;
+      }
+
+      &.active {
+        background: rgba(225, 158, 186, 0.05);
+        color: #df1c5f;
+        font-weight: bold;
       }
     }
-
   }
 }
 
@@ -184,7 +231,4 @@ watch(articleId, selectDate)
   transform: translateY(-4px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
 }
-
-
-
 </style>
