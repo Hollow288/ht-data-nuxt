@@ -18,7 +18,6 @@
 
       </nav>
     <div class="title">
-      1234
     </div>
     <ProgressBar />
   </header>
@@ -125,7 +124,6 @@ const goBack = () => {
 
 .title{
   font-size: 25px;
-  font-weight: bold;
   margin-right: 15px;
 }
 

@@ -76,7 +76,7 @@ onMounted(async () => {
   <div class="gallery-container">
     <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
     <div v-else class="gallery-container__content">
-      <div style="height:100%;width: 50%;display:flex;flex-direction: column;align-items: center;gap: 10px;text-align: center;    align-items: center;justify-content: center;">
+      <div style="height:100%;width: 50%;display:flex;flex-direction: column;align-items: center;gap: 10px;text-align: center;justify-content: center;">
         <img width="100" :src="thisFoodInfo?.foodIcon" :alt="thisFoodInfo?.foodName" loading="lazy"/>
         <div style="color: rgb(84, 47, 19);font-size: 24px;">
           {{ thisFoodInfo?.foodName }}

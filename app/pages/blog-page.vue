@@ -204,7 +204,7 @@ watch(date, fetchArticles)
   .summary {
     font-size: 1rem;
     color: #666;
-    margin: 30px 0;
+    margin: 20px 0;
   }
 
   .date {

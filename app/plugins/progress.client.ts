@@ -14,4 +14,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     router.afterEach(() => {
         progress.requestEnd()
     })
+
+    router.onError((_err) => {
+        progress.requestEnd()
+    })
 })

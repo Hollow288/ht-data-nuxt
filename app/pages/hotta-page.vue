@@ -1,5 +1,5 @@
 <template>
-  <div class="page-layout">
+  <div class="page-layout" v-cloak>
 
     <aside class="sidebar sidebar--left">
       <div class="menu-panel">
@@ -136,7 +136,7 @@ onMounted(() => {
   position: relative;
 
   &__overlay {
-    background: url() no-repeat top / contain;
+    /*background: url() no-repeat top / contain;*/
     position: absolute;
     inset: 0;
 
