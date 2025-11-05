@@ -11,6 +11,7 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@bg-dev/nuxt-naiveui": "^2.0.0",
     "@pinia/nuxt": "^0.11.2",
     "github-markdown-css": "^5.8.1",
     "install": "^0.13.0",
@@ -27,7 +28,6 @@
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^24.5.2",
     "@types/prismjs": "^1.26.5",
-    "naive-ui": "^2.43.1",
     "sass-embedded": "^1.92.1",
     "typescript": "^5.9.2",
     "vite-tsconfig-paths": "^5.1.4",

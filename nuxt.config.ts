@@ -5,11 +5,10 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt'],
+  modules: ['@pinia/nuxt', '@bg-dev/nuxt-naiveui'],
   vite: {
     plugins: [tsconfigPaths()],
   },
-  build: { transpile: ['naive-ui', "vueuc"] },
   css: ['~/assets/css/global.css',
     'remixicon/fonts/remixicon.css'],
   app: {
