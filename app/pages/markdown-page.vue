@@ -158,7 +158,7 @@ watch(articleId, selectDate)
   position: sticky;
   top: 40px;
   max-height: calc(100vh - 100px);
-
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -225,6 +225,7 @@ watch(articleId, selectDate)
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   backdrop-filter: blur(8px);
+  border-radius: 10px;
 }
 
 .content:hover{

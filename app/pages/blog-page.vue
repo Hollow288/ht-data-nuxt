@@ -176,6 +176,7 @@ watch(date, fetchArticles)
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   padding: 12px 15px;
   transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 10px;
 
   &:hover {
     transform: translateY(-2px);
@@ -249,6 +250,7 @@ watch(date, fetchArticles)
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: auto;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 10px;
 
   .twelve h2 {
     font-size: 26px;
@@ -302,6 +304,7 @@ watch(date, fetchArticles)
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: auto;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 10px;
 
   &:hover {
     transform: translateY(-4px);
@@ -352,7 +355,6 @@ watch(date, fetchArticles)
       .date-list {
         margin-top: 6px;
         padding-left: 8px;
-        border-left: 2px solid #eaeaea;
 
         li {
           display: flex;
