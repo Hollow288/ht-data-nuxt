@@ -86,7 +86,7 @@ onMounted(async () => {
 
         <div class="artifact-detail">
           <span class="level">星级效果：</span>
-          <div v-for="(items,index) in thisArtifactInfo?.artifactDetail" style="margin-bottom: 5px">
+          <div v-for="(items,index) in thisArtifactInfo?.artifactDetail" style="display: flex;margin-bottom: 10px">
             <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>
             <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>
           </div>
@@ -257,7 +257,7 @@ onMounted(async () => {
           text-transform: uppercase;
           font-size: 15px;
           font-weight: 700;
-          margin-bottom: 3px;
+          margin-bottom: 10px;
           color: #EC9B3B;
         }
 
@@ -267,6 +267,7 @@ onMounted(async () => {
           display: inline-block;
           line-height: 1.2;
           user-select: none;
+          margin-right: 10px;
         }
 
         .desc {
@@ -274,6 +275,7 @@ onMounted(async () => {
           flex: 1;
           word-break: break-word;
           align-items: flex-start;
+          margin-top: -4px;
         }
       }
 
