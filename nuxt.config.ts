@@ -9,6 +9,7 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tsconfigPaths()],
   },
+  build: { transpile: ['naive-ui', "vueuc"] },
   css: ['~/assets/css/global.css',
     'remixicon/fonts/remixicon.css'],
   app: {
