@@ -2,7 +2,7 @@ import { useProgressStore } from '~/stores/progress'
 
 
 export class BaseAPI {
-    private static API_PREFIX = `http://ht-data/api/v1/`
+    private static API_PREFIX = `/hotta-api/`
 
 
     static async apiFetch<T>(url: string, options?: any): Promise<T> {
