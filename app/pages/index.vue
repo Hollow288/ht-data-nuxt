@@ -8,12 +8,12 @@
       <div class="info-card">
         <span class="username with-line">Hollow</span>
         <span class="briefly">我本微末凡尘，但也心向天空</span>
-        <div style="font-size: 30px; display: flex; gap: 10px; align-items: center; justify-content: center;">
+        <div class="icons">
           <div class="icon-button">
             <i class="ri-github-fill"></i>
           </div>
           <div class="icon-button">
-              <i class="ri-bilibili-fill"></i>
+            <i class="ri-bilibili-fill"></i>
           </div>
         </div>
       </div>
@@ -21,7 +21,9 @@
 
     <main class="main-content">
       <div class="right-card">
-        <span class="me-title" ><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=4000&pause=200&vCenter=true&width=435&height=25&lines=Hi+there+%F0%9F%91%8B;and+welcome+to+this+website." alt="Typing SVG" /></span>
+        <span class="me-title"><img
+            src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=4000&pause=200&vCenter=true&width=435&height=25&lines=Hi+there+%F0%9F%91%8B;and+welcome+to+this+website."
+            alt="Typing SVG"/></span>
         <div style="display: flex;flex-direction: column;">
           <div>
             <ul>
@@ -33,21 +35,21 @@
           </div>
 
           <div>
-            <span style="font-family: 'Noto-Sans-SC',sans-serif">在遥远的明天，月亮不再只是月亮，它开始学会呼吸。每当星辰低语，河水便想起自己曾经是一颗漂浮的沙粒，沙粒又记得自己其实是夜空里一片懒惰的云。于是风走到了屋顶，却发现屋顶早已经离开了地面，去和一群失眠的影子下棋。城市的路灯慢慢长出了翅膀，它们在夜里追赶自己的影子，影子却总是跑到昨天去睡觉。
-              人们穿着时间做成的外套，却忘了扣扣子，因为扣子本身早已经逃到了平行世界的冰箱里。每一次呼吸都是一次穿越，每一次眨眼都是一次哲学讲座。猫会说笑话，笑话会写小说，小说又会跑去告诉鱼，鱼则开始思考人生是不是该换一个水池。当你试图理解这一切的时候，一片透明的雨落在书页上，书页却悄悄溶解成气体，飘向遥远的星球，告诉那里的居民：“你们的逻辑太过整齐了，我们不接受整齐。”于是，世界继续旋转，旋转的同时开始学习数学，但数学发现自己其实不懂自己，于是决定放假，去海边和时间玩扑克。</span>
+            <span style="font-family: 'Noto-Sans-SC',sans-serif">&nbsp;&nbsp;在遥远的明天，月亮不再只是月亮，它开始学会呼吸。每当星辰低语，河水便想起自己曾经是一颗漂浮的沙粒，沙粒又记得自己其实是夜空里一片懒惰的云。于是风走到了屋顶，却发现屋顶早已经离开了地面，去和一群失眠的影子下棋。城市的路灯慢慢长出了翅膀，它们在夜里追赶自己的影子，影子却总是跑到昨天去睡觉。
+              人们穿着时间做成的外套，却忘了扣扣子，因为扣子本身早已经逃到了平行世界的冰箱里。每一次呼吸都是一次穿越，每一次眨眼都是一次哲学讲座。猫会说笑话，笑话会写小说，小说又会跑去告诉鱼，鱼则开始思考人生是不是该换一个水池。当你试图理解这一切的时候，一片透明的雨落在书页上，书页却悄悄溶解成气体，飘向遥远的星球，告诉那里的居民：“你们的逻辑太过整齐了，我们不接受整齐。”于是，世界继续旋转，旋转的同时开始学习数学，但数学发现自己其实不懂自己，于是决定放假，去海边和时间玩扑克。这只是用来测试的一段话。</span>
           </div>
         </div>
       </div>
       <div class="right-card">
         <span class="con-title" v-if="imgLoaded">Github Contributions:</span>
-        <n-skeleton round v-if="!imgLoaded" :style="{ height: '20px', width: '160px', borderRadius : '10px' }" />
+        <n-skeleton round v-if="!imgLoaded" :style="{ height: '20px', width: '160px', borderRadius : '10px' }"/>
         <div style="margin-top: 15px;">
-          <n-skeleton round v-if="!imgLoaded" :style="{ height: '140px', width: '100%', borderRadius : '10px' }" />
+          <n-skeleton round v-if="!imgLoaded" :style="{ height: '140px', width: '100%', borderRadius : '10px' }"/>
 
           <!-- 图片加载完后显示 -->
           <div style="overflow-x: auto; width: 100%;">
             <div style="display: flex; justify-content: center; min-width: max-content;">
-              <img v-show="imgLoaded" :src="imgSrc" alt="GitHub Contributions" @load="onLoad" />
+              <img v-show="imgLoaded" :src="imgSrc" alt="GitHub Contributions" @load="onLoad"/>
             </div>
           </div>
         </div>
@@ -85,7 +87,7 @@ function onLoad() {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  margin-right: 30px;
+  margin-right: 25px;
   border-radius: 10px;
   padding: 0;
   box-sizing: border-box;
@@ -157,6 +159,15 @@ function onLoad() {
   border-radius: 10px;
 }
 
+.icons {
+  font-size: 30px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
 
 .briefly {
   display: flex;
@@ -194,14 +205,14 @@ function onLoad() {
   color: #9eb4ed;
 }
 
-.right-card{
+.right-card {
   background: #fff;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   border-radius: 10px;
   padding: 20px 20px 30px 20px;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 
-  .con-title{
+  .con-title {
     font-weight: bold;
     position: relative;
     padding-left: 12px;

@@ -10,5 +10,16 @@ export default defineNuxtConfig({
     plugins: [tsconfigPaths()],
   },
   css: ['~/assets/css/global.css',
-    'remixicon/fonts/remixicon.css']
+    'remixicon/fonts/remixicon.css'],
+  app: {
+    head: {
+      title: 'Hollow’s Space',
+      htmlAttrs: {
+        lang: 'zh-CN'
+      },
+      link: [
+        { rel: 'icon', type: 'image/png', href: 'favicon.png' }
+      ]
+    }
+  }
 })
