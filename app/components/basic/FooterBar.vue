@@ -1,7 +1,7 @@
 <template>
   <footer class="footer">
     <div>
-      <a href="https://beian.miit.gov.cn" target="_blank">京ICP备2025142794号</a>
+      <a href="https://beian.miit.gov.cn" target="_blank">京ICP备2025142794号-1</a>
       <span>|</span>
       <a href="https://github.com/hollow288" target="_blank">
         <svg height="16" width="16" viewBox="0 0 16 16">

@@ -35,15 +35,17 @@
             <NuxtLink to="/hotta-page/food" active-class="active-link">
               <li class="menu__item menu__item--green">
                 <span class="task-title">食物</span>
-                <span class="task-cat">非烹饪的食物来源、效果</span>
+                <span class="task-cat">非烹饪的食物/食材来源、效果</span>
               </li>
             </NuxtLink>
 
+            <NuxtLink to="/hotta-page/recipes" active-class="active-link">
+              <li class="menu__item menu__item--red">
+                <span class="task-title">食谱</span>
+                <span class="task-cat">144种制作解锁食谱</span>
+              </li>
+            </NuxtLink>
 
-            <li class="menu__item menu__item--red">
-              <span class="task-title">食谱</span>
-              <span class="task-cat">待制作...</span>
-            </li>
             <li class="menu__item menu__item--green">
               <span class="task-title">武器</span>
               <span class="task-cat">待制作...</span>
@@ -110,10 +112,10 @@ onMounted(() => {
   user-select: none;
   cursor: default;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
+  //&:hover {
+  //  transform: translateY(-4px);
+  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  //}
 }
 
 /* Reusable text styles */

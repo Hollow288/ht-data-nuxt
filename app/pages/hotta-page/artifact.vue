@@ -105,7 +105,7 @@ onMounted(async () => {
               trigger="click"
               placement="bottom"
               v-model:show="popoverVisible"
-              :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }"
+              :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
               style="max-width: 200px; background-color: rgba(255, 255, 255, 0.5);box-sizing: border-box;padding:0"
           >
             <template #trigger>
@@ -165,10 +165,10 @@ onMounted(async () => {
   user-select: none;
   cursor: default;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
+  //&:hover {
+  //  transform: translateY(-4px);
+  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  //}
 }
 
 
@@ -181,10 +181,10 @@ onMounted(async () => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
+  //&:hover {
+  //  transform: translateY(-4px);
+  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  //}
 
   &__status {
     display: flex;

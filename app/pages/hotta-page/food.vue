@@ -144,10 +144,10 @@ onMounted(async () => {
   user-select: none;
   cursor: default;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
+  //&:hover {
+  //  transform: translateY(-4px);
+  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  //}
 }
 
 
@@ -160,10 +160,10 @@ onMounted(async () => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
+  //&:hover {
+  //  transform: translateY(-4px);
+  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  //}
 
   &__status {
     display: flex;

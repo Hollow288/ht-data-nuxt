@@ -173,10 +173,10 @@ watch(articleId, selectDate)
     height: 0;
   }
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
+  //&:hover {
+  //  transform: translateY(-4px);
+  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  //}
 
   .menu-wrapper {
     margin: 0;
@@ -228,8 +228,8 @@ watch(articleId, selectDate)
   border-radius: 10px;
 }
 
-.content:hover{
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-}
+//.content:hover{
+//  transform: translateY(-4px);
+//  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+//}
 </style>

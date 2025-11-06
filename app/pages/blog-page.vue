@@ -178,10 +178,10 @@ watch(date, fetchArticles)
   transition: transform 0.2s, box-shadow 0.2s;
   border-radius: 10px;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-  }
+  //&:hover {
+  //  transform: translateY(-2px);
+  //  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  //}
 
   .title {
     margin-top: 5px;
@@ -286,10 +286,10 @@ watch(date, fetchArticles)
     margin-bottom: 0.25em;
   }
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
+  //&:hover {
+  //  transform: translateY(-4px);
+  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  //}
 }
 
 .left-sidebar {
@@ -306,10 +306,10 @@ watch(date, fetchArticles)
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   border-radius: 10px;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
+  //&:hover {
+  //  transform: translateY(-4px);
+  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  //}
 
   .menu-wrapper {
     height: 100%;
@@ -417,10 +417,10 @@ watch(date, fetchArticles)
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  }
+  //&:hover {
+  //  transform: translateY(-4px);
+  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  //}
 
 
   .loading, .empty {
