@@ -293,11 +293,11 @@ const handleFocus = () => {
   width: 100%;
   padding: 10px 0;
   transition: background 0.2s ease;
+  border-radius: 10px;
 }
 
 .search-item:hover {
   background-color: rgba(225, 158, 186, 0.5);
-  border-radius: 10px;
   cursor: pointer;
 }
 
