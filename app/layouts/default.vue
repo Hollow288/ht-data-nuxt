@@ -7,7 +7,8 @@
       </Transition>
     </div>
     <FooterBar/>
-    <FanMenu/>
+<!--    <FanMenu/>-->
+    <BackAndToTop />
     <PaintClickEffect />
 
 
@@ -60,7 +61,8 @@
 <script setup>
 import HeaderBar from '~/components/basic/HeaderBar.vue'
 import FooterBar from '~/components/basic/FooterBar.vue'
-import FanMenu from '~/components/basic/FanMenu.vue'
+// import FanMenu from '~/components/basic/FanMenu.vue'
+import BackAndToTop from '~/components/basic/BackAndToTop.vue'
 import { ref, onMounted, nextTick } from "vue"
 
 const ready = ref(false)
