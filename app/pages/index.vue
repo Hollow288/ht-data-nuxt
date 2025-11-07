@@ -126,6 +126,7 @@ function onLoad() {
 .username {
   font-size: 24px;
   line-height: 1.25;
+  font-family: "Sour Gummy", sans-serif;
 }
 
 .info {

@@ -7,6 +7,13 @@ html {
     background: #9eb4ed;
 }
 
+/*@font-face {*/
+/*    font-family: 'AlibabaPuHuiTi';*/
+/*    src: url('/fonts/AlibabaPuHuiTi-3-55-Regular.otf') format('opentype');*/
+/*    font-style: normal;*/
+/*    font-display: swap;*/
+/*}*/
+
 
 * {
     outline: none;

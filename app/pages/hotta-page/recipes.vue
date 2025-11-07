@@ -383,7 +383,7 @@ onMounted(async () => {
   font-size: 12px;
   width: 15px;
   height: 15px;
-  padding: 1px 1px 2px 2px;
+  padding: 2px 1px 2px 2px;
   text-align: center;
   line-height: 11px;
   border-radius: 50%;
