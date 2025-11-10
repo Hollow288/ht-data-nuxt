@@ -23,6 +23,7 @@
     <!-- 搜索框 -->
     <div class="search-container">
       <input
+          ref="searchInputRef"
           type="text"
           placeholder="请输入"
           v-model="searchText"
@@ -30,7 +31,7 @@
           @focus="handleFocus"
           @input="searchBlog"
       />
-      <div @click="searchBlog">
+      <div @click="handleIconClick">
         <i class="ri-search-line search-icon"></i>
       </div>
     </div>
@@ -96,6 +97,7 @@ const searchText = ref('')
 const showDropdown = ref(false)
 const articles = ref<BlogItem[]>([])
 const isLoading = ref<boolean>(false)
+const searchInputRef = ref<HTMLInputElement | null>(null)
 
 const goBack = () => {
   router.back()
@@ -116,6 +118,10 @@ const performSearch = async () => {
     isLoading.value = false
   }
 
+}
+
+const handleIconClick = () => {
+  searchInputRef.value?.focus();
 }
 
 const searchBlog = debounce(performSearch, 500);
@@ -263,7 +269,12 @@ const handleFocus = () => {
   top: 50%;
   transform: translateY(-50%);
   font-size: 16px;
+  cursor: pointer;
   color: #999;
+}
+
+.search-container div :hover{
+  color: #7e7d7d;
 }
 
 /* --- 5. 搜索结果下拉框 --- */
@@ -274,7 +285,7 @@ const handleFocus = () => {
   z-index: 20;
   width: 500px;
   height: 430px;
-  padding: 15px 3px;
+  padding: 10px 3px;
   color: black;
   background-color: rgba(255, 255, 255, 0.8);
   border-radius: 4px;
