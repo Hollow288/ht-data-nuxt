@@ -70,13 +70,14 @@ code[class*="language-"] {
   font-family: Consolas, Monaco, "Courier New", monospace;
   font-size: 14px;
   line-height: 1.6;
+  max-height: 300px;
 
   /* 边框方正，无圆角 */
   border-radius: 8px;
   border: 1px solid #e0e0e0;       /* 浅边框增加层次 */
 
   /* 内边距 */
-  padding: 14px 16px 10px 16px;
+  padding: 14px 16px 13px 16px;
 
   /* 凸起感 */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
@@ -100,8 +101,8 @@ code[class*="language-"] {
 
 /* 滚动条整体部分，可以设置宽度等 */
 pre[class*="language-"]::-webkit-scrollbar {
-  width: 8px;       /* 纵向滚动条的宽度 */
-  height: 8px;      /* 横向滚动条的高度 */
+  width: 0;       /* 纵向滚动条的宽度 */
+  height: 6px;      /* 横向滚动条的高度 */
 }
 
 /* 滚动条轨道 */

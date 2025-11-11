@@ -15,7 +15,15 @@
             <li v-for="(items, year) in groupedDates" :key="year" class="year-group">
               <div class="year-header" @click="toggleYear(year)">
                 <span>{{ year }}</span>
-                <span class="arrow" :class="{ expanded: expandedYears.includes(year) }">▶</span>
+                <span class="arrow" :class="{ expanded: expandedYears.includes(year) }"> <svg aria-hidden="true"
+                                                                                              focusable="false"
+                                                                                              data-prefix="fas"
+                                                                                              data-icon="chevron-left"
+                                                                                              role="img"
+                                                                                              xmlns="http://www.w3.org/2000/svg"
+                                                                                              viewBox="0 0 512 512"
+                                                                                              style="width: 8px; height: 8px;"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
+                    d="M169.4 297.4C156.9 309.9 156.9 330.2 169.4 342.7L361.4 534.7C373.9 547.2 394.2 547.2 406.7 534.7C419.2 522.2 419.2 501.9 406.7 489.4L237.3 320L406.6 150.6C419.1 138.1 419.1 117.8 406.6 105.3C394.1 92.8 373.8 92.8 361.3 105.3L169.3 297.3z"/></svg> </span>
               </div>
               <ul v-show="expandedYears.includes(year)" class="date-list">
                 <li v-for="item in items" :key="item.yearMonth"
@@ -347,7 +355,7 @@ watch(date, fetchArticles)
           transition: transform 0.3s;
 
           &.expanded {
-            transform: rotate(90deg);
+            transform: rotate(-90deg);
           }
         }
       }
@@ -392,8 +400,11 @@ watch(date, fetchArticles)
           }
 
           .count {
-            font-size: 0.8em;
+            font-size: 10px;
             color: #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
           }
         }
       }
