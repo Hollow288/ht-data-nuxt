@@ -13,7 +13,7 @@ const store = useProgressStore()
   position: fixed;
   top: 60px;
   left: 0;
-  z-index: 9999;
+  z-index: 1;
   width: 0;
   border-radius: 2px;
   background: linear-gradient(90deg, #a6c1ff, #4da6ff, #7db9ff);
