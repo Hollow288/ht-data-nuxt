@@ -77,7 +77,10 @@
 import {onMounted} from "vue";
 
 const initializePage = ()=> {
-  navigateTo('/hotta-page/artifact')
+  const route = useRoute();
+  if (route.path === '/hotta-page') {
+    navigateTo('/hotta-page/artifact');
+  }
 }
 
 onMounted(() => {
