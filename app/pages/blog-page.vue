@@ -12,7 +12,7 @@
         </div>
         <div class="left-sidebar">
           <ul class="menu-wrapper">
-            <li v-for="(items, year) in groupedDates" :key="year" class="year-group">
+            <li v-for="year in Object.keys(groupedDates).sort((a, b) => Number(b) - Number(a))" :key="year" class="year-group">
               <div class="year-header" @click="toggleYear(year)">
                 <span>{{ year }}</span>
                 <span class="arrow" :class="{ expanded: expandedYears.includes(year) }"> <svg aria-hidden="true"
@@ -26,7 +26,7 @@
                     d="M169.4 297.4C156.9 309.9 156.9 330.2 169.4 342.7L361.4 534.7C373.9 547.2 394.2 547.2 406.7 534.7C419.2 522.2 419.2 501.9 406.7 489.4L237.3 320L406.6 150.6C419.1 138.1 419.1 117.8 406.6 105.3C394.1 92.8 373.8 92.8 361.3 105.3L169.3 297.3z"/></svg> </span>
               </div>
               <ul v-show="expandedYears.includes(year)" class="date-list">
-                <li v-for="item in items" :key="item.yearMonth"
+                <li v-for="item in groupedDates[year]" :key="item.yearMonth"
                     :class="{ active: activeDate === item.yearMonth }"
                     @click="selectDate(item.yearMonth)">
                   {{ item.yearMonth.split('-')[1] }}月 <span class="count">{{ item.count }}</span>
@@ -127,7 +127,7 @@ const fetchArticles = async () => {
     groupedDates.value = grouped
 
     // 自动选中第一个分组的第一个日期
-    const years = Object.keys(grouped)
+    const years =  Object.keys(grouped).sort((a, b) => Number(b) - Number(a))
     if (years.length > 0) {
       const firstYear = years[0] as string
       const firstGroup = grouped[firstYear]

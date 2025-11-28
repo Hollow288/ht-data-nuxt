@@ -11,6 +11,8 @@ import 'prismjs/themes/prism-tomorrow.css'
 // 需要的语言
 import 'prismjs/components/prism-javascript'
 import 'prismjs/components/prism-python'
+import 'prismjs/components/prism-nginx'
+import 'prismjs/components/prism-java'
 
 // Props 类型
 interface Props {

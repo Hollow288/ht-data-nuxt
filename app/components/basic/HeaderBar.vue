@@ -352,6 +352,7 @@ const handleFocus = () => {
 .search-title {
   margin-bottom: 5px;
   font-weight: bold;
+  word-break: break-all;
 }
 
 .search-item:hover .search-title {
@@ -361,6 +362,7 @@ const handleFocus = () => {
 .search-date {
   font-size: 12px;
   color: #666666;
+  min-width: 80px;
 }
 
 .search-summary {
