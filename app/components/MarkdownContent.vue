@@ -13,6 +13,7 @@ import 'prismjs/components/prism-javascript'
 import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-nginx'
 import 'prismjs/components/prism-java'
+import 'prismjs/components/prism-bash'
 
 // Props 类型
 interface Props {
