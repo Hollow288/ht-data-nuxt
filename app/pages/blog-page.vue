@@ -42,7 +42,18 @@
 
     <!-- 文章区域 -->
     <div class="card-container" v-if="loading || articles.length === 0">
-      <div v-if="loading" class="loading">{{ loading ? '加载中...' : '该日期没有文章' }}</div>
+      <div v-if="loading" class="loading">
+<!--        {{ loading ? '加载中...' : '该日期没有文章' }}-->
+        <n-skeleton round :style="{ height: '20px', width: '30%', borderRadius : '10px', marginTop : '13px' }"/>
+        <n-skeleton round :style="{ height: '20px', width: '100%', borderRadius : '10px', marginTop : '13px' }"/>
+        <n-skeleton round :style="{ height: '20px', width: '100%', borderRadius : '10px', marginTop : '13px' }"/>
+        <n-skeleton round :style="{ height: '20px', width: '30%', borderRadius : '10px', marginTop : '13px' }"/>
+        <n-skeleton round :style="{ height: '20px', width: '100%', borderRadius : '10px', marginTop : '13px' }"/>
+        <n-skeleton round :style="{ height: '20px', width: '100%', borderRadius : '10px', marginTop : '13px' }"/>
+      </div>
+      <div v-else class="loading">
+        该日期没有文章
+      </div>
     </div>
     <div v-else class="cards-grid">
       <div v-for="article in articles" :key="article.blogId" class="card-item">
@@ -72,6 +83,7 @@
 
 import type {BlogDateListRes, BlogDateMenuItem, BlogDateMenuRes, BlogItem} from "~/types/blog";
 import {BaseAPI} from "~/utils/api";
+import {NSkeleton} from "naive-ui";
 
 const route = useRoute()
 const router = useRouter()
@@ -427,6 +439,7 @@ watch(date, fetchArticles)
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 10px;
 
   //&:hover {
   //  transform: translateY(-4px);
@@ -437,7 +450,7 @@ watch(date, fetchArticles)
   .loading, .empty {
     text-align: center;
     color: #999;
-    margin-top: 50px;
+    margin: 30px;
     font-size: 1rem;
   }
 
