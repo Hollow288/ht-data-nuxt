@@ -160,41 +160,6 @@ function expandParents(id: string) {
   }
 }
 
-// === 核心逻辑优化：监听高亮变化 ===
-watch(activeTocId, async (newId) => {
-  if (!newId) return
-
-  // 1. 处理侧边栏自动滚动 (解决问题 2)
-  if (sidebarRef.value) {
-    await nextTick() // 等待 DOM 更新，确保 visibleToc 变化导致的布局改变已完成
-
-    // 我们在 template 里加了 id="toc-item-..." 方便获取
-    const activeEl = sidebarRef.value.querySelector(`#toc-item-${newId}`) as HTMLElement
-
-    if (activeEl) {
-      const container = sidebarRef.value
-      // 计算滚动位置：让当前项尽量居中
-      const top = activeEl.offsetTop
-      const height = activeEl.clientHeight
-      const containerHeight = container.clientHeight
-
-      // 目标 scrollTop = 元素顶部距离 - 容器一半高度 + 元素一半高度
-      const targetScrollTop = top - containerHeight / 2 + height / 2
-
-      container.scrollTo({
-        top: targetScrollTop,
-        behavior: 'smooth'
-      })
-    }
-  }
-
-  // 2. 处理自动展开父级 (解决问题 1)
-  // 如果是点击跳转引起的滚动，则不执行中间过程的自动展开
-  if (!isClickScrolling.value) {
-    expandParents(newId)
-  }
-})
-
 function scrollTo(id: string) {
   // 1. 标记正在进行点击滚动，防止途中触发自动展开
   isClickScrolling.value = true
@@ -294,7 +259,8 @@ watch(activeTocId, async (newId) => {
 
   // 3. 第三步：处理侧边栏滚动
   if (sidebarRef.value) {
-    const activeEl = sidebarRef.value.querySelector(`#toc-item-${newId}`) as HTMLElement
+
+    const activeEl = document.getElementById(`toc-item-${newId}`) as HTMLElement
 
     if (activeEl) {
       const container = sidebarRef.value
