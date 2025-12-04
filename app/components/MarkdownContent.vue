@@ -14,6 +14,7 @@ import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-nginx'
 import 'prismjs/components/prism-java'
 import 'prismjs/components/prism-bash'
+import 'prismjs/components/prism-sql'
 
 // Props 类型
 interface Props {
@@ -43,6 +44,15 @@ md.renderer.rules.heading_open = (tokens:any, idx, options, env, self) => {
   const id = title.toLowerCase().replace(/\s+/g, '-')
   token.attrSet('id', id)
   return self.renderToken(tokens, idx, options)
+}
+
+// 【新增】重写 table 的渲染规则
+md.renderer.rules.table_open = (tokens, idx, options, env, self) => {
+  return '<div class="table-container"><table>'
+}
+
+md.renderer.rules.table_close = (tokens, idx, options, env, self) => {
+  return '</table></div>'
 }
 
 const rendered = computed(() => md.render(props.content))
@@ -99,6 +109,29 @@ code[class*="language-"] {
   padding: 2px 6px;
   text-shadow: none;
   box-shadow: none;
+}
+
+/* 1. 表格的外层容器：负责滚动 */
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* 内容溢出时显示横向滚动条 */
+  margin-bottom: 16px;
+}
+
+/* 2. 表格本身：负责撑满容器 */
+.markdown-body table {
+  width: 100% !important; /* 强制撑满容器宽度 */
+  display: table;         /* 恢复标准的表格布局算法 */
+  margin: 0;              /* 去除 github-css 默认的 margin，由 container 控制 */
+}
+
+/* (可选) 优化移动端滚动体验 */
+.table-container::-webkit-scrollbar {
+  height: 6px;
+}
+.table-container::-webkit-scrollbar-thumb {
+  background-color: #e0e0e0;
+  border-radius: 4px;
 }
 
 

@@ -1,17 +1,31 @@
 <template>
   <div class="page-layout">
-    <!-- 侧边栏 -->
-    <aside class="sidebar">
+    <!-- 侧边栏：添加 ref -->
+    <aside class="sidebar" ref="sidebarRef">
       <div class="menu-wrapper">
         <ul>
           <li
-              v-for="item in toc"
+              v-for="item in visibleToc"
               :key="item.id"
-              :style="{ marginLeft: item.relativeLevel * 5 + 'px' }"
+              :id="'toc-item-' + item.id"
+              :style="{ paddingLeft: item.relativeLevel * 15 + 'px' }"
               :class="{ 'active': item.id === activeTocId }"
-              @click="scrollTo(item.id)"
           >
-            {{ item.content }}
+            <!-- 折叠箭头 -->
+            <span
+                class="toc-arrow"
+                :class="{ 'is-collapsed': collapsedIds.has(item.id), 'hidden': !item.hasChildren }"
+                @click.stop="toggleCollapse(item.id)"
+            >
+               <svg viewBox="0 0 1024 1024" width="10" height="10">
+                <path d="M85.333333 256l426.666667 426.666667 426.666667-426.666667z" fill="currentColor"></path>
+              </svg>
+            </span>
+
+            <!-- 标题内容 -->
+            <span class="toc-text" @click="scrollTo(item.id)">
+              {{ item.content }}
+            </span>
           </li>
         </ul>
       </div>
@@ -25,31 +39,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { useRoute } from '#vue-router'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { useRoute } from 'vue-router'
 import MarkdownContent from '~/components/MarkdownContent.vue'
 import MarkdownIt from 'markdown-it'
-import {BaseAPI} from '~/utils/api'
-import type {BlogPostRes} from "~/types/blog";
+import { BaseAPI } from '~/utils/api'
+import type { BlogPostRes } from "~/types/blog";
 
 // 路由参数
 const route = useRoute()
 const articleId = computed(() => route.query.articleId || '')
 
-// markdown 内容用 ref
-const markdown = ref<string>(`
-# 加载中...
-
-请稍等，正在获取文章 ID: ${articleId.value}
-`)
-
+const markdown = ref<string>(`# 加载中...\n\n请稍等...`)
 const md = new MarkdownIt()
+const sidebarRef = ref<HTMLElement | null>(null) // 获取侧边栏DOM
+const isClickScrolling = ref(false) // 标记是否正在进行点击跳转引起的滚动
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/\s+/g, '-')
 }
 
-// 目录（从 markdown 里解析出来）
+// === TOC 生成逻辑 ===
 const toc = computed(() => {
   const tokens: any[] = md.parse(markdown.value, {})
   const headings = tokens
@@ -63,19 +73,137 @@ const toc = computed(() => {
 
   const uniqueLevels = [...new Set(headings.map(h => h.level))].sort((a, b) => a - b)
 
-  return headings.map(h => ({
-    ...h,
-    relativeLevel: uniqueLevels.indexOf(h.level)
-  }))
+  return headings.map((h, index) => {
+    const nextHeading = headings[index + 1]
+    const hasChildren = nextHeading && nextHeading.level > h.level
+    return {
+      ...h,
+      relativeLevel: uniqueLevels.indexOf(h.level),
+      hasChildren
+    }
+  })
+})
 
+// === 折叠状态管理 ===
+const collapsedIds = ref(new Set<string>())
+
+function toggleCollapse(id: string) {
+  const isCollapsed = collapsedIds.value.has(id)
+  if (isCollapsed) {
+    collapsedIds.value.delete(id)
+  } else {
+    collapsedIds.value.add(id)
+    const index = toc.value.findIndex(item => item.id === id)
+    if (index === -1) return
+    const currentItem = toc.value[index]
+    if (!currentItem) return // 如果是 undefined 直接返回，消除 TS 报错
+    const currentLevel = currentItem.level
+    for (let i = index + 1; i < toc.value.length; i++) {
+      const item = toc.value[i]
+      if (!item) continue
+      if (item.level <= currentLevel) break
+      collapsedIds.value.add(item.id)
+    }
+  }
+}
+
+// === 可见性计算 ===
+const visibleToc = computed(() => {
+  const list = toc.value
+  const result = []
+  const stack: { level: number; isCollapsed: boolean }[] = []
+
+  for (const item of list) {
+    while (stack.length > 0 && stack[stack.length - 1]!.level >= item.level) {
+      stack.pop()
+    }
+    const isParentCollapsed = stack.some(s => s.isCollapsed)
+    if (!isParentCollapsed) {
+      result.push(item)
+    }
+    stack.push({
+      level: item.level,
+      isCollapsed: collapsedIds.value.has(item.id)
+    })
+  }
+  return result
 })
 
 const activeTocId = ref('')
 
+// === 辅助函数：展开指定ID的所有父级 ===
+// 修改 script setup 中的 expandParents 函数
+function expandParents(id: string) {
+  const index = toc.value.findIndex(item => item.id === id)
+  if (index === -1) return
+
+  // 1. 自身去折叠：不管有没有子集，先确保自己不是折叠状态
+  // 这解决了之前因为 toggleCollapse 把所有子孙都加入折叠列表导致的副作用
+  if (collapsedIds.value.has(id)) {
+    collapsedIds.value.delete(id)
+  }
+
+  const currentItem = toc.value[index]
+  if (!currentItem) return
+  let checkLevel = currentItem.level
+
+  // 2. 向上回溯查找父级
+  for (let i = index - 1; i >= 0; i--) {
+    const prevItem = toc.value[i]
+    if (!prevItem) continue
+
+    // 关键逻辑：只要找到层级比当前参考层级小的，它就是父级（或祖先级）
+    if (prevItem.level < checkLevel) {
+      collapsedIds.value.delete(prevItem.id) // 移除折叠状态
+      checkLevel = prevItem.level // 更新参考层级，继续向上找爷爷级
+    }
+  }
+}
+
+// === 核心逻辑优化：监听高亮变化 ===
+watch(activeTocId, async (newId) => {
+  if (!newId) return
+
+  // 1. 处理侧边栏自动滚动 (解决问题 2)
+  if (sidebarRef.value) {
+    await nextTick() // 等待 DOM 更新，确保 visibleToc 变化导致的布局改变已完成
+
+    // 我们在 template 里加了 id="toc-item-..." 方便获取
+    const activeEl = sidebarRef.value.querySelector(`#toc-item-${newId}`) as HTMLElement
+
+    if (activeEl) {
+      const container = sidebarRef.value
+      // 计算滚动位置：让当前项尽量居中
+      const top = activeEl.offsetTop
+      const height = activeEl.clientHeight
+      const containerHeight = container.clientHeight
+
+      // 目标 scrollTop = 元素顶部距离 - 容器一半高度 + 元素一半高度
+      const targetScrollTop = top - containerHeight / 2 + height / 2
+
+      container.scrollTo({
+        top: targetScrollTop,
+        behavior: 'smooth'
+      })
+    }
+  }
+
+  // 2. 处理自动展开父级 (解决问题 1)
+  // 如果是点击跳转引起的滚动，则不执行中间过程的自动展开
+  if (!isClickScrolling.value) {
+    expandParents(newId)
+  }
+})
+
 function scrollTo(id: string) {
+  // 1. 标记正在进行点击滚动，防止途中触发自动展开
+  isClickScrolling.value = true
 
+  // 2. 立即设置高亮并展开目标路径（确保目标可见）
   activeTocId.value = id
+  expandParents(id)
 
+  // 3. 执行页面滚动
   const el = document.getElementById(id)
   if (el) {
     const rect = el.getBoundingClientRect()
@@ -85,9 +213,15 @@ function scrollTo(id: string) {
       behavior: 'smooth'
     })
   }
+
+  // 4. 解锁机制：平滑滚动需要时间，设置一个超时后释放锁
+  // 时间设为 1000ms 大概足以覆盖大多数滚动的时长
+  setTimeout(() => {
+    isClickScrolling.value = false
+  }, 1500)
 }
 
-
+// ... 数据获取和 scroll 事件监听部分保持不变 ...
 const selectDate = async () => {
   try {
     const res: BlogPostRes = await BaseAPI.apiGet(`blog/${articleId.value}`)
@@ -101,31 +235,40 @@ const selectDate = async () => {
 const handleScroll = () => {
   if (toc.value.length === 0) return;
 
-  const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 5;
+  // 增加一个偏移量，让人眼的聚焦位置（屏幕上方约100-150px处）作为判定点
+  const offset = 120;
 
+  const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 20;
   if (atBottom) {
     const lastTocItem = toc.value[toc.value.length - 1];
-    if (lastTocItem) {
-      activeTocId.value = lastTocItem.id;
-    }
+    if (lastTocItem) activeTocId.value = lastTocItem.id;
     return;
   }
 
+  // 获取所有标题的位置信息
   const headings = toc.value
-      .map(item => document.getElementById(item.id))
-      .filter((el): el is HTMLElement => el !== null);
+      .map(item => {
+        const el = document.getElementById(item.id)
+        return el ? { id: item.id, top: el.getBoundingClientRect().top } : null
+      })
+      .filter((item): item is { id: string, top: number } => item !== null);
 
-  const activeHeading = headings
-      .reverse()
-      .find(el => el.getBoundingClientRect().top <= 101);
+  if (headings.length === 0) return;
 
-  if (activeHeading) {
-    activeTocId.value = activeHeading.id;
+  // 查找逻辑：找到第一个 top 值大于 offset 的元素，那它的"前一个"就是当前应该高亮的
+  const index = headings.findIndex(h => h.top > offset);
+
+  if (index === -1) {
+    // 所有标题都在 offset 上方，说明在看最后一部分
+    activeTocId.value = headings[headings.length - 1]!.id;
+  } else if (index > 0) {
+    // 正常情况，高亮前一个
+    activeTocId.value = headings[index - 1]!.id;
   } else {
-    activeTocId.value = '';
+    // 第一个标题就在 offset 下方，说明刚开始滚动，高亮第一个
+    activeTocId.value = headings[0]!.id;
   }
 }
-
 
 onMounted(() => {
   selectDate()
@@ -136,10 +279,42 @@ onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
 })
 
-watch(articleId, selectDate)
+watch(activeTocId, async (newId) => {
+  if (!newId) return
+
+  // 1. 第一步：先修改数据，展开父级
+  // 必须在 nextTick 之前执行，这样 Vue 才能在下一次 DOM 更新时渲染出隐藏的菜单项
+  if (!isClickScrolling.value) {
+    expandParents(newId)
+  }
+
+  // 2. 第二步：等待 DOM 更新完成
+  // 此时 visibleToc 已经重新计算，隐藏的 li 元素已经渲染到页面上
+  await nextTick()
+
+  // 3. 第三步：处理侧边栏滚动
+  if (sidebarRef.value) {
+    const activeEl = sidebarRef.value.querySelector(`#toc-item-${newId}`) as HTMLElement
+
+    if (activeEl) {
+      const container = sidebarRef.value
+      const top = activeEl.offsetTop
+      const height = activeEl.clientHeight
+      const containerHeight = container.clientHeight
+
+      const targetScrollTop = top - containerHeight / 2 + height / 2
+
+      container.scrollTo({
+        top: targetScrollTop,
+        behavior: 'smooth'
+      })
+    }
+  }
+})
 </script>
 
 <style scoped lang="scss">
+/* 样式保持不变 */
 .page-layout {
   display: flex;
   justify-content: center;
@@ -148,7 +323,6 @@ watch(articleId, selectDate)
   flex-direction: row;
 }
 
-/* 侧边栏 */
 .sidebar {
   flex: 0 0 25%;
   min-width: 180px;
@@ -162,27 +336,23 @@ watch(articleId, selectDate)
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  overflow: auto;
+  overflow: auto; /* 确保这里是 auto */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  /* 隐藏滚动条 */
   scrollbar-width: none;
   -ms-overflow-style: none;
+
+  /* 为了平滑滚动效果 */
+  scroll-behavior: smooth;
+
   &::-webkit-scrollbar {
     width: 0;
     height: 0;
   }
 
-  //&:hover {
-  //  transform: translateY(-4px);
-  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  //}
-
   .menu-wrapper {
     margin: 0;
     padding: 0;
     list-style: none;
-    max-height: 100%;
 
     ul {
       list-style: none;
@@ -191,35 +361,68 @@ watch(articleId, selectDate)
     }
 
     li {
+      display: flex;
+      align-items: center;
       padding: 5px;
       font-size: 0.85rem;
       border-radius: 4px;
-      cursor: pointer;
       transition: all 0.2s;
       color: #555;
       word-wrap: break-word;
       white-space: normal;
 
+      .toc-arrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+        color: #999;
+
+        &:hover {
+          color: #df1c5f;
+        }
+      }
+
+      .toc-arrow.is-collapsed {
+        transform: rotate(-90deg);
+      }
+
+      .toc-arrow.hidden {
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .toc-text {
+        flex: 1;
+        cursor: pointer;
+        &:hover {
+          color: #df1c5f;
+        }
+      }
+
       &:hover {
         background: rgba(225, 158, 186, 0.05);
-        color: #df1c5f;
       }
 
       &.active {
         background: rgba(225, 158, 186, 0.05);
-        color: #df1c5f;
-        font-weight: bold;
+        .toc-text {
+          color: #df1c5f;
+          font-weight: bold;
+        }
       }
     }
   }
 }
 
-/* 主内容区 */
 .content {
   min-height: calc(100vh - 140px);
   overflow-y: auto;
   width: clamp(300px, 60%, 1000px);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
   padding: 20px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -227,9 +430,4 @@ watch(articleId, selectDate)
   backdrop-filter: blur(8px);
   border-radius: 10px;
 }
-
-//.content:hover{
-//  transform: translateY(-4px);
-//  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-//}
 </style>
