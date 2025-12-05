@@ -10,6 +10,7 @@ export interface BlogItem {
     blogId: number
     title: string
     summary: string
+    tags: string
     createdAt: string
 }
 export type BlogDateListRes = BaseRes<BlogItem[]>
@@ -19,6 +20,7 @@ export interface BlogPost {
     title: string
     summary: string
     content: string
+    tags: string
     createdAt: string
 }
 export type BlogPostRes = BaseRes<BlogPost>

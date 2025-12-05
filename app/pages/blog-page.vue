@@ -60,8 +60,17 @@
         <div style="display: flex; justify-content: space-between; align-items: stretch;">
           <div style="flex: 1;">
             <p class="title">{{ article.title }}</p>
+            <div class="date"><i class="ri-calendar-2-line" ></i>{{ formatDate(article.createdAt) }}</div>
             <p class="summary">{{ article.summary }}</p>
-            <div class="date"><i class="ri-calendar-2-line"></i>{{ formatDate(article.createdAt) }}</div>
+
+            <div style="display: flex;margin-bottom: 5px">
+            <div v-for="item in (article.tags == null || article.tags == '') ? []: article.tags.split(',')" style="margin-right: 10px">
+              <n-tag round :bordered="false" type="warning">
+                # {{ item }}
+              </n-tag>
+            </div>
+            </div>
+
           </div>
 
 
@@ -223,20 +232,19 @@ watch(date, fetchArticles)
   }
 
   .summary {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: #666;
-    margin: 20px 0;
+    margin: 5px 0 10px;
   }
 
   .date {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: #999;
-    margin: 20px 0 10px;
     display: flex;
     align-items: center;
 
     i {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       margin-right: 10px;
     }
 
