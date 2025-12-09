@@ -28,7 +28,7 @@ const props = defineProps<Props>()
 const md: MarkdownIt = new MarkdownIt({
   html: true,
   linkify: true,
-  typographer: true,
+  typographer: false,
   highlight: (str: string, lang: string) => {
     if (lang && Prism.languages[lang]) {
       return `<pre class="language-${lang}"><code>${Prism.highlight(str, Prism.languages[lang], lang)}</code></pre>`
