@@ -4,11 +4,15 @@
     <aside class="basic-aside">
       <div style="display: flex;flex-direction: column;height: 100%">
         <div class="left-sidebar-name">
-          <div class="twelve">
-            <h2>
-              <span style="color: #9eb4ed;">//</span> 日期 <span style="color: #e19eba;">//</span>
-            </h2>
+        <p class="title">Tags</p>
+        <div style="display: flex;margin-bottom: 5px;flex-wrap: wrap;">
+          <div v-for="item in tagList" style="margin: 3px">
+            <n-tag class="custom-tag" :class="{ active: activeTag === item }" round size="small" :bordered="false" @click="handleTagClick(item)">
+              # {{ item }}
+            </n-tag>
           </div>
+        </div>
+
         </div>
         <div class="left-sidebar">
           <ul class="menu-wrapper">
@@ -65,7 +69,7 @@
 
             <div style="display: flex;margin-bottom: 5px">
             <div v-for="item in (article.tags == null || article.tags == '') ? []: article.tags.split(',')" style="margin-right: 10px">
-              <n-tag round :bordered="false" type="warning">
+              <n-tag round :bordered="false" size="small" type="warning">
                 # {{ item }}
               </n-tag>
             </div>
@@ -93,6 +97,7 @@
 import type {BlogDateListRes, BlogDateMenuItem, BlogDateMenuRes, BlogItem} from "~/types/blog";
 import {BaseAPI} from "~/utils/api";
 import {NSkeleton} from "naive-ui";
+import type {BaseRes} from "~/types/api";
 
 const route = useRoute()
 const router = useRouter()
@@ -101,10 +106,12 @@ const date = computed(() => route.query.date as string || '')
 // ===================== 数据状态 =====================
 const articles = ref<BlogItem[]>([])
 const dateList = ref<BlogDateMenuItem[]>([])
+const tagList = ref<string[]>([])
 const groupedDates = ref<Record<string, BlogDateMenuItem[]>>({})
 const loading = ref(false)
 
 const activeDate = ref('')
+const activeTag = ref('')
 const expandedYears = ref<string[]>([])
 
 // ===================== 工具函数 =====================
@@ -119,6 +126,7 @@ const formatDate = (d: string) => {
 // ===================== 点击日期加载文章 =====================
 const selectDate = async (selectedDate: string) => {
   activeDate.value = selectedDate
+  activeTag.value = ''
   loading.value = true
   try {
     const res: BlogDateListRes = await BaseAPI.apiGet(`blog/blog-date-list/${selectedDate}`)
@@ -130,13 +138,26 @@ const selectDate = async (selectedDate: string) => {
   }
 }
 
+// ===================== 点击标签加载文章 =====================
+const handleTagClick = async (tagName: string) => {
+  console.log('点击了标签:', tagName)
+  activeDate.value = ''
+  activeTag.value = tagName
+  // 这里可以写跳转逻辑，例如：
+  // router.push({ path: '/tags', query: { tag: tagName } })
+  const res: BlogDateListRes = await BaseAPI.apiGet(`blog/blog-tag/${tagName}`)
+  articles.value = res.data
+}
+
 // ===================== 数据请求 =====================
 const fetchArticles = async () => {
   loading.value = true
   try {
-    const res: BlogDateMenuRes = await BaseAPI.apiGet('blog/blog-date-menu')
+    const resDate: BlogDateMenuRes = await BaseAPI.apiGet('blog/blog-date-menu')
+    const resTags: BaseRes<string[]> = await BaseAPI.apiGet('blog/blog-date-tags')
 
-    dateList.value = res.data
+    dateList.value = resDate.data
+    tagList.value = resTags.data
 
     // 按年份分组
     const grouped: Record<string, BlogDateMenuItem[]> = {}
@@ -266,59 +287,101 @@ watch(date, fetchArticles)
 .left-sidebar-name {
   min-height: 100px;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 5px 15px 15px 15px;
   box-sizing: border-box;
   position: sticky;
   top: 20px;
-  max-height: calc(100vh - 100px);
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: auto;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   border-radius: 10px;
+  flex-wrap: wrap;
 
-  .twelve h2 {
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    width: 160px;
-    text-align: center;
-    margin: auto;
-    white-space: nowrap;
-    padding-bottom: 13px;
-    position: relative;
+  .title {
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+
+    &::before {
+      content: "";
+      display: inline-block;
+      width: 5px;
+      height: 1.25em;
+      background: #6e4040;
+    }
   }
 
-  .twelve h2:before {
-    background-color: #9eb4ed;
-    content: '';
-    display: block;
-    height: 3px;
-    width: 75px;
-    margin-bottom: 5px;
-  }
-
-  .twelve h2:after {
-    background-color: #e19eba;
-    content: '';
-    display: block;
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    height: 3px;
-    width: 75px;
-    margin-bottom: 0.25em;
-  }
+  //.twelve h2 {
+  //  font-size: 26px;
+  //  font-weight: 700;
+  //  letter-spacing: 1px;
+  //  text-transform: uppercase;
+  //  width: 160px;
+  //  text-align: center;
+  //  margin: auto;
+  //  white-space: nowrap;
+  //  padding-bottom: 13px;
+  //  position: relative;
+  //}
+  //
+  //.twelve h2:before {
+  //  background-color: #9eb4ed;
+  //  content: '';
+  //  display: block;
+  //  height: 3px;
+  //  width: 75px;
+  //  margin-bottom: 5px;
+  //}
+  //
+  //.twelve h2:after {
+  //  background-color: #e19eba;
+  //  content: '';
+  //  display: block;
+  //  position: absolute;
+  //  right: 0;
+  //  bottom: 0;
+  //  height: 3px;
+  //  width: 75px;
+  //  margin-bottom: 0.25em;
+  //}
 
   //&:hover {
   //  transform: translateY(-4px);
   //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
   //}
 }
+
+.custom-tag {
+  cursor: pointer;
+  background-color: #f3f3f3;
+  color: #666;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0 12px;
+  user-select: none;
+
+  &:hover {
+    background-color: #e19eba;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(225, 158, 186, 0.4);
+  }
+
+  &.active {
+    transform: translateY(0);
+    background-color: #e19eba;
+    color: white;
+  }
+}
+
 
 .left-sidebar {
   margin-top: 20px;
