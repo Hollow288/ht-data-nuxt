@@ -1,49 +1,64 @@
 <template>
   <header class="header-container">
-    <!-- 返回按钮 -->
+    <!-- 1. 返回按钮 -->
     <button class="back-btn" @click="goBack" aria-label="返回">
       <i class="ri-arrow-left-line"></i>
     </button>
 
-    <!-- 主导航 -->
-    <nav class="main-nav">
+    <!-- 2. 移动端菜单切换按钮 -->
+    <button class="mobile-menu-toggle" @click="toggleMobileMenu" aria-label="菜单">
+      <i :class="isMobileMenuOpen ? 'ri-close-line' : 'ri-menu-line'"></i>
+    </button>
+
+    <!-- 3. 主导航 -->
+    <!-- 注意：这里的 CSS 会控制它从左侧滑出来 -->
+    <nav class="main-nav" :class="{ 'mobile-active': isMobileMenuOpen }">
       <ul class="main-menu">
-        <li>
+        <li @click="closeMobileMenu">
           <NuxtLink to="/" active-class="active-link">首页</NuxtLink>
         </li>
-        <li>
+        <li @click="closeMobileMenu">
           <NuxtLink to="/blog-page" active-class="active-link">文章</NuxtLink>
         </li>
-        <li @mouseenter="showSubmenu"
-            @mouseleave="hideSubmenu"
-            class="has-submenu">
-          <NuxtLink to="/hotta-page" active-class="active-link"><div style="display: flex">
-            Hotta&nbsp;
-            <div style="vertical-align: middle;display: flex;  align-items: center;">
-              <svg      aria-hidden="true"
-                        focusable="false"
-                        data-prefix="fas"
-                        data-icon="chevron-down"
-                        role="img"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 512 512"
-                        style="width: 8px; height: 8px;">
+
+        <!-- Hotta 下拉菜单 -->
+        <li
+            @mouseenter="isDesktop ? showSubmenu() : null"
+            @mouseleave="isDesktop ? hideSubmenu() : null"
+            class="has-submenu"
+        >
+          <div class="menu-label-wrapper" @click="handleSubmenuClick">
+            <NuxtLink to="/hotta-page" active-class="active-link" class="menu-link-txt">
+              Hotta
+            </NuxtLink>
+            <div class="arrow-icon" :class="{ 'rotated': isSubmenuVisible }">
+              <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg"
+                   viewBox="0 0 512 512" style="width: 10px; height: 10px;">
                 <path fill="currentColor"
                       d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path>
               </svg>
             </div>
           </div>
-          </NuxtLink>
+
           <transition name="fade-slide">
             <ul v-show="isSubmenuVisible" class="submenu">
-              <li>
-                <NuxtLink to="/hotta-page/artifact" active-class="active-link"><i class="ri-box-3-line" style="font-size: 14px"></i><span style="margin-left: 10px">源器</span></NuxtLink>
+              <li @click="closeMobileMenu">
+                <NuxtLink to="/hotta-page/artifact" active-class="active-link">
+                  <i class="ri-box-3-line" style="font-size: 14px"></i>
+                  <span style="margin-left: 10px">源器</span>
+                </NuxtLink>
               </li>
-              <li>
-                <NuxtLink to="/hotta-page/food" active-class="active-link"><i class="ri-cake-3-line" style="font-size: 14px"></i><span style="margin-left: 10px">食物</span></NuxtLink>
+              <li @click="closeMobileMenu">
+                <NuxtLink to="/hotta-page/food" active-class="active-link">
+                  <i class="ri-cake-3-line" style="font-size: 14px"></i>
+                  <span style="margin-left: 10px">食物</span>
+                </NuxtLink>
               </li>
-              <li>
-                <NuxtLink to="/hotta-page/recipes" active-class="active-link"><i class="ri-book-2-line" style="font-size: 14px"></i><span style="margin-left: 10px">食谱</span></NuxtLink>
+              <li @click="closeMobileMenu">
+                <NuxtLink to="/hotta-page/recipes" active-class="active-link">
+                  <i class="ri-book-2-line" style="font-size: 14px"></i>
+                  <span style="margin-left: 10px">食谱</span>
+                </NuxtLink>
               </li>
             </ul>
           </transition>
@@ -51,7 +66,7 @@
       </ul>
     </nav>
 
-    <!-- 搜索框 -->
+    <!-- 4. 搜索框 (桌面显示/移动隐藏) -->
     <div class="search-container">
       <input
           ref="searchInputRef"
@@ -67,7 +82,7 @@
       </div>
     </div>
 
-    <!-- 搜索结果下拉框 (保持在 header 下以维持原始定位) -->
+    <!-- 5. 搜索结果 -->
     <transition name="fade-slide">
       <div v-show="showDropdown" class="dropdown-box" @mousedown.prevent>
         <div class="search-results-list">
@@ -116,11 +131,11 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
+import {ref, onMounted, onUnmounted, watch} from 'vue'
 import {useRouter} from 'vue-router'
 import type {BlogDateListRes, BlogItem} from "~/types/blog";
 import {BaseAPI} from "~/utils/api";
-import {NSkeleton} from "naive-ui";
+import {NSkeleton, NHighlight} from "naive-ui";
 import {debounce} from 'lodash-es';
 
 const router = useRouter()
@@ -129,13 +144,59 @@ const showDropdown = ref(false)
 const articles = ref<BlogItem[]>([])
 const isLoading = ref<boolean>(false)
 const searchInputRef = ref<HTMLInputElement | null>(null)
+
+// 菜单相关
 const isSubmenuVisible = ref(false)
+const isMobileMenuOpen = ref(false)
+const isDesktop = ref(true)
+
+const checkScreenSize = () => {
+  if (typeof window !== 'undefined') {
+    isDesktop.value = window.innerWidth > 768
+    if (isDesktop.value) {
+      isMobileMenuOpen.value = false
+      isSubmenuVisible.value = false
+    }
+  }
+}
+
+// 禁止背景滚动
+watch(isMobileMenuOpen, (val) => {
+  if (typeof document !== 'undefined') {
+    document.body.style.overflow = val ? 'hidden' : ''
+  }
+})
+
+onMounted(() => {
+  checkScreenSize()
+  window.addEventListener('resize', checkScreenSize)
+})
+
+onUnmounted(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', checkScreenSize)
+    document.body.style.overflow = ''
+  }
+})
 
 const goBack = () => {
   router.back()
 }
 
-// 搜索文章
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+  if (!isMobileMenuOpen.value) {
+    isSubmenuVisible.value = false
+  }
+}
+
+const closeMobileMenu = () => {
+  if (!isDesktop.value) {
+    isMobileMenuOpen.value = false
+    isSubmenuVisible.value = false
+  }
+}
+
 const performSearch = async () => {
   if (!searchText.value.trim()) {
     showDropdown.value = false
@@ -149,24 +210,27 @@ const performSearch = async () => {
   } finally {
     isLoading.value = false
   }
-
 }
 
 const showSubmenu = () => {
-  isSubmenuVisible.value = true
+  if (isDesktop.value) isSubmenuVisible.value = true
+}
+const hideSubmenu = () => {
+  if (isDesktop.value) isSubmenuVisible.value = false
 }
 
-const hideSubmenu = () => {
-  isSubmenuVisible.value = false
+const handleSubmenuClick = (e: Event) => {
+  if (!isDesktop.value) {
+    e.preventDefault()
+    isSubmenuVisible.value = !isSubmenuVisible.value
+  }
 }
 
 const handleIconClick = () => {
   searchInputRef.value?.focus();
 }
-
 const searchBlog = debounce(performSearch, 500);
 
-// 导航到文章（占位函数）
 const navigateToArticle = (articleId: number) => {
   showDropdown.value = false;
   router.push(`/markdown-page?articleId=${articleId}`)
@@ -179,7 +243,7 @@ const handleBlur = () => {
 }
 const handleFocus = () => {
   if (!searchText.value.trim()) {
-    showDropdown.value = false
+    showDropdown.value = false;
     return
   }
   setTimeout(() => {
@@ -188,13 +252,14 @@ const handleFocus = () => {
 }
 </script>
 
+
 <style scoped>
-/* --- 1. 头部容器 --- */
+/* --- 1. Header 基础样式 --- */
 .header-container {
   position: sticky;
   top: -60px; /* 原始样式 */
   left: 0;
-  z-index: 10;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -205,30 +270,39 @@ const handleFocus = () => {
   background-color: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(5px);
   user-select: none;
-  cursor: default;
+  transition: all 0.3s;
 }
 
-/* --- 2. 返回按钮 --- */
+/* --- 2. 按钮样式 --- */
 .back-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 200px;
   margin-right: 1rem;
-  margin-left: 30px;
   font-size: 1.5rem;
   color: white;
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: color 0.2s;
+  z-index: 102; /* 确保在最上层 */
 }
 
 .back-btn:hover {
   color: #4da6ff;
 }
 
-/* --- 3. 导航菜单 --- */
+/* 移动端菜单开关按钮 */
+.mobile-menu-toggle {
+  display: none; /* 桌面端隐藏 */
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: white; /* 这里建议用白色以适配深色 Header 背景，或者根据你的主题调整 */
+  cursor: pointer;
+  z-index: 102;
+}
+
+/* --- 3. 导航菜单 (默认桌面端样式) --- */
 .main-nav {
   margin: 0 auto;
 }
@@ -247,16 +321,29 @@ const handleFocus = () => {
 
 .main-menu li a {
   position: relative;
-  padding-bottom: 1em;
   font-size: 1em;
   color: rgb(39, 39, 42);
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;
-  transition: color 0.2s;
+  display: flex;
+  align-items: center;
 }
 
-.main-menu li a:hover {
+.menu-label-wrapper {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.arrow-icon {
+  margin-left: 8px;
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease;
+}
+
+.main-menu li a:hover, .menu-label-wrapper:hover .menu-link-txt {
   color: #78c1f3;
 }
 
@@ -264,8 +351,7 @@ const handleFocus = () => {
   color: #78c1f3;
 }
 
-
-/* --- 4. 搜索区域 --- */
+/* --- 4. 搜索框 --- */
 .search-container {
   position: relative;
   margin-left: 20px;
@@ -297,8 +383,63 @@ const handleFocus = () => {
   color: #999;
 }
 
-.search-container div :hover {
-  color: #7e7d7d;
+/* --- 5. 子菜单 (桌面悬浮) --- */
+.has-submenu {
+  position: relative;
+}
+
+.submenu {
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  margin: 0;
+  list-style: none;
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 11;
+  padding: 10px 0;
+  min-width: 120px;
+}
+
+.submenu {
+  position: absolute;
+  top: 40px;
+  left: 100px;
+  width: max-content;
+  margin: 0;
+  list-style: none;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 11;
+  padding-inline-start: 0;
+  overflow: hidden;
+  min-width: 100px;
+  text-align: center;
+}
+
+.submenu li {
+  display: block;
+  padding: 0;
+}
+
+.submenu li a {
+  display: block;
+  padding: 10px 20px;
+  font-size: 0.9em;
+  color: black;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.submenu li a:hover {
+  background-color: rgba(209, 241, 253, 0.5);
+  color: rgb(47, 183, 227);
 }
 
 /* --- 5. 搜索结果下拉框 --- */
@@ -323,7 +464,6 @@ const handleFocus = () => {
   overflow-y: auto;
 }
 
-/* --- 6. 搜索结果条目 --- */
 .search-item {
   width: 100%;
   padding: 10px 0;
@@ -372,87 +512,100 @@ const handleFocus = () => {
   word-break: break-all;
 }
 
-/* --- 7. 下拉框滚动条样式 --- */
-.search-results-list::-webkit-scrollbar {
-  width: 6px;
-}
+/* =========================================
+   移动端适配 (核心修复)
+   ========================================= */
+@media screen and (max-width: 768px) {
+  /* 1. Header 调整 */
+  .header-container {
+    padding: 0 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+  }
 
-.search-results-list::-webkit-scrollbar-track {
-  background-color: transparent;
-}
+  .back-btn{
+    display: none;
+  }
 
-.search-results-list::-webkit-scrollbar-thumb {
-  background-color: #b8b6b6;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
+  /* 2. 按钮颜色适配 */
+  .mobile-menu-toggle {
+    color: #333; /* 浅色背景用深色图标 */
+  }
 
-.search-results-list::-webkit-scrollbar-thumb:hover {
-  background-color: #999;
-}
+  .mobile-menu-toggle {
+    display: block;
+  }
 
-/* --- 8. 过渡动画 --- */
-.fade-slide-enter-from,
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
+  /* 3. 隐藏搜索 */
+  .search-container, .dropdown-box {
+    display: none !important;
+  }
 
-.fade-slide-enter-to,
-.fade-slide-leave-from {
-  opacity: 1;
-  transform: translateY(0);
-}
+  /* 4. 侧滑菜单 (从左侧滑出) */
+  .main-nav {
+    position: fixed;
+    top: 60px; /* 在 Header 下方 */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 60px);
+    background-color: white; /* 确保背景不透明 */
+    padding: 20px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: all 0.2s ease;
-}
+    /* 核心修改：改为从左侧(-100%)滑入，解决右侧空白问题 */
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.3s;
+    box-shadow: none;
+  }
 
-.has-submenu {
-  position: relative;
-}
+  .main-nav.mobile-active {
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0s;
+  }
 
-.submenu {
-  position: absolute;
-  top: 50px;
-  left: 50px;
-  width: max-content;
-  margin: 0;
-  list-style: none;
-  background-color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(5px);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 11;
-  padding-inline-start: 0;
-  overflow: hidden;
-  min-width: 100px;
-  text-align: center;
-}
+  /* 5. 菜单项调整 */
+  .main-menu {
+    flex-direction: column;
+    width: 100%;
+    align-items: flex-start;
+  }
 
-.submenu li {
-  display: block;
-  padding: 0;
-}
+  .main-menu li {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
 
-.submenu li a {
-  display: block;
-  padding: 10px 20px;
-  font-size: 0.9em;
-  color: black;
-  text-transform: none;
-  white-space: nowrap;
-}
+  .main-menu li a, .menu-label-wrapper {
+    padding: 16px 24px;
+    width: 100%;
+    font-size: 16px;
+    justify-content: space-between;
+    color: #333;
+  }
 
-.submenu li a:hover {
-  background-color: rgba(209, 241, 253, 0.5);
-  color: rgb(47, 183, 227);
-}
+  /* 6. 子菜单调整 */
+  .submenu {
+    position: static;
+    transform: none;
+    box-shadow: none;
+    background-color: #fafafa;
+    width: 100%;
+    border-radius: 0;
+    padding: 0;
+  }
 
-/* 子菜单的下划线效果可以移除或修改 */
-.submenu li a::after {
-  display: none;
+  .submenu li a {
+    padding-left: 48px;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .arrow-icon.rotated {
+    transform: rotate(180deg);
+  }
 }
 </style>
