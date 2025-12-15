@@ -95,4 +95,44 @@ onUnmounted(() => {
 .fade-leave-active {
   transition: all 0.3s ease;
 }
+
+
+@media screen and (max-width: 768px) {
+  .back-container {
+    right: 15px; /* 靠右边近一点 */
+    bottom: 30px; /* 稍微往下放一点，离拇指更近 */
+  }
+
+  /* 隐藏“返回上一页”按钮 */
+  /* 假设你在 template 里给返回按钮加个特定的 class 或者用 :nth-child */
+  /* 为了方便，建议修改 template 给两个按钮分别加 class，见下方 HTML 修改建议 */
+
+  /* 如果不想改 HTML，可以用 nth-child(2) 选择第二个按钮 (goBack) */
+  .back-btn:nth-child(2) {
+    display: none;
+  }
+
+  /* 调整移动端按钮样式 */
+  .back-btn {
+    width: 40px; /* 稍微做小一点点 */
+    height: 40px;
+    font-size: 20px;
+    opacity: 0.8; /* 稍微透明，避免遮挡文字太严重 */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* 滚动时稍微透明，停止时恢复 (如果想做高级点可以加 JS，这里简单处理保持半透明即可) */
+}
+
+/* 动画部分保持不变 */
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: scale(0.8) translateY(10px);
+}
+.fade-enter-to,
+.fade-leave-from {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
 </style>
