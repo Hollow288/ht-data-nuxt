@@ -21,8 +21,8 @@
 
     <main class="main-content">
       <div class="right-card">
-        <span class="me-title"><img
-            src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=4000&pause=200&vCenter=true&width=435&height=25&lines=Hi+there+%F0%9F%91%8B;and+welcome+to+this+website."
+        <span class="me-title"><img style="max-width: 100%; height: auto;"
+                                    src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=4000&pause=200&vCenter=true&width=435&height=25&lines=Hi+there+%F0%9F%91%8B;and+welcome+to+this+website."
             alt="Typing SVG"/></span>
         <div style="display: flex;flex-direction: column;">
           <div>
@@ -268,5 +268,50 @@ function onLoad() {
 .main-content ::-webkit-scrollbar {
   height: 8px;
   width: 8px;
+}
+
+@media screen and (max-width: 768px) {
+  /* 1. 容器改为纵向排列，减少内边距 */
+  .container {
+    flex-direction: column;
+    padding: 20px 15px;
+  }
+
+  /* 2. 侧边栏调整 */
+  .sidebar {
+    width: 100%; /* 宽度撑满 */
+    margin-right: 0; /* 去除右侧间距 */
+    margin-bottom: 20px; /* 改为底部间距 */
+    height: auto; /* 高度自动，取消可能的内部滚动 */
+    overflow: visible; /* 允许内容撑开 */
+  }
+
+  /* 如果觉得手机上头像太大，可以限制一下侧边栏内部图片的最大高度/宽度，或者保持原样 */
+  /* 可选：让侧边栏在手机上看起来更紧凑
+  .avatar-wrap {
+    padding: 15px;
+  }
+  */
+
+  /* 3.主要内容区域调整 */
+  .main-content {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* 4. 右侧卡片调整 */
+  .right-card {
+    padding: 15px; /* 稍微减小内边距 */
+  }
+
+  /* 5. 调整字体大小（可选，防止标题在小手机换行太丑） */
+  .username {
+    font-size: 20px;
+  }
+
+  /* 修复 Skeleton 骨架屏在移动端的宽度 */
+  .n-skeleton {
+    max-width: 100% !important;
+  }
 }
 </style>
