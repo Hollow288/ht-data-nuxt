@@ -1,7 +1,20 @@
 <template>
   <div class="page-layout">
+
+    <div
+        class="mobile-mask"
+        v-if="showMobileToc"
+        @click="showMobileToc = false"
+    ></div>
+
     <!-- 侧边栏：添加 ref -->
-    <aside class="sidebar" ref="sidebarRef">
+    <aside class="sidebar" ref="sidebarRef" :class="{ 'mobile-open': showMobileToc }">
+
+      <div class="mobile-sidebar-header">
+        <span>目录</span>
+        <span @click="showMobileToc = false"><i class="ri-close-line"></i></span>
+      </div>
+
       <div class="menu-wrapper">
         <ul>
           <li
@@ -35,6 +48,10 @@
     <main class="content">
       <MarkdownContent :content="markdown" />
     </main>
+
+    <button class="toc-toggle-btn" @click="showMobileToc = true" aria-label="目录">
+      <i class="ri-list-check"></i>
+    </button>
   </div>
 </template>
 
@@ -49,7 +66,7 @@ import type { BlogPostRes } from "~/types/blog";
 // 路由参数
 const route = useRoute()
 const articleId = computed(() => route.query.articleId || '')
-
+const showMobileToc = ref(false)
 const markdown = ref<string>(`# 加载中...\n\n请稍等...`)
 const md = new MarkdownIt()
 const sidebarRef = ref<HTMLElement | null>(null) // 获取侧边栏DOM
@@ -161,26 +178,27 @@ function expandParents(id: string) {
 }
 
 function scrollTo(id: string) {
-  // 1. 标记正在进行点击滚动，防止途中触发自动展开
+  // 1. 标记正在进行点击滚动
   isClickScrolling.value = true
 
-  // 2. 立即设置高亮并展开目标路径（确保目标可见）
+  // 新增：如果是移动端，点击跳转后自动关闭目录抽屉
+  showMobileToc.value = false
+
+  // ... 原有的跳转逻辑 ...
   activeTocId.value = id
   expandParents(id)
 
-  // 3. 执行页面滚动
   const el = document.getElementById(id)
   if (el) {
     const rect = el.getBoundingClientRect()
-    const offsetTop = window.scrollY + rect.top - 100
+    // 移动端头部可能有遮挡，偏移量可以稍微调大一点
+    const offsetTop = window.scrollY + rect.top - 80
     window.scrollTo({
       top: offsetTop,
       behavior: 'smooth'
     })
   }
 
-  // 4. 解锁机制：平滑滚动需要时间，设置一个超时后释放锁
-  // 时间设为 1000ms 大概足以覆盖大多数滚动的时长
   setTimeout(() => {
     isClickScrolling.value = false
   }, 1500)
@@ -395,5 +413,149 @@ watch(activeTocId, async (newId) => {
   box-sizing: border-box;
   backdrop-filter: blur(8px);
   border-radius: 10px;
+}
+
+
+@media screen and (max-width: 768px) {
+  .page-layout {
+    flex-direction: column;
+    margin: 10px;
+    gap: 0;
+  }
+
+  .content {
+    width: 100%;
+    max-width: 100%;
+    min-height: auto;
+    padding: 15px;
+  }
+
+  /* === 侧边栏改为 Flex 布局，解决高度和对齐问题 === */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;      /* 占满全屏 */
+    max-height: none;
+
+    /* 关键改动：使用 Flex 布局 */
+    display: flex;
+    flex-direction: column;
+
+    background: #fff;
+    z-index: 2000;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0;
+    margin: 0;
+    padding: 0;
+
+    /* 禁止外层滚动 */
+    overflow: hidden;
+
+    &.mobile-open {
+      transform: translateX(0);
+    }
+
+    /* 头部：固定高度，不被压缩 */
+    .mobile-sidebar-header {
+      flex: 0 0 auto; /* 禁止缩放 */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px; /* 增加一点内边距更好看 */
+      border-bottom: 1px solid #f0f0f0;
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: #333;
+      background: #fff; /* 确保背景色 */
+
+      span:last-child {
+        cursor: pointer;
+        font-size: 1.5rem;
+        color: #999;
+        display: flex; /* 让关闭图标垂直居中 */
+      }
+    }
+
+    /* 列表容器：自动填满剩余空间，并处理滚动条 */
+    .menu-wrapper {
+      flex: 1; /* 自动占据头部剩下的所有高度 */
+      height: auto; /* 取消固定的 height */
+      overflow-y: auto;
+      padding: 10px 15px 50px 15px; /* 顶部留点空隙，底部留出空间防遮挡 */
+
+      /* === 隐藏滚动条的核心代码 === */
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+
+      &::-webkit-scrollbar {
+        width: 0 !important;
+        height: 0 !important;
+        display: none !important; /* Chrome/Safari */
+      }
+
+      /* 修复列表可能的默认 margin 导致的错位 */
+      ul {
+        margin-top: 0;
+        padding-top: 5px;
+      }
+    }
+  }
+
+  /* 遮罩层 */
+  .mobile-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1999;
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.3s;
+  }
+
+  /* 悬浮按钮 */
+  .toc-toggle-btn {
+    display: flex;
+    position: fixed;
+    right: 15px;
+    bottom: 90px;
+    min-width: 50px;
+    min-height: 50px;
+    background: #fff;
+    border-radius: 12px;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: none;
+    opacity: 0.8;
+    z-index: 900;
+    color: #BBCCF6;
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+}
+
+/* PC端默认隐藏这些移动端元素 */
+@media screen and (min-width: 769px) {
+  .mobile-mask,
+  .mobile-sidebar-header,
+  .toc-toggle-btn {
+    display: none;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>

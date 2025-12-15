@@ -552,4 +552,80 @@ watch(date, fetchArticles)
   }
 }
 
+
+@media screen and (max-width: 768px) {
+  /* 1. 整体布局改为纵向 */
+  .page-layout {
+    flex-direction: column-reverse; /* 上下排列 */
+    margin: 10px; /* 减小页面边距 */
+    gap: 15px; /* 减小模块间距 */
+  }
+
+  /* 2. 侧边栏 (标签 & 日期) 调整 */
+  .basic-aside {
+    flex: none; /* 取消 flex 比例限制 */
+    width: 100%; /* 宽度撑满 */
+    max-width: 100%;
+    min-width: 0;
+    height: auto; /* 高度自动 */
+    position: static; /* 取消固定定位，随页面滚动 */
+
+    /* 强制重置侧边栏内部那个 inline-style 的 height: 100% */
+    & > div {
+      height: auto !important;
+    }
+  }
+
+  /* 3. 标签区域调整 */
+  .left-sidebar-name {
+    min-height: auto; /* 取消最小高度限制 */
+    position: static; /* 取消 sticky */
+    margin-bottom: 10px;
+    padding: 10px; /* 减小内边距 */
+  }
+
+  /* 4. 日期归档区域调整 */
+  .left-sidebar {
+    margin-top: 0; /* 紧贴标签区域 */
+    max-height: 250px; /* 限制高度，防止日期列表太长占满屏幕，强制出现内部滚动条 */
+    position: static;
+    padding: 10px;
+  }
+
+  /* 5. 文章列表容器调整 */
+  .cards-grid,
+  .card-container {
+    width: 100%; /* 覆盖原来的 clamp() 宽度，撑满屏幕 */
+    /* clamp(300px, 60%, 1000px) 在手机上可能只有 60% 导致太窄，必须改为 100% */
+
+    /* 骨架屏容器高度适应 */
+    min-height: auto;
+  }
+
+  /* 6. 单个文章卡片微调 */
+  .card-item {
+    padding: 10px; /* 稍微减小内边距 */
+
+    .title {
+      font-size: 1.1rem; /* 标题字体稍小一点 */
+      word-break: break-all; /* 防止长标题撑开 */
+    }
+
+    .summary {
+      font-size: 0.9rem;
+      /* 限制摘要行数，可选 */
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* 调整右侧按钮大小，防止在小屏幕挤压内容 */
+    .right-btn {
+      width: 35px;
+      font-size: 1rem;
+    }
+  }
+}
+
 </style>
