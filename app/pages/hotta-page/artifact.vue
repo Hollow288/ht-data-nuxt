@@ -545,7 +545,7 @@ onMounted(async () => {
 
 
 .toc-toggle-btn {
-  display: flex;
+  display: none;
   position: fixed;
   right: 15px;
   bottom: 90px;
@@ -578,6 +578,11 @@ onMounted(async () => {
   .pc-sidebar {
     display: none !important;
   }
+
+  .toc-toggle-btn{
+    display: flex;
+  }
+
 
   .gallery-container { width: 100%; margin: 0; height: auto; min-height: auto; }
   .gallery-container__content { flex-direction: column; }
