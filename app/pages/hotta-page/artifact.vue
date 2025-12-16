@@ -10,11 +10,12 @@ import {BaseAPI} from "~/utils/api";
 const searchText = ref<string>('')
 const thisShowKey = ref<string | undefined>()
 const popoverVisible = ref(false)
+const popoverVisibleMobile = ref(false)
 const loading = ref(false)
 const items = ref<ArtifactListDto[]>([])
 const allItems = ref<ArtifactListDto[]>([])
 const thisArtifactInfo = ref<Artifact>()
-
+const showDrawer = ref(false)
 // artifact filter
 const artifactRarity = ref<string>('')
 
@@ -35,7 +36,6 @@ const onInputArtifactSearch = () => {
   }
 }
 
-
 const queryArtifactList = async () => {
   const artifactList: ArtifactListDtoRes = await BaseAPI.apiGet("artifact/search",{'artifactRarity':encodeURIComponent(artifactRarity.value)})
   allItems.value = artifactList.data
@@ -47,15 +47,16 @@ const findArtifactInfoByKey = async () => {
     loading.value = true
     const artifactRes: ArtifactRes = await BaseAPI.apiGet(`artifact/${thisShowKey.value}`)
     thisArtifactInfo.value = artifactRes.data
-  }finally {
+  } finally {
     loading.value = false
   }
-
 }
 
 const showThisArtifactInfo = async (artifactKey: string) => {
   thisShowKey.value = artifactKey
   await findArtifactInfoByKey()
+  // 核心：在移动端点击后，自动关闭抽屉
+  showDrawer.value = false
 }
 
 const initializePage = async () => {
@@ -73,118 +74,183 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="gallery-container">
-    <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
-    <div v-else class="gallery-container__content">
-      <div class="gallery-container__content__left">
-        <img width="150" :src="thisArtifactInfo?.artifactIcon" :alt="thisArtifactInfo?.artifactName" class="gallery-card__image" loading="lazy"/>
-        <div class="level">{{ thisArtifactInfo?.artifactRarity }}</div>
-        <div class="name">{{ thisArtifactInfo?.artifactName }}</div>
-        <div class="description" v-html="replaceTagWithColor(thisArtifactInfo?.useDescription,'shuzhi','C94F4F')"></div>
-      </div>
-      <div class="gallery-container__content__right">
+  <div class="page-container-wrapper">
 
-        <div class="artifact-detail">
-          <span class="level">星级效果：</span>
-          <div v-for="(items,index) in thisArtifactInfo?.artifactDetail" style="display: flex;margin-bottom: 10px">
-            <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>
-            <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>
+    <!-- 1. 主要内容区域 -->
+    <div class="gallery-container">
+      <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
+      <div v-else class="gallery-container__content">
+        <div class="gallery-container__content__left">
+          <img width="150" :src="thisArtifactInfo?.artifactIcon" :alt="thisArtifactInfo?.artifactName" class="gallery-card__image" loading="lazy"/>
+          <div class="level">{{ thisArtifactInfo?.artifactRarity }}</div>
+          <div class="name">{{ thisArtifactInfo?.artifactName }}</div>
+          <div class="description" v-html="replaceTagWithColor(thisArtifactInfo?.useDescription,'shuzhi','C94F4F')"></div>
+        </div>
+        <div class="gallery-container__content__right">
+          <div class="artifact-detail">
+            <span class="level">星级效果：</span>
+            <div v-for="(items,index) in thisArtifactInfo?.artifactDetail" style="display: flex;margin-bottom: 10px">
+              <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>
+              <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <aside class="sidebar sidebar--right">
-    <div class="search-panel">
-      <header class="search-panel__header">
-        <h4 class="search-panel__title">Search</h4>
-        <small class="search-panel__subtitle">Search by name and/or type</small>
-        <div class="search-panel__input-wrapper">
-          <n-popover
-              trigger="click"
-              placement="bottom"
-              v-model:show="popoverVisible"
-              :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
-              style="max-width: 200px; background-color: rgba(255, 255, 255, 0.5);box-sizing: border-box;padding:0"
-          >
-            <template #trigger>
-              <i class="ri-filter-3-line" :class="{ 'active': popoverVisible }"></i>
-            </template>
-            <template #header>
-              <n-text strong depth="1">Type filter</n-text>
-            </template>
-            <div class="filter-group">
-              <p>Rarity:</p>
-              <div class="button-group">
-                <NButton color="#9E8BA8" :dashed="artifactRarity!=='SSR'" size="tiny"
-                         @click="changeArtifactRarity('SSR')">SSR
-                </NButton>
-                <NButton color="#9E8BA8" :dashed="artifactRarity!=='SR'" size="tiny"
-                         @click="changeArtifactRarity('SR')">SR
-                </NButton>
+    <!-- 2. PC端侧边栏 (移动端隐藏) -->
+    <aside class="sidebar sidebar--right pc-sidebar">
+      <div class="search-panel">
+        <header class="search-panel__header">
+          <h4 class="search-panel__title">Search</h4>
+          <small class="search-panel__subtitle">Search by name and/or type</small>
+          <div class="search-panel__input-wrapper">
+            <n-popover
+                trigger="click"
+                placement="bottom"
+                v-model:show="popoverVisible"
+                :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
+                style="max-width: 200px; background-color: rgba(255, 255, 255, 0.5);box-sizing: border-box;padding:0;"
+            >
+              <template #trigger>
+                <i class="ri-filter-3-line" :class="{ 'active': popoverVisible }"></i>
+              </template>
+              <template #header>
+                <n-text strong depth="1">Type filter</n-text>
+              </template>
+              <div class="filter-group">
+                <p>Rarity:</p>
+                <div class="button-group">
+                  <NButton color="#9E8BA8" :dashed="artifactRarity!=='SSR'" size="tiny"
+                           @click="changeArtifactRarity('SSR')">SSR
+                  </NButton>
+                  <NButton color="#9E8BA8" :dashed="artifactRarity!=='SR'" size="tiny"
+                           @click="changeArtifactRarity('SR')">SR
+                  </NButton>
+                </div>
               </div>
-            </div>
-          </n-popover>
-          <input type="text" name="filter" id="filter" v-model="searchText" @input="onInputArtifactSearch()"
-                 placeholder="Search"/>
+            </n-popover>
+            <input type="text" v-model="searchText" @input="onInputArtifactSearch()" placeholder="Search"/>
+          </div>
+        </header>
+        <div class="search-panel__content">
+          <n-virtual-list style="height: 100%" :item-size="50" :items="items">
+            <template #default="{ item }">
+              <div :key="item.artifactKey" class="result-item" :class="{'active': thisShowKey === item.artifactKey}"
+                   @click="showThisArtifactInfo(item.artifactKey)">
+                <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt="">
+                <div class="result-item__details">
+                  <span class="task-title">{{ item.artifactName }}</span>
+                  <span class="task-cat">{{ item.artifactRarity }}</span>
+                </div>
+              </div>
+            </template>
+          </n-virtual-list>
         </div>
-      </header>
-      <div class="search-panel__content">
-        <n-virtual-list style="height: 100%" :item-size="50" :items="items">
-          <template #default="{ item }">
-            <div :key="item.artifactKey" class="result-item" :class="{'active': thisShowKey === item.artifactKey}"
-                 @click="showThisArtifactInfo(item.artifactKey)">
-              <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt="">
-              <div class="result-item__details">
-                <span class="task-title">{{ item.artifactName }}</span>
-                <span class="task-cat">{{ item.artifactRarity }}</span>
-              </div>
-            </div>
-          </template>
-        </n-virtual-list>
       </div>
-    </div>
-  </aside>
+    </aside>
+
+    <!-- 3. 移动端悬浮按钮 (PC端隐藏) -->
+<!--    <div class="mobile-fab" @click="showDrawer = true">-->
+<!--      <i class="ri-list-check"></i>-->
+<!--      <span>列表</span>-->
+<!--    </div>-->
+
+    <button class="toc-toggle-btn" @click="showDrawer = true" aria-label="搜索">
+      <i class="ri-search-line"></i>
+    </button>
+
+    <!-- 4. 移动端抽屉 (PC端隐藏，内容复用侧边栏逻辑) -->
+    <Teleport to="body">
+      <!-- 遮罩层 -->
+      <Transition name="fade">
+        <div v-if="showDrawer" class="custom-drawer-mask" @click="showDrawer = false"></div>
+      </Transition>
+
+      <!-- 抽屉面板 -->
+      <Transition name="slide">
+        <div v-if="showDrawer" class="custom-drawer-panel">
+          <!-- 核心布局容器 -->
+          <div class="drawer-layout">
+
+            <!-- 固定头部 -->
+            <header class="search-panel__header drawer-header">
+              <h4 class="search-panel__title">Search</h4>
+              <small class="search-panel__subtitle">Search by name and/or type</small>
+              <div class="search-panel__input-wrapper">
+                <n-popover
+                    trigger="click"
+                    placement="bottom"
+                    v-model:show="popoverVisibleMobile"
+                    :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
+                    style="max-width: 200px; background-color: rgba(255, 255, 255, 0.5); box-sizing: border-box; padding: 0; z-index: 1000;"
+                >
+                  <template #trigger>
+                    <i class="ri-filter-3-line" :class="{ active: popoverVisibleMobile }"></i>
+                  </template>
+                  <template #header>
+                    <n-text strong depth="1">Type filter</n-text>
+                  </template>
+                  <div class="filter-group">
+                    <p>Rarity:</p>
+                    <div class="button-group">
+                      <NButton color="#9E8BA8" :dashed="artifactRarity !== 'SSR'" size="tiny" @click="changeArtifactRarity('SSR')">SSR</NButton>
+                      <NButton color="#9E8BA8" :dashed="artifactRarity !== 'SR'" size="tiny" @click="changeArtifactRarity('SR')">SR</NButton>
+                    </div>
+                  </div>
+                </n-popover>
+                <input type="text" v-model="searchText" @input="onInputArtifactSearch" placeholder="Search"/>
+              </div>
+            </header>
+
+            <!-- 滚动列表区域 (Flex: 1) -->
+            <div class="drawer-body">
+              <n-virtual-list
+                  style="height: 100%;"
+                  :item-size="50"
+                  :items="items"
+              >
+                <template #default="{ item }">
+                  <div
+                      :key="item.artifactKey"
+                      class="result-item"
+                      :class="{ active: thisShowKey === item.artifactKey }"
+                      @click="showThisArtifactInfo(item.artifactKey)"
+                  >
+                    <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt=""/>
+                    <div class="result-item__details">
+                      <span class="task-title">{{ item.artifactName }}</span>
+                      <span class="task-cat">{{ item.artifactRarity }}</span>
+                    </div>
+                  </div>
+                </template>
+              </n-virtual-list>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+  </div>
 </template>
 
 <style scoped lang="scss">
-.sidebar {
-  flex: 0 0 25%;
-  min-height: calc(100vh - 100px);
-  max-height: calc(100vh - 100px);
-  min-width: 180px;
-  max-width: 300px;
-  box-sizing: border-box;
-  position: sticky;
-  top: 40px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  user-select: none;
-  cursor: default;
 
-  //&:hover {
-  //  transform: translateY(-4px);
-  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  //}
+/* PC 端布局容器 */
+.page-container-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
 }
-
 
 .gallery-container {
   min-height: calc(100vh - 100px);
   overflow-y: auto;
-  width: clamp(300px, 60%, 1000px);
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  //&:hover {
-  //  transform: translateY(-4px);
-  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  //}
 
   &__status {
     display: flex;
@@ -199,7 +265,6 @@ onMounted(async () => {
     display: flex;
     height: 100%;
 
-
     &__left {
       width: 40%;
       display: flex;
@@ -213,7 +278,7 @@ onMounted(async () => {
       ::after {
         content: "";
         position: absolute;
-        top: 10%; /* 控制分割线上下的位置 */
+        top: 10%;
         bottom: 10%;
         right: 0;
         width: 1px;
@@ -252,7 +317,6 @@ onMounted(async () => {
         flex-direction: column;
         justify-content: center;
 
-
         .level {
           text-transform: uppercase;
           font-size: 15px;
@@ -278,43 +342,29 @@ onMounted(async () => {
           margin-top: -4px;
         }
       }
-
     }
-
-
   }
 }
 
-
-.result-item {
-  display: flex;
-  align-items: center;
-  height: 50px;
+/* PC Sidebar 样式 */
+.sidebar {
+  flex: 0 0 25%;
+  min-height: calc(100vh - 100px);
+  max-height: calc(100vh - 100px);
+  min-width: 180px;
+  max-width: 300px;
   box-sizing: border-box;
-
-  &:hover {
-    background-color: rgba(128, 128, 128, 0.1);
-    cursor: pointer;
-  }
-
-  &.active {
-    background-color: rgba(128, 128, 128, 0.1);
-  }
-
-  &__avatar {
-    margin-left: 10px;
-    width: 28px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-
-  &__details {
-    display: flex;
-    flex-direction: column;
-  }
+  position: sticky;
+  top: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+  cursor: default;
 }
 
-
+/* 搜索面板通用样式 */
 .search-panel {
   display: flex;
   flex-direction: column;
@@ -362,6 +412,7 @@ onMounted(async () => {
       color: rgba(255, 255, 255, 0.7);
       font-size: 18px;
       cursor: pointer;
+      z-index: 10;
 
       &:hover, &.active {
         color: #FFF;
@@ -373,6 +424,34 @@ onMounted(async () => {
     flex: 1;
     min-height: 0;
     position: relative;
+  }
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  box-sizing: border-box;
+
+  &:hover {
+    background-color: rgba(128, 128, 128, 0.1);
+    cursor: pointer;
+  }
+
+  &.active {
+    background-color: rgba(128, 128, 128, 0.1);
+  }
+
+  &__avatar {
+    margin-left: 10px;
+    width: 28px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
   }
 }
 
@@ -409,10 +488,100 @@ onMounted(async () => {
 }
 
 
-@media (max-height: 600px) {
-  .search-panel__header {
-    display: none;
+.custom-drawer-mask {
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 998;
+  backdrop-filter: blur(2px);
+}
+
+/* 抽屉本体 */
+.custom-drawer-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 85%;
+  max-width: 340px;
+  z-index: 999;
+  box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+  /* 确保抽屉内部布局占满 */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 抽屉内部 Flex 布局核心 */
+.drawer-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.drawer-header {
+  flex-shrink: 0; /* 头部不被压缩，高度固定 */
+  /* 这里直接复用了 search-panel__header 的样式 */
+}
+
+.drawer-body {
+  flex: 1; /* 占据剩余高度 */
+  overflow: hidden; /* 隐藏溢出，交给内部 Virtual List 处理滚动 */
+  position: relative;
+  background-color: #fff;
+}
+
+/* =========================================
+   Vue 动画 (Transitions)
+   ========================================= */
+
+/* Fade 动画 (Mask) */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+/* Slide 动画 (Drawer) */
+.slide-enter-active, .slide-leave-active { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.slide-enter-from, .slide-leave-to { transform: translateX(100%); }
+
+
+.toc-toggle-btn {
+  display: flex;
+  position: fixed;
+  right: 15px;
+  bottom: 90px;
+  min-width: 50px;
+  min-height: 50px;
+  background: #fff;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: none;
+  opacity: 0.8;
+  z-index: 900;
+  color: #BBCCF6;
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.2s;
+
+  &:active {
+    transform: scale(0.9);
   }
 }
 
+/* =========================================
+   移动端适配代码 (Mobile Adaptation)
+   ========================================= */
+@media screen and (max-width: 768px) {
+
+  /* 1. 隐藏 PC 端侧边栏 */
+  .pc-sidebar {
+    display: none !important;
+  }
+
+  .gallery-container { width: 100%; margin: 0; height: auto; min-height: auto; }
+  .gallery-container__content { flex-direction: column; }
+  .gallery-container__content__left { width: 100%; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+  .gallery-container__content__right { width: 100%; padding: 20px; }
+}
 </style>

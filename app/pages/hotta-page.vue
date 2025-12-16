@@ -1,6 +1,7 @@
 <template>
   <div class="page-layout" v-cloak>
 
+    <!-- 侧边栏：在移动端会被 CSS 隐藏 -->
     <aside class="sidebar sidebar--left">
       <div class="menu-panel">
         <div class="menu-panel__overlay"></div>
@@ -23,7 +24,6 @@
             <small>Updated: 8,2025</small>
           </div>
           <ul class="menu__list">
-
 
             <NuxtLink to="/hotta-page/artifact" active-class="active-link">
               <li class="menu__item menu__item--red">
@@ -67,13 +67,14 @@
       </div>
     </aside>
 
+
     <NuxtPage/>
+
 
   </div>
 </template>
 
 <script setup lang="ts">
-
 import {onMounted} from "vue";
 
 const initializePage = ()=> {
@@ -87,7 +88,6 @@ onMounted(() => {
   initializePage();
 });
 </script>
-
 
 <style scoped lang="scss">
 
@@ -114,11 +114,6 @@ onMounted(() => {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   user-select: none;
   cursor: default;
-
-  //&:hover {
-  //  transform: translateY(-4px);
-  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  //}
 }
 
 /* Reusable text styles */
@@ -133,7 +128,6 @@ onMounted(() => {
   color: #888;
 }
 
-
 .menu-panel {
   display: flex;
   flex-direction: column;
@@ -141,7 +135,6 @@ onMounted(() => {
   position: relative;
 
   &__overlay {
-    /*background: url() no-repeat top / contain;*/
     position: absolute;
     inset: 0;
 
@@ -307,6 +300,28 @@ onMounted(() => {
 @media (max-height: 600px) {
   .profile-card {
     display: none;
+  }
+}
+
+/* =========================================
+   移动端适配代码 (Mobile Adaptation)
+   ========================================= */
+@media screen and (max-width: 768px) {
+  /* 1. 隐藏侧边栏 */
+  .sidebar.sidebar--left {
+    display: none !important;
+  }
+
+  /* 2. 调整主布局容器 */
+  .page-layout {
+    margin: 10px;        /* 减小边距，增加手机屏幕利用率 */
+    gap: 0;              /* 移除间距，因为侧边栏已经没了 */
+    display: block;      /* 取消 flex 布局，让内容自然堆叠 */
+  }
+
+  /* 3. 确保内容区域占满宽度 */
+  .content-area {
+    width: 100%;
   }
 }
 </style>
