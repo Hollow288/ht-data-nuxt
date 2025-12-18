@@ -569,6 +569,10 @@ onMounted(async () => {
   }
 }
 
+:deep(.n-virtual-list) {
+  overscroll-behavior: contain;
+}
+
 /* =========================================
    移动端适配代码 (Mobile Adaptation)
    ========================================= */
