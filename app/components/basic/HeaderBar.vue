@@ -572,7 +572,7 @@ const handleFocus = () => {
 
   .header-img{
     border-radius:20px;
-    display: block;
+    display: flex;
   }
   /* 1. Header 调整 */
   .header-container {

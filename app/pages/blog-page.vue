@@ -580,7 +580,7 @@ watch(date, fetchArticles)
   .left-sidebar-name {
     min-height: auto; /* 取消最小高度限制 */
     position: static; /* 取消 sticky */
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     padding: 10px; /* 减小内边距 */
   }
 
