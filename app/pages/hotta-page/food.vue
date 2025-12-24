@@ -80,7 +80,7 @@ onMounted(async () => {
       <div v-else class="gallery-container__content">
         <!-- 优化了内联样式为 class，以便移动端适配 -->
         <div class="food-info-wrapper">
-<!--          <img width="100" :src="thisFoodInfo?.foodIcon" :alt="thisFoodInfo?.foodName" loading="lazy"/>-->
+          <img width="100" :src="thisFoodInfo?.foodIcon" :alt="thisFoodInfo?.foodName" loading="lazy"/>
           <div class="food-name">
             {{ thisFoodInfo?.foodName }}
           </div>
