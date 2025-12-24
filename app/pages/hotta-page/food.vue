@@ -1,19 +1,18 @@
 <script setup lang="ts">
 
 import {NButton, NPopover, NText, NVirtualList} from "naive-ui";
-import {ref} from "vue";
+import {ref, onMounted} from "vue";
 import type {Food, FoodListDto, FoodListDtoRes, FoodRes} from "~/types/food";
-import {onMounted} from 'vue'
 import {BaseAPI} from "~/utils/api";
 import {replaceTagWithColor} from "~/utils/common";
 
 const searchText = ref<string>('')
 const thisShowKey = ref<string | undefined>()
-const popoverVisible = ref(false)
 const loading = ref(false)
 const items = ref<FoodListDto[]>([])
 const allItems = ref<FoodListDto[]>([])
 const thisFoodInfo = ref<Food>()
+const showDrawer = ref(false) // 新增：抽屉显示状态
 
 // food filter
 const foodRarity = ref<string>('')
@@ -35,7 +34,6 @@ const onInputFoodSearch = () => {
   }
 }
 
-
 const queryFoodList = async () => {
   const foodList: FoodListDtoRes = await BaseAPI.apiGet("food/search")
   allItems.value = foodList.data
@@ -47,15 +45,16 @@ const findFoodInfoByKey = async () => {
     loading.value = true
     const foodRes: FoodRes = await BaseAPI.apiGet(`food/${thisShowKey.value}`)
     thisFoodInfo.value = foodRes.data
-  }finally {
+  } finally {
     loading.value = false
   }
-
 }
 
 const showThisFoodInfo = async (foodKey: string) => {
   thisShowKey.value = foodKey
   await findFoodInfoByKey()
+  // 新增：移动端点击后关闭抽屉
+  showDrawer.value = false
 }
 
 const initializePage = async () => {
@@ -73,97 +72,135 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="gallery-container">
-    <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
-    <div v-else class="gallery-container__content">
-      <div style="height:100%;width: 50%;display:flex;flex-direction: column;align-items: center;gap: 10px;text-align: center;justify-content: center;">
-        <img width="100" :src="thisFoodInfo?.foodIcon" :alt="thisFoodInfo?.foodName" loading="lazy"/>
-        <div style="color: rgb(84, 47, 19);font-size: 24px;">
-          {{ thisFoodInfo?.foodName }}
-        </div>
-        <div style="color: #c4c8cB;font-size: 14px;">
-          {{ thisFoodInfo?.foodDes == '' ? '//**无基本介绍**//' : thisFoodInfo?.foodDes }}
-        </div>
-        <div style="color: #c4c8cB;font-size: 14px;">
-          {{ thisFoodInfo?.source == '' ? '//**无来源介绍**//' : thisFoodInfo?.source }}
-        </div>
-        <div
-             v-html="(thisFoodInfo?.useDescription == '' ? '' : replaceTagWithColor(replaceTagWithColor(thisFoodInfo?.useDescription,'shuzhi','C94F4F'),'ComLblGreen','4C9717') + '<br>') + replaceTagWithColor(replaceTagWithColor(thisFoodInfo?.buffs,'shuzhi','C94F4F'),'ComLblGreen','4C9717')"></div>
+  <div class="page-container-wrapper">
 
+    <!-- 1. 主要内容区域 -->
+    <div class="gallery-container">
+      <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
+      <div v-else class="gallery-container__content">
+        <!-- 优化了内联样式为 class，以便移动端适配 -->
+        <div class="food-info-wrapper">
+<!--          <img width="100" :src="thisFoodInfo?.foodIcon" :alt="thisFoodInfo?.foodName" loading="lazy"/>-->
+          <div class="food-name">
+            {{ thisFoodInfo?.foodName }}
+          </div>
+          <div class="food-desc">
+            {{ thisFoodInfo?.foodDes == '' ? '//**无基本介绍**//' : thisFoodInfo?.foodDes }}
+          </div>
+          <div class="food-source">
+            {{ thisFoodInfo?.source == '' ? '//**无来源介绍**//' : thisFoodInfo?.source }}
+          </div>
+          <div class="food-detail-html"
+               v-html="(thisFoodInfo?.useDescription == '' ? '' : replaceTagWithColor(replaceTagWithColor(thisFoodInfo?.useDescription,'shuzhi','C94F4F'),'ComLblGreen','4C9717') + '<br>') + replaceTagWithColor(replaceTagWithColor(thisFoodInfo?.buffs,'shuzhi','C94F4F'),'ComLblGreen','4C9717')"></div>
+        </div>
+
+        <!-- 底部占位/装饰条 -->
+        <div style="background-color: #9eb4ed;height: 30px;width: 100%; margin-top: auto;">
+          <div style="background-color: #e19eba;height: 30px;width:30%"></div>
+        </div>
       </div>
-      <div style="background-color: #9eb4ed;height: 30px;width: 100%">
-        <div
-          style="background-color: #e19eba;height: 30px;width:30%"
-      ></div></div>
-
     </div>
-  </div>
 
-  <aside class="sidebar sidebar--right">
-    <div class="search-panel">
-      <header class="search-panel__header">
-        <h4 class="search-panel__title">Search</h4>
-        <small class="search-panel__subtitle">Search by name and/or type</small>
-        <div class="search-panel__input-wrapper">
-          <input type="text" name="filter" id="filter" v-model="searchText" @input="onInputFoodSearch()"
-                 placeholder="Search"/>
-        </div>
-      </header>
-      <div class="search-panel__content">
-        <n-virtual-list style="height: 100%" :item-size="50" :items="items">
-          <template #default="{ item }">
-            <div :key="item.foodKey" class="result-item" :class="{'active': thisShowKey === item.foodKey}"
-                 @click="showThisFoodInfo(item.foodKey)">
-              <img :key="item.foodKey" loading="lazy" decoding="async" class="result-item__avatar" :src="item.foodIcon" alt="">
-              <div class="result-item__details">
-                <span class="task-title">{{ item.foodName }}</span>
-                <span class="task-cat">{{ item.foodKey }}</span>
+    <!-- 2. PC端侧边栏 (移动端通过 CSS 隐藏) -->
+    <aside class="sidebar sidebar--right pc-sidebar">
+      <div class="search-panel">
+        <header class="search-panel__header">
+          <h4 class="search-panel__title">Search</h4>
+          <small class="search-panel__subtitle">Search by name and/or type</small>
+          <div class="search-panel__input-wrapper">
+            <input type="text" v-model="searchText" @input="onInputFoodSearch()" placeholder="Search"/>
+          </div>
+        </header>
+        <div class="search-panel__content">
+          <n-virtual-list style="height: 100%" :item-size="50" :items="items">
+            <template #default="{ item }">
+              <div :key="item.foodKey" class="result-item" :class="{'active': thisShowKey === item.foodKey}"
+                   @click="showThisFoodInfo(item.foodKey)">
+                <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.foodIcon" alt="">
+                <div class="result-item__details">
+                  <span class="task-title">{{ item.foodName }}</span>
+                  <span class="task-cat">{{ item.foodKey }}</span>
+                </div>
               </div>
-            </div>
-          </template>
-        </n-virtual-list>
+            </template>
+          </n-virtual-list>
+        </div>
       </div>
-    </div>
-  </aside>
+    </aside>
+
+    <!-- 3. 移动端悬浮按钮 -->
+    <button class="toc-toggle-btn" @click="showDrawer = true" aria-label="搜索">
+      <i class="ri-search-line"></i>
+    </button>
+
+    <!-- 4. 移动端抽屉 -->
+    <Teleport to="body">
+      <!-- 遮罩层 -->
+      <Transition name="fade">
+        <div v-if="showDrawer" class="custom-drawer-mask" @click="showDrawer = false"></div>
+      </Transition>
+
+      <!-- 抽屉面板 -->
+      <Transition name="slide">
+        <div v-if="showDrawer" class="custom-drawer-panel">
+          <div class="drawer-layout">
+            <!-- 抽屉头部 -->
+            <header class="search-panel__header drawer-header">
+              <h4 class="search-panel__title">Search</h4>
+              <small class="search-panel__subtitle">Search by name and/or type</small>
+              <div class="search-panel__input-wrapper">
+                <input type="text" v-model="searchText" @input="onInputFoodSearch" placeholder="Search"/>
+              </div>
+            </header>
+
+            <!-- 抽屉列表 -->
+            <div class="drawer-body">
+              <n-virtual-list style="height: 100%;" :item-size="50" :items="items">
+                <template #default="{ item }">
+                  <div
+                      :key="item.foodKey"
+                      class="result-item"
+                      :class="{ active: thisShowKey === item.foodKey }"
+                      @click="showThisFoodInfo(item.foodKey)"
+                  >
+                    <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.foodIcon" alt=""/>
+                    <div class="result-item__details">
+                      <span class="task-title">{{ item.foodName }}</span>
+                      <span class="task-cat">{{ item.foodKey }}</span>
+                    </div>
+                  </div>
+                </template>
+              </n-virtual-list>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+  </div>
 </template>
 
 <style scoped lang="scss">
-.sidebar {
-  flex: 0 0 25%;
-  min-height: calc(100vh - 100px);
-  max-height: calc(100vh - 100px);
-  min-width: 180px;
-  max-width: 300px;
-  box-sizing: border-box;
-  position: sticky;
-  top: 40px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  user-select: none;
-  cursor: default;
 
-  //&:hover {
-  //  transform: translateY(-4px);
-  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  //}
+/* 全局布局容器 */
+.page-container-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
 }
 
-
+/* 主内容区域 */
 .gallery-container {
   min-height: calc(100vh - 100px);
   overflow-y: auto;
-  width: clamp(300px, 60%, 1000px);
+  /* width: clamp(300px, 60%, 1000px); 不需要 clamp，交由 flex 控制 */
+  flex: 1; /* 自适应宽度 */
+  max-width: 1000px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  //&:hover {
-  //  transform: translateY(-4px);
-  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  //}
 
   &__status {
     display: flex;
@@ -179,42 +216,51 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     align-items: center;
-
-
-
   }
 }
 
-
-.result-item {
+/* 详情内容样式 */
+.food-info-wrapper {
+  height: 100%;
+  width: 60%; /* PC 端宽度 */
   display: flex;
+  flex-direction: column;
   align-items: center;
-  height: 50px;
-  box-sizing: border-box;
-
-  &:hover {
-    background-color: rgba(128, 128, 128, 0.1);
-    cursor: pointer;
-  }
-
-  &.active {
-    background-color: rgba(128, 128, 128, 0.1);
-  }
-
-  &__avatar {
-    margin-left: 10px;
-    width: 28px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-
-  &__details {
-    display: flex;
-    flex-direction: column;
-  }
+  gap: 10px;
+  text-align: center;
+  justify-content: center;
+  padding: 40px 20px;
 }
 
+.food-name {
+  color: rgb(84, 47, 19);
+  font-size: 24px;
+}
 
+.food-desc, .food-source {
+  color: #c4c8cB;
+  font-size: 14px;
+}
+
+/* Sidebar 样式 */
+.sidebar {
+  flex: 0 0 25%;
+  min-height: calc(100vh - 100px);
+  max-height: calc(100vh - 100px);
+  min-width: 180px;
+  max-width: 300px;
+  box-sizing: border-box;
+  position: sticky;
+  top: 40px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+  cursor: default;
+}
+
+/* 搜索面板通用样式 */
 .search-panel {
   display: flex;
   flex-direction: column;
@@ -262,6 +308,7 @@ onMounted(async () => {
       color: rgba(255, 255, 255, 0.7);
       font-size: 18px;
       cursor: pointer;
+      z-index: 10;
 
       &:hover, &.active {
         color: #FFF;
@@ -273,6 +320,34 @@ onMounted(async () => {
     flex: 1;
     min-height: 0;
     position: relative;
+  }
+}
+
+.result-item {
+  display: flex;
+  align-items: center;
+  height: 50px;
+  box-sizing: border-box;
+
+  &:hover {
+    background-color: rgba(128, 128, 128, 0.1);
+    cursor: pointer;
+  }
+
+  &.active {
+    background-color: rgba(128, 128, 128, 0.1);
+  }
+
+  &__avatar {
+    margin-left: 10px;
+    width: 28px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
   }
 }
 
@@ -308,11 +383,113 @@ onMounted(async () => {
   color: #888;
 }
 
+/* =========================================
+   移动端抽屉与按钮 (Mobile Drawer & FAB)
+   ========================================= */
 
-@media (max-height: 600px) {
-  .search-panel__header {
-    display: none;
+.toc-toggle-btn {
+  display: none; /* 默认隐藏，在 media query 中显示 */
+  position: fixed;
+  right: 15px;
+  bottom: 90px;
+  min-width: 50px;
+  min-height: 50px;
+  background: #fff;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: none;
+  opacity: 0.8;
+  z-index: 900;
+  color: #BBCCF6;
+  font-size: 24px;
+  cursor: pointer;
+  transition: transform 0.2s;
+
+  &:active {
+    transform: scale(0.9);
   }
 }
 
+.custom-drawer-mask {
+  position: fixed;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 998;
+  backdrop-filter: blur(2px);
+}
+
+.custom-drawer-panel {
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 85%;
+  max-width: 340px;
+  z-index: 999;
+  box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.drawer-header {
+  flex-shrink: 0;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background-color: #fff;
+}
+
+/* 动画 */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+
+.slide-enter-active, .slide-leave-active { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.slide-enter-from, .slide-leave-to { transform: translateX(100%); }
+
+:deep(.n-virtual-list) {
+  overscroll-behavior: contain;
+}
+
+/* =========================================
+   移动端适配 (Mobile Adaptation)
+   ========================================= */
+@media screen and (max-width: 768px) {
+  .pc-sidebar {
+    display: none !important;
+  }
+
+  .toc-toggle-btn {
+    display: flex;
+  }
+
+  .gallery-container {
+    width: 100%;
+    margin: 0;
+    height: auto;
+    min-height: auto;
+  }
+
+  /* 移动端详情宽度占满 */
+  .food-info-wrapper {
+    width: 90%;
+    padding: 20px 10px;
+  }
+}
+
+@media (max-height: 600px) {
+  .search-panel__header {
+    /* 矮屏适配 */
+    padding: 15px 20px;
+  }
+}
 </style>
