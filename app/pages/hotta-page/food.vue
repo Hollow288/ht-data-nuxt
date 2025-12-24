@@ -2,6 +2,7 @@
 
 import {NButton, NPopover, NText, NVirtualList} from "naive-ui";
 import {ref, onMounted} from "vue";
+import { watch } from 'vue'
 import type {Food, FoodListDto, FoodListDtoRes, FoodRes} from "~/types/food";
 import {BaseAPI} from "~/utils/api";
 import {replaceTagWithColor} from "~/utils/common";
@@ -64,6 +65,14 @@ const initializePage = async () => {
   }
   await findFoodInfoByKey()
 };
+
+watch(showDrawer, (val) => {
+  if (val) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+})
 
 onMounted(async () => {
   await initializePage();
@@ -456,9 +465,7 @@ onMounted(async () => {
 .slide-enter-active, .slide-leave-active { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 .slide-enter-from, .slide-leave-to { transform: translateX(100%); }
 
-:deep(.n-virtual-list) {
-  overscroll-behavior: contain;
-}
+
 
 /* =========================================
    移动端适配 (Mobile Adaptation)

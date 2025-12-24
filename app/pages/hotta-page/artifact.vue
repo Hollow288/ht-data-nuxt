@@ -4,6 +4,7 @@ import {NButton, NPopover, NText, NVirtualList} from "naive-ui";
 import {ref} from "vue";
 import type {Artifact, ArtifactListDto, ArtifactListDtoRes, ArtifactRes} from "~/types/artifact";
 import {onMounted} from 'vue'
+import { watch } from 'vue'
 import {replaceTagWithColor} from "~/utils/common";
 import {BaseAPI} from "~/utils/api";
 
@@ -66,6 +67,14 @@ const initializePage = async () => {
   }
   await findArtifactInfoByKey()
 };
+
+watch(showDrawer, (val) => {
+  if (val) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+})
 
 onMounted(async () => {
   await initializePage();

@@ -262,6 +262,14 @@ onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
 })
 
+watch(showMobileToc, (val) => {
+  if (val) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+})
+
 watch(activeTocId, async (newId) => {
   if (!newId) return
 
