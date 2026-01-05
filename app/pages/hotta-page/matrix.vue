@@ -2,7 +2,7 @@
 
 import {NButton, NPopover, NText, NVirtualList} from "naive-ui";
 import {ref} from "vue";
-import type {Artifact, ArtifactListDto, ArtifactListDtoRes, ArtifactRes} from "~/types/artifact";
+import type {Matrix, MatrixListDto, MatrixListDtoRes, MatrixRes} from "~/types/matrix";
 import {onMounted} from 'vue'
 import { watch } from 'vue'
 import {replaceTagWithColor} from "~/utils/common";
@@ -13,59 +13,59 @@ const thisShowKey = ref<string | undefined>()
 const popoverVisible = ref(false)
 const popoverVisibleMobile = ref(false)
 const loading = ref(false)
-const items = ref<ArtifactListDto[]>([])
-const allItems = ref<ArtifactListDto[]>([])
-const thisArtifactInfo = ref<Artifact>()
+const items = ref<MatrixListDto[]>([])
+const allItems = ref<MatrixListDto[]>([])
+const thisMatrixInfo = ref<Matrix>()
 const showDrawer = ref(false)
-// artifact filter
-const artifactRarity = ref<string>('')
+// matrix filter
+const matrixRarity = ref<string>('')
 
-const changeArtifactRarity = async (rarity: string) => {
-  if (artifactRarity.value === rarity) {
-    artifactRarity.value = ''
+const changeMatrixRarity = async (rarity: string) => {
+  if (matrixRarity.value === rarity) {
+    matrixRarity.value = ''
   } else {
-    artifactRarity.value = rarity
+    matrixRarity.value = rarity
   }
-  await queryArtifactList()
+  await queryMatrixList()
 }
 
-const onInputArtifactSearch = () => {
+const onInputMatrixSearch = () => {
   if (searchText.value == '') {
     items.value = allItems.value
   } else {
-    items.value = allItems.value.filter(n => n.artifactName.indexOf(searchText.value) > -1)
+    items.value = allItems.value.filter(n => n.matrixName.indexOf(searchText.value) > -1)
   }
 }
 
-const queryArtifactList = async () => {
-  const artifactList: ArtifactListDtoRes = await BaseAPI.apiGet("artifact/search",{'artifactRarity':encodeURIComponent(artifactRarity.value)})
-  allItems.value = artifactList.data
-  onInputArtifactSearch()
+const queryMatrixList = async () => {
+  const matrixList: MatrixListDtoRes = await BaseAPI.apiGet("matrix/search",{'matrixRarity':encodeURIComponent(matrixRarity.value)})
+  allItems.value = matrixList.data
+  onInputMatrixSearch()
 }
 
-const findArtifactInfoByKey = async () => {
+const findMatrixInfoByKey = async () => {
   try {
     loading.value = true
-    const artifactRes: ArtifactRes = await BaseAPI.apiGet(`artifact/${thisShowKey.value}`)
-    thisArtifactInfo.value = artifactRes.data
+    const matrixRes: MatrixRes = await BaseAPI.apiGet(`matrix/${thisShowKey.value}`)
+    thisMatrixInfo.value = matrixRes.data
   } finally {
     loading.value = false
   }
 }
 
-const showThisArtifactInfo = async (artifactKey: string) => {
-  thisShowKey.value = artifactKey
-  await findArtifactInfoByKey()
+const showThisMatrixInfo = async (matrixKey: string) => {
+  thisShowKey.value = matrixKey
+  await findMatrixInfoByKey()
   // 核心：在移动端点击后，自动关闭抽屉
   showDrawer.value = false
 }
 
 const initializePage = async () => {
-  await queryArtifactList()
+  await queryMatrixList()
   if (allItems.value.length > 0) {
-    thisShowKey.value = allItems.value[0]?.artifactKey
+    thisShowKey.value = allItems.value[0]?.matrixKey
   }
-  await findArtifactInfoByKey()
+  await findMatrixInfoByKey()
 };
 
 watch(showDrawer, (val) => {
@@ -90,17 +90,21 @@ onMounted(async () => {
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else class="gallery-container__content">
         <div class="gallery-container__content__left">
-          <img width="150" :src="thisArtifactInfo?.artifactIcon" :alt="thisArtifactInfo?.artifactName" class="gallery-card__image" loading="lazy"/>
-          <div class="level">{{ thisArtifactInfo?.artifactRarity }}</div>
-          <div class="name">{{ thisArtifactInfo?.artifactName }}</div>
-          <div class="description" v-html="replaceTagWithColor(thisArtifactInfo?.useDescription,'shuzhi','C94F4F')"></div>
+          <img width="150" :src="thisMatrixInfo?.matrixIcon" :alt="thisMatrixInfo?.matrixName" class="gallery-card__image" loading="lazy"/>
+          <div class="level">{{ thisMatrixInfo?.matrixQuality }}</div>
+          <div class="name">{{ thisMatrixInfo?.matrixName }}</div>
+<!--          <div class="description" v-html="replaceTagWithColor(thisMatrixInfo?.useDescription,'shuzhi','C94F4F')"></div>-->
         </div>
         <div class="gallery-container__content__right">
-          <div class="artifact-detail">
-            <span class="level">星级效果：</span>
-            <div v-for="(items,index) in thisArtifactInfo?.artifactDetail" style="display: flex;margin-bottom: 10px">
-              <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>
-              <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>
+          <div class="matrix-detail">
+
+            <div v-for="(items,index) in thisMatrixInfo?.matrixDetail" style="display: flex;margin-bottom: 10px">
+              <div style="display: flex;flex-direction: column;">
+                <span class="level">{{ items.type }}：</span>
+                <!--              <span class="stars">{{ items.type }} : </span>-->
+                <span class="desc" v-html="replaceTagWithColor(items.desc,'shuzhi','C94F4F')"></span>
+              </div>
+
             </div>
           </div>
         </div>
@@ -130,27 +134,27 @@ onMounted(async () => {
               <div class="filter-group">
                 <p>Rarity:</p>
                 <div class="button-group">
-                  <NButton color="#9E8BA8" :dashed="artifactRarity!=='SSR'" size="tiny"
-                           @click="changeArtifactRarity('SSR')">SSR
+                  <NButton color="#9E8BA8" :dashed="matrixRarity!=='SSR'" size="tiny"
+                           @click="changeMatrixRarity('SSR')">SSR
                   </NButton>
-                  <NButton color="#9E8BA8" :dashed="artifactRarity!=='SR'" size="tiny"
-                           @click="changeArtifactRarity('SR')">SR
+                  <NButton color="#9E8BA8" :dashed="matrixRarity!=='SR'" size="tiny"
+                           @click="changeMatrixRarity('SR')">SR
                   </NButton>
                 </div>
               </div>
             </n-popover>
-            <input type="text" v-model="searchText" @input="onInputArtifactSearch()" placeholder="Search"/>
+            <input type="text" v-model="searchText" @input="onInputMatrixSearch()" placeholder="Search"/>
           </div>
         </header>
         <div class="search-panel__content">
           <n-virtual-list style="height: 100%" :item-size="50" :items="items">
             <template #default="{ item }">
-              <div :key="item.artifactKey" class="result-item" :class="{'active': thisShowKey === item.artifactKey}"
-                   @click="showThisArtifactInfo(item.artifactKey)">
-                <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt="">
+              <div :key="item.matrixKey" class="result-item" :class="{'active': thisShowKey === item.matrixKey}"
+                   @click="showThisMatrixInfo(item.matrixKey)">
+                <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.matrixIcon" alt="">
                 <div class="result-item__details">
-                  <span class="task-title">{{ item.artifactName }}</span>
-                  <span class="task-cat">{{ item.artifactRarity }}</span>
+                  <span class="task-title">{{ item.matrixName }}</span>
+                  <span class="task-cat">{{ item.matrixQuality }}</span>
                 </div>
               </div>
             </template>
@@ -203,12 +207,12 @@ onMounted(async () => {
                   <div class="filter-group">
                     <p>Rarity:</p>
                     <div class="button-group">
-                      <NButton color="#9E8BA8" :dashed="artifactRarity !== 'SSR'" size="tiny" @click="changeArtifactRarity('SSR')">SSR</NButton>
-                      <NButton color="#9E8BA8" :dashed="artifactRarity !== 'SR'" size="tiny" @click="changeArtifactRarity('SR')">SR</NButton>
+                      <NButton color="#9E8BA8" :dashed="matrixRarity !== 'SSR'" size="tiny" @click="changeMatrixRarity('SSR')">SSR</NButton>
+                      <NButton color="#9E8BA8" :dashed="matrixRarity !== 'SR'" size="tiny" @click="changeMatrixRarity('SR')">SR</NButton>
                     </div>
                   </div>
                 </n-popover>
-                <input type="text" v-model="searchText" @input="onInputArtifactSearch" placeholder="Search"/>
+                <input type="text" v-model="searchText" @input="onInputMatrixSearch" placeholder="Search"/>
               </div>
             </header>
 
@@ -221,15 +225,15 @@ onMounted(async () => {
               >
                 <template #default="{ item }">
                   <div
-                      :key="item.artifactKey"
+                      :key="item.matrixKey"
                       class="result-item"
-                      :class="{ active: thisShowKey === item.artifactKey }"
-                      @click="showThisArtifactInfo(item.artifactKey)"
+                      :class="{ active: thisShowKey === item.matrixKey }"
+                      @click="showThisMatrixInfo(item.matrixKey)"
                   >
-                    <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt=""/>
+                    <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.matrixIcon" alt=""/>
                     <div class="result-item__details">
-                      <span class="task-title">{{ item.artifactName }}</span>
-                      <span class="task-cat">{{ item.artifactRarity }}</span>
+                      <span class="task-title">{{ item.matrixName }}</span>
+                      <span class="task-cat">{{ item.matrixQuality }}</span>
                     </div>
                   </div>
                 </template>
@@ -320,7 +324,7 @@ onMounted(async () => {
       padding: 20px 20px 15px;
       display: flex;
 
-      .artifact-detail {
+      .matrix-detail {
         display: flex;
         align-items: flex-start;
         flex-direction: column;

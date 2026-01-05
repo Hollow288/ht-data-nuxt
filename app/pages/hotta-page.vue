@@ -50,10 +50,14 @@
               <span class="task-title">武器</span>
               <span class="task-cat">待制作...</span>
             </li>
-            <li class="menu__item menu__item--green">
-              <span class="task-title">意志</span>
-              <span class="task-cat">待制作...</span>
-            </li>
+
+            <NuxtLink to="/hotta-page/matrix" active-class="active-link">
+              <li class="menu__item menu__item--green">
+                <span class="task-title">意志</span>
+                <span class="task-cat">意志相关信息</span>
+              </li>
+            </NuxtLink>
+
             <li class="menu__item menu__item--green">
               <span class="task-title">点了也没用</span>
               <span class="task-cat">no yong...</span>

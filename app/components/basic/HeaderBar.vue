@@ -1,9 +1,12 @@
 <template>
   <header class="header-container">
     <!-- 1. 返回按钮 -->
-    <button class="back-btn" @click="goBack" aria-label="返回">
-      <i class="ri-arrow-left-line"></i>
-    </button>
+    <div class="back-div">
+      <button class="back-btn" @click="goBack" aria-label="返回">
+        <i class="ri-arrow-left-line"></i>
+      </button>
+    </div>
+
 
     <!-- 2. 移动端菜单切换按钮 -->
     <button
@@ -15,9 +18,13 @@
       <i :class="isMobileMenuOpen ? 'ri-close-line' : 'ri-menu-line'"></i>
     </button>
 
-  <div class="header-img">
-    <img  width="40" src="https://avatars.githubusercontent.com/u/87030922?v=4" alt="头像" class="avatar"/>
-  </div>
+    <div class="header-name">
+      <span>Hollow's Space</span>
+    </div>
+
+    <div class="header-img">
+      <img width="40" src="https://avatars.githubusercontent.com/u/87030922?v=4" alt="头像" class="avatar"/>
+    </div>
 
     <!-- 3. 主导航 -->
     <!-- 注意：这里的 CSS 会控制它从左侧滑出来 -->
@@ -37,15 +44,15 @@
             class="has-submenu"
         >
           <div class="menu-label-wrapper" @click="handleSubmenuClick">
-            <NuxtLink  active-class="active-link" class="menu-link-txt">
+            <NuxtLink active-class="active-link" class="menu-link-txt">
               Hotta
-            <div class="arrow-icon" :class="{ 'rotated': isSubmenuVisible }">
-              <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg"
-                   viewBox="0 0 512 512" style="width: 10px; height: 10px;">
-                <path fill="currentColor"
-                      d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path>
-              </svg>
-            </div>
+              <div class="arrow-icon" :class="{ 'rotated': isSubmenuVisible }">
+                <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg"
+                     viewBox="0 0 512 512" style="width: 10px; height: 10px;">
+                  <path fill="currentColor"
+                        d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path>
+                </svg>
+              </div>
             </NuxtLink>
           </div>
 
@@ -67,6 +74,12 @@
                 <NuxtLink class="submenu-li" to="/hotta-page/recipes" active-class="active-link">
                   <i class="ri-book-2-line" style="font-size: 14px"></i>
                   <span style="margin-left: 10px">食谱</span>
+                </NuxtLink>
+              </li>
+              <li @click="closeMobileMenu">
+                <NuxtLink class="submenu-li" to="/hotta-page/matrix" active-class="active-link">
+                  <i class="ri-cpu-line" style="font-size: 14px"></i>
+                  <span style="margin-left: 10px">意志</span>
                 </NuxtLink>
               </li>
             </ul>
@@ -311,12 +324,15 @@ const handleFocus = () => {
   transition: all 0.3s;
 }
 
+.back-div {
+  width: 200px;
+}
+
 /* --- 2. 按钮样式 --- */
 .back-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 1rem;
   font-size: 1.5rem;
   color: white;
   background: transparent;
@@ -468,7 +484,7 @@ const handleFocus = () => {
 
 .submenu li a {
   display: block;
-  padding: 10px 20px;
+  padding: 10px 30px;
   font-size: 0.9em;
   color: black;
   text-transform: none;
@@ -550,12 +566,17 @@ const handleFocus = () => {
   word-break: break-all;
 }
 
-.header-img{
-
+.header-name {
   display: none;
+  color: rgba(204, 204, 204, 0.9);
+  font-size: 18px;
+  font-weight: bold;
+}
 
-  img{
-    border-radius:20px;
+.header-img {
+  display: none;
+  img {
+    border-radius: 20px;
   }
 }
 
@@ -570,20 +591,30 @@ const handleFocus = () => {
    ========================================= */
 @media screen and (max-width: 768px) {
 
-  .header-img{
-    border-radius:20px;
+  .header-img {
+    border-radius: 20px;
     display: flex;
   }
+
+  .header-name {
+    display: flex;
+  }
+
   /* 1. Header 调整 */
   .header-container {
     padding: 0 20px;
     background-color: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   }
 
-  .back-btn { display: none; }
-  .search-container, .dropdown-box { display: none !important; }
+  .back-btn, .back-div {
+    display: none;
+  }
+
+  .search-container, .dropdown-box {
+    display: none !important;
+  }
 
   .mobile-menu-toggle {
     display: flex;
@@ -596,35 +627,34 @@ const handleFocus = () => {
     border-radius: 8px;
     transition: background 0.2s;
   }
+
   .mobile-menu-toggle:active {
-    background-color: rgba(0,0,0,0.05);
+    background-color: rgba(0, 0, 0, 0.05);
   }
 
   /* 2. 主导航 - 悬浮气泡样式 */
   .main-nav {
     position: absolute; /* 绝对定位，不再是 fixed */
-    top: 70px;          /* 距离 Header 底部一点距离 */
-    left: 10px;        /* 靠右对齐 */
-    width: 150px;       /* 固定宽度，做成卡片 */
-    height: auto;       /* 高度随内容自适应 */
-    background-color: rgba(255,255,255,0.95);
+    top: 70px; /* 距离 Header 底部一点距离 */
+    left: 10px; /* 靠右对齐 */
+    width: 150px; /* 固定宽度，做成卡片 */
+    height: auto; /* 高度随内容自适应 */
+    background-color: rgba(255, 255, 255, 0.95);
     border-radius: 12px; /* 圆角 */
-    padding: 8px;       /* 整体内边距 */
+    padding: 8px; /* 整体内边距 */
 
     /* 核心：卡片阴影 */
-    box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06),
-        0 0 0 1px rgba(0,0,0,0.05); /* 模拟细边框 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.05); /* 模拟细边框 */
 
     /* 动画初始状态：缩放 + 透明 */
     transform-origin: top right; /* 从右上角放大出来 */
     transform: scale(0.9) translateY(-10px);
     opacity: 0;
     pointer-events: none; /* 隐藏时不可点击 */
-    transition:
-        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-        opacity 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.2s ease;
     z-index: 1000;
   }
 
@@ -665,7 +695,7 @@ const handleFocus = () => {
     width: 100%;
   }
 
-  .menu-label-wrapper{
+  .menu-label-wrapper {
     padding: 0;
   }
 
@@ -687,6 +717,7 @@ const handleFocus = () => {
     height: 10px;
     color: #9ca3af; /* 浅灰色箭头 */
   }
+
   .arrow-icon.rotated {
     transform: rotate(180deg);
   }
@@ -708,8 +739,8 @@ const handleFocus = () => {
     padding-left: 24px; /* 简单的缩进 */
     font-size: 14px;
     color: #6b7280;
-    height: 36px; /* 子菜单稍微矮一点 */
-    line-height: 36px;
+    height: 40px; /* 子菜单稍微矮一点 */
+    line-height: 40px;
     padding-top: 0;
     padding-bottom: 0;
   }

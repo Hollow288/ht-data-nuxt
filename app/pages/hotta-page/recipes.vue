@@ -317,7 +317,7 @@ onMounted(async () => {
 .recipes-des, .recipes-categories, .recipes-buffs-description {
   color: #c4c8cB;
   font-size: 14px;
-  word-break: break-word; /* 避免长文本溢出 */
+  word-break: break-all; /* 避免长文本溢出 */
 }
 
 /* 制作方式标题 */
@@ -402,7 +402,7 @@ onMounted(async () => {
   padding: 2px 0px;
   width: 80px; /* 确保名称有足够的宽度显示 */
   text-align: center;
-  word-break: break-word; /* 允许名称换行 */
+  word-break: break-all; /* 允许名称换行 */
   margin-top: 5px; /* 与图片保持一定距离 */
 }
 
