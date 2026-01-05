@@ -59,14 +59,14 @@ onUnmounted(() => {
   padding: 6px 12px;
   min-width: 50px;
   min-height: 50px;
-  background-color: #fff;
+  background-color: var(--bg-card);
   color: #BBCCF6;
   border: none;
   cursor: pointer;
   font-size: 24px;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  transition: background 0.1s, transform 0.1s;
+  transition: background 0.3s, transform 0.1s;
 }
 
 .back-btn span {
@@ -75,7 +75,7 @@ onUnmounted(() => {
 
 /* 悬浮效果 */
 .back-btn:hover {
-  background-color: #fcf7f8;
+  background-color: var(--back-btn-hover);
 }
 
 

@@ -5,12 +5,18 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt', '@bg-dev/nuxt-naiveui'],
+  modules: ['@pinia/nuxt', '@bg-dev/nuxt-naiveui', '@nuxtjs/color-mode'],
   vite: {
     plugins: [tsconfigPaths()],
   },
   css: ['~/assets/css/global.css',
     'remixicon/fonts/remixicon.css'],
+  colorMode: {
+    preference: 'light', // 默认设为亮色，不自动跟随系统
+    fallback: 'light',
+    classSuffix: '',     // 这样 html 上的类名是 .dark 而不是 .dark-mode
+    storageKey: 'nuxt-color-mode'
+  },
   app: {
     head: {
       title: 'Hollow’s Space',

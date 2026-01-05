@@ -221,7 +221,7 @@ watch(date, fetchArticles)
 
 .card-item {
   margin-bottom: 20px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-card-glass-95);
   backdrop-filter: blur(6px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   padding: 12px 15px;
@@ -240,7 +240,7 @@ watch(date, fetchArticles)
     gap: 10px;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-main);
     margin-bottom: 4px;
 
     &::before {
@@ -293,7 +293,7 @@ watch(date, fetchArticles)
   box-sizing: border-box;
   position: sticky;
   top: 20px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card-glass-95);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: auto;
@@ -308,7 +308,7 @@ watch(date, fetchArticles)
     gap: 10px;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #333;
+    color: var(--text-main);
     margin-bottom: 4px;
 
     &::before {
@@ -343,7 +343,7 @@ watch(date, fetchArticles)
   //}
   //
   //.twelve h2:after {
-  //  background-color: #e19eba;
+  //  background-color: var(--btn-pink);
   //  content: '';
   //  display: block;
   //  position: absolute;
@@ -362,14 +362,14 @@ watch(date, fetchArticles)
 
 .custom-tag {
   cursor: pointer;
-  background-color: #f3f3f3;
-  color: #666;
+  background-color: var(--border-color);
+  color: var(--text-main);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0 12px;
   user-select: none;
 
   &:hover {
-    background-color: #e19eba;
+    background-color: var(--btn-pink);
     color: white;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(225, 158, 186, 0.4);
@@ -377,7 +377,7 @@ watch(date, fetchArticles)
 
   &.active {
     transform: translateY(0);
-    background-color: #e19eba;
+    background-color: var(--btn-pink);
     color: white;
   }
 }
@@ -390,7 +390,7 @@ watch(date, fetchArticles)
   padding: 15px;
   box-sizing: border-box;
   position: sticky;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card-glass-95);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: auto;
@@ -424,7 +424,7 @@ watch(date, fetchArticles)
         align-items: center;
         padding: 6px 10px;
         font-weight: 600;
-        color: #333;
+        color: var(--text-main);
         border-radius: 6px;
         cursor: pointer;
         transition: background 0.25s;
@@ -461,13 +461,13 @@ watch(date, fetchArticles)
 
           &:hover {
             background: rgba(225, 158, 186, 0.05);
-            color: #df1c5f;
+            color: var(--btn-red);
           }
 
           &.active {
             background: rgba(225, 158, 186, 0.1);
             font-weight: 600;
-            color: #df1c5f;
+            color: var(--btn-red);
             position: relative;
 
             &::before {
@@ -477,7 +477,7 @@ watch(date, fetchArticles)
               top: 4px;
               bottom: 4px;
               width: 3px;
-              background: #e19eba;
+              background: var(--btn-pink);
               border-radius: 2px;
             }
           }
@@ -506,7 +506,7 @@ watch(date, fetchArticles)
   // clamp(最小值, 理想值, 最大值)
   width: clamp(300px, 60%, 1000px);
 
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card-glass-95);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -531,7 +531,7 @@ watch(date, fetchArticles)
 .right-btn {
   width: 100%;
   height: 100%;
-  background-color: #e19eba;
+  background-color: var(--btn-pink);
   border: none;
   border-radius: 8px;
   display: flex;
@@ -543,7 +543,7 @@ watch(date, fetchArticles)
   transition: all 0.25s ease;
 
   &:hover {
-    background-color: #df1c5f;
+    background-color: var(--btn-red);
     color: #fff;
   }
 

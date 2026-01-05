@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@bg-dev/nuxt-naiveui": "^2.0.0",
+    "@nuxtjs/color-mode": "^4.0.0",
     "@pinia/nuxt": "^0.11.2",
     "github-markdown-css": "^5.8.1",
     "install": "^0.13.0",

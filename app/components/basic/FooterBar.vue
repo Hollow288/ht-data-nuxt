@@ -38,7 +38,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: #272222;
+  color: var(--text-main);
 }
 
 .footer a {
@@ -55,7 +55,7 @@
 }
 
 .footer span {
-  color: #514848;
+  color: var(--text-main);
 }
 
 .footer svg {

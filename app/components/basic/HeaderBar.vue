@@ -1,22 +1,37 @@
 <template>
   <header class="header-container">
     <!-- 1. 返回按钮 -->
+
     <div class="back-div">
       <button class="back-btn" @click="goBack" aria-label="返回">
         <i class="ri-arrow-left-line"></i>
       </button>
+
     </div>
 
 
     <!-- 2. 移动端菜单切换按钮 -->
-    <button
-        ref="toggleBtnRef"
-        class="mobile-menu-toggle"
-        @click="toggleMobileMenu"
-        aria-label="菜单"
-    >
-      <i :class="isMobileMenuOpen ? 'ri-close-line' : 'ri-menu-line'"></i>
-    </button>
+    <div style="display: flex;">
+      <button
+          ref="toggleBtnRef"
+          class="mobile-menu-toggle"
+          @click="toggleMobileMenu"
+          aria-label="菜单"
+      >
+        <i :class="isMobileMenuOpen ? 'ri-close-line' : 'ri-menu-line'"></i>
+      </button>
+
+      <button
+          @click="toggleTheme"
+          class="mobile-menu-toggle"
+      >
+        <i v-if="colorMode.value === 'dark'" class="ri-moon-clear-fill"></i>
+        <i v-else class="ri-sun-fill"></i>
+      </button>
+    </div>
+
+
+
 
     <div class="header-name">
       <span>Hollow's Space</span>
@@ -175,6 +190,15 @@ const isDesktop = ref(true)
 const navRef = ref<HTMLElement | null>(null) // 新增：用于绑定菜单DOM
 const toggleBtnRef = ref<HTMLElement | null>(null) // 新增：用于绑定按钮DOM
 
+// 获取 colorMode 实例
+const colorMode = useColorMode()
+
+// 切换函数
+const toggleTheme = () => {
+  // 如果当前是 dark 就变 light，反之亦然
+  colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
+}
+
 const handleClickOutside = (event: MouseEvent) => {
   if (isDesktop.value || !isMobileMenuOpen.value) return
 
@@ -325,7 +349,6 @@ const handleFocus = () => {
 }
 
 .back-div {
-  width: 200px;
 }
 
 /* --- 2. 按钮样式 --- */
@@ -376,7 +399,7 @@ const handleFocus = () => {
 .main-menu li a {
   position: relative;
   font-size: 1em;
-  color: rgb(39, 39, 42);
+  color: var(--text-main);
   text-decoration: none;
   text-transform: uppercase;
   cursor: pointer;
@@ -415,7 +438,7 @@ const handleFocus = () => {
   width: 200px;
   padding: 5px 20px 5px 0;
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.5);
+  color: var(--summary-50);
   background: transparent;
   border: none;
   border-bottom: 2px solid #bcb7b7;
@@ -450,7 +473,7 @@ const handleFocus = () => {
   width: max-content;
   margin: 0;
   list-style: none;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: var(--bg-card-glass-95);
   backdrop-filter: blur(10px);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -466,7 +489,7 @@ const handleFocus = () => {
   width: max-content;
   margin: 0;
   list-style: none;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--bg-card-glass-95);
   backdrop-filter: blur(5px);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -486,7 +509,7 @@ const handleFocus = () => {
   display: block;
   padding: 10px 30px;
   font-size: 0.9em;
-  color: black;
+  color: var(--text-main);
   text-transform: none;
   white-space: nowrap;
 }
@@ -505,8 +528,8 @@ const handleFocus = () => {
   width: 500px;
   height: 430px;
   padding: 10px 3px;
-  color: black;
-  background-color: rgba(255, 255, 255, 0.8);
+  color: var(--text-main);
+  background-color: var(--bg-card-glass-95);
   border-radius: 4px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -561,7 +584,7 @@ const handleFocus = () => {
 
 .search-summary {
   font-size: 13px;
-  color: #00000080;
+  color: var(--summary-50);
   letter-spacing: 0.01em;
   word-break: break-all;
 }
@@ -603,7 +626,7 @@ const handleFocus = () => {
   /* 1. Header 调整 */
   .header-container {
     padding: 0 20px;
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: var(--bg-card-glass-95);
     backdrop-filter: blur(10px);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   }
@@ -621,7 +644,7 @@ const handleFocus = () => {
     align-items: center;
     justify-content: center;
     font-size: 22px;
-    color: #333;
+    color: var(--text-main);
     width: 40px;
     height: 40px;
     border-radius: 8px;
@@ -639,7 +662,7 @@ const handleFocus = () => {
     left: 10px; /* 靠右对齐 */
     width: 150px; /* 固定宽度，做成卡片 */
     height: auto; /* 高度随内容自适应 */
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: var(--bg-card-glass-95);
     border-radius: 12px; /* 圆角 */
     padding: 8px; /* 整体内边距 */
 
@@ -685,7 +708,7 @@ const handleFocus = () => {
     padding: 10px 12px; /* 紧凑一点的内边距 */
     font-size: 15px;
     font-weight: bold;
-    color: #4a4a4a;
+    color: var(--text-main);
     border-radius: 8px; /* 每一项也是圆角 */
     display: flex;
     align-items: center;
@@ -703,7 +726,7 @@ const handleFocus = () => {
   .main-menu li a:hover,
   .submenu-li:hover,
   .menu-label-wrapper:hover {
-    background-color: #f3f4f6;
+    background-color: var(--bg-card);
   }
 
   .main-menu li a.active-link {
@@ -738,7 +761,7 @@ const handleFocus = () => {
   .submenu li a {
     padding-left: 24px; /* 简单的缩进 */
     font-size: 14px;
-    color: #6b7280;
+    color: var(--text-main);
     height: 40px; /* 子菜单稍微矮一点 */
     line-height: 40px;
     padding-top: 0;

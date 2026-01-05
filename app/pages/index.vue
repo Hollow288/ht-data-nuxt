@@ -91,7 +91,7 @@ function onLoad() {
   border-radius: 10px;
   padding: 0;
   box-sizing: border-box;
-  background: #fff;
+  background: var(--bg-card);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); /* 阴影效果 */
   overflow: auto;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -177,7 +177,7 @@ function onLoad() {
   text-align: center;
   justify-content: center;
   padding: 20px;
-  color: #c4c8cB;
+  color: var(--text-main);
   font-size: 14px;
 }
 
@@ -207,7 +207,7 @@ function onLoad() {
 }
 
 .right-card {
-  background: #fff;
+  background: var(--bg-card);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   border-radius: 10px;
   padding: 20px 20px 30px 20px;
