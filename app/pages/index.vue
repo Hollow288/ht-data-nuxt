@@ -185,21 +185,22 @@ function onLoad() {
 
 .icon-button {
   display: inline-block;
-  background-color: #f0f0f0;
   border-radius: 8px;
   transition: transform 0.3s ease, background-color 0.3s ease;
   cursor: pointer;
   line-height: 1;
 }
 
+/*
 .icon-button:hover {
   background-color: #dcdcdc;
   transform: translateY(-4px);
 }
+*/
 
 .icon-button i {
   font-size: 30px;
-  color: #333;
+  color: var(--text-main);
   transition: color 0.3s ease;
 }
 
