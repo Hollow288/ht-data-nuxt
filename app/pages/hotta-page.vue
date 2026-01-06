@@ -146,7 +146,7 @@ onMounted(() => {
       content: '';
       position: absolute;
       inset: 0;
-      background: rgba(71, 32, 84, 0.5);
+      background: var(--search-panel);
     }
   }
 }
@@ -163,7 +163,7 @@ onMounted(() => {
     content: '';
     position: absolute;
     top: 170px;
-    background: #fff;
+    background: var(--bg-card);
     left: -22px;
     height: 60px;
     transform: rotate(10deg);
@@ -210,13 +210,13 @@ onMounted(() => {
 }
 
 .menu {
-  background-color: #fff;
+  background-color: var(--bg-card);
   flex: 1;
   display: flex;
   flex-direction: column;
   z-index: 1;
   position: relative;
-  color: #222;
+  color: var(--text-main);
   min-height: 0;
   height: 100%;
 

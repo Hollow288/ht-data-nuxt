@@ -54,9 +54,14 @@ body {
 
     --back-btn-hover:#fcf7f8;
 
-    --btn-red:#df1c5f;
-    --btn-pink:#e19eba;
-
+    --right-btn-hover:#df1c5f;
+    --right-btn:#e19eba;
+    --custom-tag: #666;
+    --menu-wrapper--li: #df1c5f;
+    --markdown-body-table-tr-2: #f6f8fa;
+    --search-panel: #9E8BA8;
+    --white-black-50: rgba(255, 255, 255, 0.5);
+    --n-popover-border:rgb(239, 239, 245);
 
 }
 
@@ -70,12 +75,20 @@ html.dark {
     --bg-card-glass-95: rgba(48, 52, 59, 0.95);
     --bg-card-glass-1: rgba(48, 52, 59, 0.1);
     --summary-50:rgba(255,255,255,0.5);
-    --back-btn-hover:rgba(255,255,255,0.5);
-    --btn-red:rgba(255,255,255,0.5);
-    --btn-pink:#4a505c;
+    --back-btn-hover: rgba(89, 89, 89, 0.5);
+    --right-btn-hover: rgba(136, 136, 136, 0.5);
+    --right-btn: rgba(67, 67, 67, 0.5);
+    --custom-tag: #e0e0e0;
+    --menu-wrapper--li: #e0e0e0;
+    --markdown-body-table-tr-2: rgba(0, 0, 0, 0.15);
+    --search-panel: #666;
+    --white-black-50: rgba(97, 96, 96, 0.5);
+    --n-popover-border: rgb(165, 165, 165);
 }
 
-
+.n-popover .n-popover__header {
+    border-bottom: 1px solid var(--n-popover-border);
+}
 
 ::-webkit-scrollbar {
     width: 0;
@@ -88,4 +101,18 @@ html.dark {
 
 ::-webkit-scrollbar-track {
     background: transparent;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none; /* 禁用默认的淡入淡出 */
+    mix-blend-mode: normal; /* 确保颜色混合正常 */
+}
+
+/* 确保视图位于最上层，防止被其他元素遮挡 */
+::view-transition-old(root) {
+    z-index: 1;
+}
+::view-transition-new(root) {
+    z-index: 9999;
 }

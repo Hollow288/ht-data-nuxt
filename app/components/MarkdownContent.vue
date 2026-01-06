@@ -88,7 +88,7 @@ code[class*="language-"] {
 
   /* 边框方正，无圆角 */
   border-radius: 8px;
-  border: 1px solid #e0e0e0;       /* 浅边框增加层次 */
+  border: 1px solid var(--border-color);       /* 浅边框增加层次 */
 
   /* 内边距 */
   padding: 14px 16px 13px 16px;
@@ -117,6 +117,21 @@ code[class*="language-"] {
   width: 100%;
   overflow-x: auto; /* 内容溢出时显示横向滚动条 */
   margin-bottom: 16px;
+  background-color: var(--bg-card);
+
+}
+
+.markdown-body table tr{
+  background-color: var(--bg-card);
+}
+
+.markdown-body table tr:nth-child(2n){
+  background-color: var(--markdown-body-table-tr-2);
+}
+
+.markdown-body table th,
+.markdown-body table td {
+  border: 1px solid var(--border-color);
 }
 
 /* 2. 表格本身：负责撑满容器 */

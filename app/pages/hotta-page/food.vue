@@ -206,7 +206,7 @@ onMounted(async () => {
   /* width: clamp(300px, 60%, 1000px); 不需要 clamp，交由 flex 控制 */
   flex: 1; /* 自适应宽度 */
   max-width: 1000px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -261,7 +261,7 @@ onMounted(async () => {
   box-sizing: border-box;
   position: sticky;
   top: 40px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -276,7 +276,7 @@ onMounted(async () => {
   height: 100%;
 
   &__header {
-    background-color: #9E8BA8;
+    background-color: var(--search-panel);
     color: #fff;
     padding: 30px 20px;
   }
@@ -403,7 +403,7 @@ onMounted(async () => {
   bottom: 90px;
   min-width: 50px;
   min-height: 50px;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 12px;
   align-items: center;
   justify-content: center;
@@ -418,6 +418,10 @@ onMounted(async () => {
 
   &:active {
     transform: scale(0.9);
+  }
+
+  &:hover {
+    background-color: var(--back-btn-hover);
   }
 }
 
@@ -455,7 +459,7 @@ onMounted(async () => {
   flex: 1;
   overflow: hidden;
   position: relative;
-  background-color: #fff;
+  background-color: var(--bg-card);
 }
 
 /* 动画 */

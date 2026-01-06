@@ -123,16 +123,16 @@ onMounted(async () => {
                 placement="bottom"
                 v-model:show="popoverVisible"
                 :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
-                style="max-width: 200px; background-color: rgba(255, 255, 255, 0.5);box-sizing: border-box;padding:0;"
+                style="max-width: 200px; background-color: var(--white-black-50);box-sizing: border-box;padding:0;"
             >
               <template #trigger>
                 <i class="ri-filter-3-line" :class="{ 'active': popoverVisible }"></i>
               </template>
               <template #header>
-                <n-text strong depth="1">Type filter</n-text>
+                <n-text style="color:var(--text-main)" strong depth="1">Type filter</n-text>
               </template>
               <div class="filter-group">
-                <p>Rarity:</p>
+                <p style="color:var(--text-main)">Rarity:</p>
                 <div class="button-group">
                   <NButton color="#9E8BA8" :dashed="matrixRarity!=='SSR'" size="tiny"
                            @click="changeMatrixRarity('SSR')">SSR
@@ -196,16 +196,16 @@ onMounted(async () => {
                     placement="bottom"
                     v-model:show="popoverVisibleMobile"
                     :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
-                    style="max-width: 200px; background-color: rgba(255, 255, 255, 0.5); box-sizing: border-box; padding: 0; z-index: 1000;"
+                    style="max-width: 200px; background-color: var(--white-black-50); box-sizing: border-box; padding: 0; z-index: 1000;"
                 >
                   <template #trigger>
                     <i class="ri-filter-3-line" :class="{ active: popoverVisibleMobile }"></i>
                   </template>
                   <template #header>
-                    <n-text strong depth="1">Type filter</n-text>
+                    <n-text style="color:var(--text-main)" strong depth="1">Type filter</n-text>
                   </template>
                   <div class="filter-group">
-                    <p>Rarity:</p>
+                    <p  style="color:var(--text-main)">Rarity:</p>
                     <div class="button-group">
                       <NButton color="#9E8BA8" :dashed="matrixRarity !== 'SSR'" size="tiny" @click="changeMatrixRarity('SSR')">SSR</NButton>
                       <NButton color="#9E8BA8" :dashed="matrixRarity !== 'SR'" size="tiny" @click="changeMatrixRarity('SR')">SR</NButton>
@@ -260,7 +260,7 @@ onMounted(async () => {
 .gallery-container {
   min-height: calc(100vh - 100px);
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -308,7 +308,7 @@ onMounted(async () => {
 
       .name {
         font-size: 26px;
-        color: black;
+        color: var(--text-main);
         font-weight: 900;
         margin-bottom: 5px;
       }
@@ -369,7 +369,7 @@ onMounted(async () => {
   box-sizing: border-box;
   position: sticky;
   top: 40px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -384,7 +384,7 @@ onMounted(async () => {
   height: 100%;
 
   &__header {
-    background-color: #9E8BA8;
+    background-color: var(--search-panel);
     color: #fff;
     padding: 30px 20px;
   }
@@ -541,7 +541,7 @@ onMounted(async () => {
   flex: 1; /* 占据剩余高度 */
   overflow: hidden; /* 隐藏溢出，交给内部 Virtual List 处理滚动 */
   position: relative;
-  background-color: #fff;
+  background-color: var(--bg-card);
 }
 
 /* =========================================
@@ -564,7 +564,7 @@ onMounted(async () => {
   bottom: 90px;
   min-width: 50px;
   min-height: 50px;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 12px;
   align-items: center;
   justify-content: center;
@@ -579,6 +579,10 @@ onMounted(async () => {
 
   &:active {
     transform: scale(0.9);
+  }
+
+  &:hover {
+    background-color: var(--back-btn-hover);
   }
 }
 
@@ -601,9 +605,23 @@ onMounted(async () => {
   }
 
 
-  .gallery-container { width: 100%; margin: 0; height: auto; min-height: auto; }
-  .gallery-container__content { flex-direction: column; }
-  .gallery-container__content__left { width: 100%; border-bottom: 1px solid #eee; padding-bottom: 20px; }
-  .gallery-container__content__right { width: 100%; padding: 20px; }
+  .gallery-container {
+    width: 100%;
+    margin: 0;
+    height: auto;
+    min-height: auto;
+  }
+  .gallery-container__content {
+    flex-direction: column;
+  }
+  .gallery-container__content__left {
+    width: 100%;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+  }
+  .gallery-container__content__right {
+    width: 100%;
+    padding: 20px;
+  }
 }
 </style>

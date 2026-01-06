@@ -141,16 +141,16 @@ onMounted(async () => {
                 placement="bottom"
                 v-model:show="popoverVisible"
                 :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }"
-                style="max-width: 400px; background-color: rgba(255, 255, 255, 0.8);box-sizing: border-box;padding:0"
+                style="max-width: 400px; background-color: var(--white-black-50);box-sizing: border-box;padding:0"
             >
               <template #trigger>
                 <i class="ri-filter-3-line" :class="{ 'active': popoverVisible }"></i>
               </template>
               <template #header>
-                <n-text strong depth="1">Type filter</n-text>
+                <n-text style="color:var(--text-main)" strong depth="1">Type filter</n-text>
               </template>
               <div class="filter-group">
-                <p>类别:</p>
+                <p style="color:var(--text-main)">类别:</p>
                 <div class="button-group">
                   <div v-for="item in categoriesList" :key="item">
                     <NButton color="#9E8BA8" :dashed="recipesCategories!==item" size="tiny"
@@ -208,16 +208,16 @@ onMounted(async () => {
                     placement="bottom"
                     v-model:show="popoverVisibleMobile"
                     :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
-                    style="max-width: 200px; background-color: rgba(255, 255, 255, 0.5); box-sizing: border-box; padding: 0; z-index: 1000;"
+                    style="max-width: 200px; background-color: var(--white-black-50); box-sizing: border-box; padding: 0; z-index: 1000;"
                 >
                   <template #trigger>
                     <i class="ri-filter-3-line" :class="{ active: popoverVisibleMobile }"></i>
                   </template>
                   <template #header>
-                    <n-text strong depth="1">Type filter</n-text>
+                    <n-text style="color:var(--text-main)" strong depth="1">Type filter</n-text>
                   </template>
                   <div class="filter-group">
-                    <p>类别:</p>
+                    <p style="color:var(--text-main)">类别:</p>
                     <div class="button-group">
                       <div v-for="item in categoriesList" :key="item">
                         <NButton color="#9E8BA8" :dashed="recipesCategories!==item" size="tiny"
@@ -274,7 +274,7 @@ onMounted(async () => {
   overflow-y: auto;
   flex: 1; /* 自适应宽度 */
   max-width: 1000px; /* 限制最大宽度 */
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -398,7 +398,7 @@ onMounted(async () => {
 
 .ingredient-name {
   font-size: 12px;
-  color: #333;
+  color: var(--text-main);
   padding: 2px 0px;
   width: 80px; /* 确保名称有足够的宽度显示 */
   text-align: center;
@@ -417,7 +417,7 @@ onMounted(async () => {
   box-sizing: border-box;
   position: sticky;
   top: 40px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -432,7 +432,7 @@ onMounted(async () => {
   height: 100%;
 
   &__header {
-    background-color: #9E8BA8;
+    background-color: var(--search-panel);
     color: #fff;
     padding: 30px 20px;
   }
@@ -559,7 +559,7 @@ onMounted(async () => {
   bottom: 90px;
   min-width: 50px;
   min-height: 50px;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 12px;
   align-items: center;
   justify-content: center;
@@ -574,6 +574,10 @@ onMounted(async () => {
 
   &:active {
     transform: scale(0.9);
+  }
+
+  &:hover {
+    background-color: var(--back-btn-hover);
   }
 }
 
@@ -612,7 +616,7 @@ onMounted(async () => {
   flex: 1;
   overflow: hidden;
   position: relative;
-  background-color: #fff;
+  background-color: var(--bg-card);
 }
 
 /* 动画 */

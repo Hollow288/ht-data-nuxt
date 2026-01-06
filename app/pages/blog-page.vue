@@ -343,7 +343,7 @@ watch(date, fetchArticles)
   //}
   //
   //.twelve h2:after {
-  //  background-color: var(--btn-pink);
+  //  background-color: var(--right-btn);
   //  content: '';
   //  display: block;
   //  position: absolute;
@@ -363,13 +363,13 @@ watch(date, fetchArticles)
 .custom-tag {
   cursor: pointer;
   background-color: var(--border-color);
-  color: var(--text-main);
+  color: var(--custom-tag);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0 12px;
   user-select: none;
 
   &:hover {
-    background-color: var(--btn-pink);
+    background-color: #e19eba;
     color: white;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(225, 158, 186, 0.4);
@@ -377,7 +377,7 @@ watch(date, fetchArticles)
 
   &.active {
     transform: translateY(0);
-    background-color: var(--btn-pink);
+    background-color: var(--right-btn);
     color: white;
   }
 }
@@ -430,7 +430,7 @@ watch(date, fetchArticles)
         transition: background 0.25s;
 
         &:hover {
-          background: #eaeaea;
+          background: var(--border-color);
         }
 
         .arrow {
@@ -461,13 +461,13 @@ watch(date, fetchArticles)
 
           &:hover {
             background: rgba(225, 158, 186, 0.05);
-            color: var(--btn-red);
+            color: var(--right-btn-hover);
           }
 
           &.active {
             background: rgba(225, 158, 186, 0.1);
             font-weight: 600;
-            color: var(--btn-red);
+            color: var(--menu-wrapper--li);
             position: relative;
 
             &::before {
@@ -477,7 +477,7 @@ watch(date, fetchArticles)
               top: 4px;
               bottom: 4px;
               width: 3px;
-              background: var(--btn-pink);
+              background: var(--right-btn);
               border-radius: 2px;
             }
           }
@@ -531,7 +531,7 @@ watch(date, fetchArticles)
 .right-btn {
   width: 100%;
   height: 100%;
-  background-color: var(--btn-pink);
+  background-color: var(--right-btn);
   border: none;
   border-radius: 8px;
   display: flex;
@@ -543,7 +543,7 @@ watch(date, fetchArticles)
   transition: all 0.25s ease;
 
   &:hover {
-    background-color: var(--btn-red);
+    background-color: var(--right-btn-hover);
     color: #fff;
   }
 

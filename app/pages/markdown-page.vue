@@ -306,6 +306,11 @@ watch(activeTocId, async (newId) => {
 </script>
 
 <style scoped lang="scss">
+
+.markdown-body{
+  color: var(--text-main);
+}
+
 /* 样式保持不变 */
 .page-layout {
   display: flex;
@@ -325,7 +330,7 @@ watch(activeTocId, async (newId) => {
   top: 40px;
   max-height: calc(100vh - 100px);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: auto; /* 确保这里是 auto */
@@ -359,7 +364,7 @@ watch(activeTocId, async (newId) => {
       font-size: 0.85rem;
       border-radius: 4px;
       transition: all 0.2s;
-      color: #555;
+      color: var(--text-main);
       word-wrap: break-word;
       white-space: normal;
 
@@ -416,7 +421,7 @@ watch(activeTocId, async (newId) => {
   overflow-y: auto;
   width: clamp(300px, 60%, 1000px);
   padding: 20px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--bg-card);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   backdrop-filter: blur(8px);
@@ -451,7 +456,7 @@ watch(activeTocId, async (newId) => {
     display: flex;
     flex-direction: column;
 
-    background: #fff;
+    background: var(--bg-card);
     z-index: 2000;
     box-shadow: -2px 0 10px rgba(0,0,0,0.1);
     transform: translateX(120%);
@@ -474,16 +479,16 @@ watch(activeTocId, async (newId) => {
       justify-content: space-between;
       align-items: center;
       padding: 15px 20px; /* 增加一点内边距更好看 */
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid var(--border-color);
       font-weight: bold;
       font-size: 1.1rem;
-      color: #333;
-      background: #fff; /* 确保背景色 */
+      color: var(--text-main);
+      background: var(--bg-card); /* 确保背景色 */
 
       span:last-child {
         cursor: pointer;
         font-size: 1.5rem;
-        color: #999;
+        color: var(--text-main);
         display: flex; /* 让关闭图标垂直居中 */
       }
     }
@@ -534,7 +539,7 @@ watch(activeTocId, async (newId) => {
     bottom: 90px;
     min-width: 50px;
     min-height: 50px;
-    background: #fff;
+    background: var(--bg-card);
     border-radius: 12px;
     align-items: center;
     justify-content: center;
@@ -549,6 +554,10 @@ watch(activeTocId, async (newId) => {
 
     &:active {
       transform: scale(0.9);
+    }
+
+    &:hover {
+      background-color: var(--back-btn-hover);
     }
   }
 }
