@@ -119,6 +119,16 @@
       </div>
     </div>
 
+    <div class="other-btn">
+      <button
+          @click="toggleTheme($event)"
+          class="other-menu-toggle"
+      >
+        <i v-if="colorMode.value === 'dark'" class="ri-moon-clear-fill"></i>
+        <i v-else class="ri-sun-fill"></i>
+      </button>
+    </div>
+
     <!-- 5. 搜索结果 -->
     <transition name="fade-slide">
       <div v-show="showDropdown" class="dropdown-box" @mousedown.prevent>
@@ -368,6 +378,17 @@ const handleFocus = () => {
 
 
 <style scoped>
+
+.other-btn{
+  width: 50px;
+  height: 100%;
+  display: flex;
+  align-items: center;     /* 关键：垂直居中 */
+  justify-content: center; /* 建议添加：水平居中 */
+  margin-top: -1px;
+}
+
+
 /* --- 1. Header 基础样式 --- */
 .header-container {
   position: sticky;
@@ -417,6 +438,20 @@ const handleFocus = () => {
   color: white; /* 这里建议用白色以适配深色 Header 背景，或者根据你的主题调整 */
   cursor: pointer;
   z-index: 102;
+}
+
+.other-menu-toggle {
+  display: flex;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #999; /* 这里建议用白色以适配深色 Header 背景，或者根据你的主题调整 */
+  cursor: pointer;
+  z-index: 102;
+}
+
+.other-menu-toggle :hover{
+  color: #78c1f3;
 }
 
 /* --- 3. 导航菜单 (默认桌面端样式) --- */
@@ -475,7 +510,7 @@ const handleFocus = () => {
 }
 
 .search-container input {
-  width: 200px;
+  width: 150px;
   padding: 5px 20px 5px 0;
   font-size: 14px;
   color: var(--summary-50);
@@ -498,6 +533,11 @@ const handleFocus = () => {
   font-size: 16px;
   cursor: pointer;
   color: #999;
+}
+
+
+.search-icon:hover {
+  color: #78c1f3;
 }
 
 /* --- 5. 子菜单 (桌面悬浮) --- */
@@ -699,6 +739,10 @@ const handleFocus = () => {
 
   .mobile-menu-toggle:active {
     background-color: rgba(0, 0, 0, 0.05);
+  }
+
+ .other-btn,.other-menu-toggle {
+    display: none;
   }
 
   /* 2. 主导航 - 悬浮气泡样式 */

@@ -236,12 +236,13 @@ watch(date, fetchArticles)
   .title {
     margin-top: 5px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-main);
     margin-bottom: 4px;
+    line-height: 1.4;
 
     &::before {
       content: "";
@@ -249,6 +250,10 @@ watch(date, fetchArticles)
       width: 5px;
       height: 1.25em;
       background: #6e4040;
+
+      margin-top: 0.15em;
+      flex-shrink: 0;
+      border-radius: 2px;
     }
   }
 
@@ -304,12 +309,13 @@ watch(date, fetchArticles)
   .title {
     margin-top: 5px;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 10px;
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-main);
     margin-bottom: 4px;
+    line-height: 1.4;
 
     &::before {
       content: "";
@@ -317,6 +323,10 @@ watch(date, fetchArticles)
       width: 5px;
       height: 1.25em;
       background: #6e4040;
+
+      margin-top: 0.15em;
+      flex-shrink: 0;
+      border-radius: 2px;
     }
   }
 

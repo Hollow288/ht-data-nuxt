@@ -21,7 +21,8 @@
 
     <main class="main-content">
       <div class="right-card">
-        <span class="me-title"><img style="max-width: 100%; height: auto;"
+        <span class="me-title">
+          <img style="max-width: 100%; height: auto; vertical-align: middle"
                                     src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=4000&pause=200&vCenter=true&width=435&height=25&lines=Hi+there+%F0%9F%91%8B;and+welcome+to+this+website."
             alt="Typing SVG"/></span>
         <div style="display: flex;flex-direction: column;">
@@ -240,7 +241,7 @@ function onLoad() {
     content: "";
     position: absolute;
     left: 0;
-    top: -9px;
+    top: 0;
     width: 4px;
     height: 100%;
     background-color: #9eb4ed;
