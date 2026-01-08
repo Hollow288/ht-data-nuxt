@@ -429,7 +429,7 @@ watch(activeTocId, async (newId) => {
 }
 
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 850px) {
   .page-layout {
     flex-direction: column;
     margin: 10px;

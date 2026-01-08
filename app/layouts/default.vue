@@ -6,7 +6,7 @@
         <NuxtPage/>
       </Transition>
     </div>
-    <FooterBar/>
+<!--    <FooterBar/>-->
 <!--    <FanMenu/>-->
     <BackAndToTop />
     <PaintClickEffect />

@@ -147,7 +147,7 @@ onMounted(async () => {
             <template #default="{ item }">
               <div :key="item.artifactKey" class="result-item" :class="{'active': thisShowKey === item.artifactKey}"
                    @click="showThisArtifactInfo(item.artifactKey)">
-                <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt="">
+                <img :key="item.artifactKey" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt="">
                 <div class="result-item__details">
                   <span class="task-title">{{ item.artifactName }}</span>
                   <span class="task-cat">{{ item.artifactRarity }}</span>
@@ -226,7 +226,7 @@ onMounted(async () => {
                       :class="{ active: thisShowKey === item.artifactKey }"
                       @click="showThisArtifactInfo(item.artifactKey)"
                   >
-                    <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt=""/>
+                    <img :key="item.artifactKey" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt=""/>
                     <div class="result-item__details">
                       <span class="task-title">{{ item.artifactName }}</span>
                       <span class="task-cat">{{ item.artifactRarity }}</span>
@@ -589,7 +589,7 @@ onMounted(async () => {
 /* =========================================
    移动端适配代码 (Mobile Adaptation)
    ========================================= */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 850px) {
 
   /* 1. 隐藏 PC 端侧边栏 */
   .pc-sidebar {

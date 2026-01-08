@@ -22,7 +22,7 @@
     <main class="main-content">
       <div class="right-card">
         <span class="me-title">
-          <img style="max-width: 100%; height: auto; vertical-align: middle"
+          <img style="max-width: 80%; height: auto; vertical-align: middle"
                                     src="https://readme-typing-svg.demolab.com?font=Fira+Code&duration=4000&pause=200&vCenter=true&width=435&height=25&lines=Hi+there+%F0%9F%91%8B;and+welcome+to+this+website."
             alt="Typing SVG"/></span>
         <div style="display: flex;flex-direction: column;">
@@ -272,7 +272,7 @@ function onLoad() {
   width: 8px;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 850px) {
   /* 1. 容器改为纵向排列，减少内边距 */
   .container {
     flex-direction: column;

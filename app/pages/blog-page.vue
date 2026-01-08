@@ -563,7 +563,7 @@ watch(date, fetchArticles)
 }
 
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 850px) {
   /* 1. 整体布局改为纵向 */
   .page-layout {
     flex-direction: column-reverse; /* 上下排列 */

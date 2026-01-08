@@ -97,7 +97,7 @@ onUnmounted(() => {
 }
 
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 850px) {
   .back-container {
     right: 15px; /* 靠右边近一点 */
     bottom: 30px; /* 稍微往下放一点，离拇指更近 */

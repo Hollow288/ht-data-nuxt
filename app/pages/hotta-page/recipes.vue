@@ -169,7 +169,7 @@ onMounted(async () => {
             <template #default="{ item }">
               <div :key="item.recipesKey" class="result-item" :class="{'active': thisShowKey === item.recipesKey}"
                    @click="showThisRecipesInfo(item.recipesKey)">
-                <img :key="item.recipesKey" loading="lazy" decoding="async" class="result-item__avatar"
+                <img :key="item.recipesKey" decoding="async" class="result-item__avatar"
                      :src="item.recipesIcon" alt="">
                 <div class="result-item__details">
                   <span class="task-title">{{ item.recipesName }}</span>
@@ -241,7 +241,7 @@ onMounted(async () => {
                       :class="{ active: thisShowKey === item.recipesKey }"
                       @click="showThisRecipesInfo(item.recipesKey)"
                   >
-                    <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.recipesIcon" alt=""/>
+                    <img :key="item.recipesKey" decoding="async" class="result-item__avatar" :src="item.recipesIcon" alt=""/>
                     <div class="result-item__details">
                       <span class="task-title">{{ item.recipesName }}</span>
                       <span class="task-cat">{{ item.recipesKey }}</span>
@@ -631,7 +631,7 @@ onMounted(async () => {
 /* =========================================
    移动端适配 (Mobile Adaptation)
    ========================================= */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 850px) {
   .pc-sidebar {
     display: none !important;
   }

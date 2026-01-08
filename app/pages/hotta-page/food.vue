@@ -125,7 +125,7 @@ onMounted(async () => {
             <template #default="{ item }">
               <div :key="item.foodKey" class="result-item" :class="{'active': thisShowKey === item.foodKey}"
                    @click="showThisFoodInfo(item.foodKey)">
-                <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.foodIcon" alt="">
+                <img :key="item.foodKey" decoding="async" class="result-item__avatar" :src="item.foodIcon" alt="">
                 <div class="result-item__details">
                   <span class="task-title">{{ item.foodName }}</span>
                   <span class="task-cat">{{ item.foodKey }}</span>
@@ -172,7 +172,7 @@ onMounted(async () => {
                       :class="{ active: thisShowKey === item.foodKey }"
                       @click="showThisFoodInfo(item.foodKey)"
                   >
-                    <img loading="lazy" decoding="async" class="result-item__avatar" :src="item.foodIcon" alt=""/>
+                    <img :key="item.foodKey" decoding="async" class="result-item__avatar" :src="item.foodIcon" alt=""/>
                     <div class="result-item__details">
                       <span class="task-title">{{ item.foodName }}</span>
                       <span class="task-cat">{{ item.foodKey }}</span>
@@ -474,7 +474,7 @@ onMounted(async () => {
 /* =========================================
    移动端适配 (Mobile Adaptation)
    ========================================= */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 850px) {
   .pc-sidebar {
     display: none !important;
   }

@@ -5,7 +5,7 @@ export interface MatrixListDto {
     matrixKey: string
     matrixName: string
     matrixQuality: string
-    matrixIcon: string
+    matrixThumbnail: string
 }
 export type MatrixListDtoRes = BaseRes<MatrixListDto[]>
 

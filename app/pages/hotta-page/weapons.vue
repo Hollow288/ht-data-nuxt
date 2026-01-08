@@ -2,10 +2,10 @@
 
 import {NButton, NPopover, NText, NVirtualList} from "naive-ui";
 import {ref} from "vue";
-import type {Matrix, MatrixListDto, MatrixListDtoRes, MatrixRes} from "~/types/matrix";
+import type {Weapons, WeaponsListDto, WeaponsListDtoRes, WeaponsRes} from "~/types/weapons";
 import {onMounted} from 'vue'
 import { watch } from 'vue'
-import {replaceTagWithColor} from "~/utils/common";
+import {getImgUrl, replaceTagWithColor, returnTrueFilePathByName} from "~/utils/common";
 import {BaseAPI} from "~/utils/api";
 
 const searchText = ref<string>('')
@@ -13,59 +13,59 @@ const thisShowKey = ref<string | undefined>()
 const popoverVisible = ref(false)
 const popoverVisibleMobile = ref(false)
 const loading = ref(false)
-const items = ref<MatrixListDto[]>([])
-const allItems = ref<MatrixListDto[]>([])
-const thisMatrixInfo = ref<Matrix>()
+const items = ref<WeaponsListDto[]>([])
+const allItems = ref<WeaponsListDto[]>([])
+const thisWeaponsInfo = ref<Weapons>()
 const showDrawer = ref(false)
-// matrix filter
-const matrixQuality = ref<string>('')
+// weapons filter
+const weaponRarity = ref<string>('')
 
-const changeMatrixRarity = async (rarity: string) => {
-  if (matrixQuality.value === rarity) {
-    matrixQuality.value = ''
+const changeWeaponsRarity = async (rarity: string) => {
+  if (weaponRarity.value === rarity) {
+    weaponRarity.value = ''
   } else {
-    matrixQuality.value = rarity
+    weaponRarity.value = rarity
   }
-  await queryMatrixList()
+  await queryWeaponsList()
 }
 
-const onInputMatrixSearch = () => {
+const onInputWeaponsSearch = () => {
   if (searchText.value == '') {
     items.value = allItems.value
   } else {
-    items.value = allItems.value.filter(n => n.matrixName.indexOf(searchText.value) > -1)
+    items.value = allItems.value.filter(n => n.weaponName.indexOf(searchText.value) > -1)
   }
 }
 
-const queryMatrixList = async () => {
-  const matrixList: MatrixListDtoRes = await BaseAPI.apiGet("matrix/search",{'matrixQuality':encodeURIComponent(matrixQuality.value)})
-  allItems.value = matrixList.data
-  onInputMatrixSearch()
+const queryWeaponsList = async () => {
+  const weaponsList: WeaponsListDtoRes = await BaseAPI.apiGet("weapons/search",{'weaponRarity':encodeURIComponent(weaponRarity.value)})
+  allItems.value = weaponsList.data
+  onInputWeaponsSearch()
 }
 
-const findMatrixInfoByKey = async () => {
+const findWeaponsInfoByKey = async () => {
   try {
     loading.value = true
-    const matrixRes: MatrixRes = await BaseAPI.apiGet(`matrix/${thisShowKey.value}`)
-    thisMatrixInfo.value = matrixRes.data
+    const weaponsRes: WeaponsRes = await BaseAPI.apiGet(`weapons/${thisShowKey.value}`)
+    thisWeaponsInfo.value = weaponsRes.data
   } finally {
     loading.value = false
   }
 }
 
-const showThisMatrixInfo = async (matrixKey: string) => {
-  thisShowKey.value = matrixKey
-  await findMatrixInfoByKey()
+const showThisWeaponsInfo = async (weaponKey: string) => {
+  thisShowKey.value = weaponKey
+  await findWeaponsInfoByKey()
   // 核心：在移动端点击后，自动关闭抽屉
   showDrawer.value = false
 }
 
 const initializePage = async () => {
-  await queryMatrixList()
+  await queryWeaponsList()
   if (allItems.value.length > 0) {
-    thisShowKey.value = allItems.value[0]?.matrixKey
+    thisShowKey.value = allItems.value[0]?.weaponKey
   }
-  await findMatrixInfoByKey()
+  await findWeaponsInfoByKey()
 };
 
 watch(showDrawer, (val) => {
@@ -90,22 +90,18 @@ onMounted(async () => {
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else class="gallery-container__content">
         <div class="gallery-container__content__left">
-          <img width="150" :src="thisMatrixInfo?.matrixIcon" :alt="thisMatrixInfo?.matrixName" class="gallery-card__image" loading="lazy"/>
-          <div class="level">{{ thisMatrixInfo?.matrixQuality }}</div>
-          <div class="name">{{ thisMatrixInfo?.matrixName }}</div>
-<!--          <div class="description" v-html="replaceTagWithColor(thisMatrixInfo?.useDescription,'shuzhi','C94F4F')"></div>-->
+<!--          <img width="150" :src="thisWeaponsInfo?.weaponIcon" :alt="thisWeaponsInfo?.weaponName" class="gallery-card__image" loading="lazy"/>-->
+          <div class="level">{{ thisWeaponsInfo?.weaponRarity }}</div>
+          <div class="name">{{ thisWeaponsInfo?.weaponName }}</div>
+<!--          <div class="description" v-html="replaceTagWithColor(thisWeaponsInfo?.useDescription,'shuzhi','C94F4F')"></div>-->
         </div>
         <div class="gallery-container__content__right">
-          <div class="matrix-detail">
-
-            <div v-for="(items,index) in thisMatrixInfo?.matrixDetail" style="display: flex;margin-bottom: 10px">
-              <div style="display: flex;flex-direction: column;">
-                <span class="level">{{ items.type }}：</span>
-                <!--              <span class="stars">{{ items.type }} : </span>-->
-                <span class="desc" v-html="replaceTagWithColor(items.desc,'shuzhi','C94F4F')"></span>
-              </div>
-
-            </div>
+          <div class="weapons-detail">
+            <span class="level">星级效果：</span>
+<!--            <div v-for="(items,index) in thisWeaponsInfo?.weaponDetail" style="display: flex;margin-bottom: 10px">-->
+<!--              <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>-->
+<!--              <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>-->
+<!--            </div>-->
           </div>
         </div>
       </div>
@@ -134,33 +130,37 @@ onMounted(async () => {
               <div class="filter-group">
                 <p style="color:var(--text-main)">Rarity:</p>
                 <div class="button-group">
-                  <NButton color="#9E8BA8" :dashed="matrixQuality!=='SSR'" size="tiny"
-                           @click="changeMatrixRarity('SSR')">SSR
+                  <NButton color="#9E8BA8" :dashed="weaponRarity!=='SSR'" size="tiny"
+                           @click="changeWeaponsRarity('SSR')">SSR
                   </NButton>
-                  <NButton color="#9E8BA8" :dashed="matrixQuality!=='SR'" size="tiny"
-                           @click="changeMatrixRarity('SR')">SR
-                  </NButton>
-                  <NButton color="#9E8BA8" :dashed="matrixQuality!=='R'" size="tiny"
-                           @click="changeMatrixRarity('R')">R
-                  </NButton>
-                  <NButton color="#9E8BA8" :dashed="matrixQuality!=='N'" size="tiny"
-                           @click="changeMatrixRarity('N')">N
+                  <NButton color="#9E8BA8" :dashed="weaponRarity!=='SR'" size="tiny"
+                           @click="changeWeaponsRarity('SR')">SR
                   </NButton>
                 </div>
               </div>
             </n-popover>
-            <input type="text" v-model="searchText" @input="onInputMatrixSearch()" placeholder="Search"/>
+            <input type="text" v-model="searchText" @input="onInputWeaponsSearch()" placeholder="Search"/>
           </div>
         </header>
         <div class="search-panel__content">
           <n-virtual-list style="height: 100%" :item-size="50" :items="items">
             <template #default="{ item }">
-              <div :key="item.matrixKey" class="result-item" :class="{'active': thisShowKey === item.matrixKey}"
-                   @click="showThisMatrixInfo(item.matrixKey)">
-                <img :key="item.matrixKey" decoding="async" class="result-item__avatar" :src="item.matrixThumbnail" alt="">
+              <div :key="item.weaponKey" class="result-item" :class="{'active': thisShowKey === item.weaponKey}"
+                   @click="showThisWeaponsInfo(item.weaponKey)">
+                <img :key="item.weaponKey" decoding="async" class="result-item__avatar" :src="item.weaponIcon" alt="">
                 <div class="result-item__details">
-                  <span class="task-title">{{ item.matrixName }}</span>
-                  <span class="task-cat">{{ item.matrixQuality }}</span>
+                  <span class="task-title">{{ item.weaponName }}</span>
+                  <span class="task-cat">
+                        <img :key="item.weaponElementType" :src="getImgUrl(returnTrueFilePathByName(item.weaponElementType))"  :alt="item.weaponElementType"/>
+                        <img :key="item.weaponCategory" :src="getImgUrl(returnTrueFilePathByName(item.weaponCategory))"  :alt="item.weaponCategory"/>
+                        <img :key="item.weaponRarity" :src="getImgUrl(returnTrueFilePathByName(item.weaponRarity))"
+                          :alt="item.weaponRarity"
+                          :style="{
+                            marginLeft: item.weaponRarity === 'R' ? '-10px' :
+                                        item.weaponRarity === 'SR' ? '-3px' : '0px'
+                          }"
+                    />
+                  </span>
                 </div>
               </div>
             </template>
@@ -211,24 +211,14 @@ onMounted(async () => {
                     <n-text style="color:var(--text-main)" strong depth="1">Type filter</n-text>
                   </template>
                   <div class="filter-group">
-                    <p  style="color:var(--text-main)">Rarity:</p>
+                    <p style="color:var(--text-main)">Rarity:</p>
                     <div class="button-group">
-                      <NButton color="#9E8BA8" :dashed="matrixQuality!=='SSR'" size="tiny"
-                               @click="changeMatrixRarity('SSR')">SSR
-                      </NButton>
-                      <NButton color="#9E8BA8" :dashed="matrixQuality!=='SR'" size="tiny"
-                               @click="changeMatrixRarity('SR')">SR
-                      </NButton>
-                      <NButton color="#9E8BA8" :dashed="matrixQuality!=='R'" size="tiny"
-                               @click="changeMatrixRarity('R')">R
-                      </NButton>
-                      <NButton color="#9E8BA8" :dashed="matrixQuality!=='N'" size="tiny"
-                               @click="changeMatrixRarity('N')">N
-                      </NButton>
+                      <NButton color="#9E8BA8" :dashed="weaponRarity !== 'SSR'" size="tiny" @click="changeWeaponsRarity('SSR')">SSR</NButton>
+                      <NButton color="#9E8BA8" :dashed="weaponRarity !== 'SR'" size="tiny" @click="changeWeaponsRarity('SR')">SR</NButton>
                     </div>
                   </div>
                 </n-popover>
-                <input type="text" v-model="searchText" @input="onInputMatrixSearch" placeholder="Search"/>
+                <input type="text" v-model="searchText" @input="onInputWeaponsSearch" placeholder="Search"/>
               </div>
             </header>
 
@@ -241,15 +231,25 @@ onMounted(async () => {
               >
                 <template #default="{ item }">
                   <div
-                      :key="item.matrixKey"
+                      :key="item.weaponKey"
                       class="result-item"
-                      :class="{ active: thisShowKey === item.matrixKey }"
-                      @click="showThisMatrixInfo(item.matrixKey)"
+                      :class="{ active: thisShowKey === item.weaponKey }"
+                      @click="showThisWeaponsInfo(item.weaponKey)"
                   >
-                    <img :key="item.matrixKey" decoding="async" class="result-item__avatar" :src="item.matrixThumbnail" alt=""/>
+                    <img :key="item.weaponKey" decoding="async" class="result-item__avatar" :src="item.weaponIcon" alt=""/>
                     <div class="result-item__details">
-                      <span class="task-title">{{ item.matrixName }}</span>
-                      <span class="task-cat">{{ item.matrixQuality }}</span>
+                      <span class="task-title">{{ item.weaponName }}</span>
+                      <span class="task-cat">
+                        <img :key="item.weaponElementType" :src="getImgUrl(returnTrueFilePathByName(item.weaponElementType))"  :alt="item.weaponElementType"/>
+                        <img :key="item.weaponCategory" :src="getImgUrl(returnTrueFilePathByName(item.weaponCategory))"  :alt="item.weaponCategory"/>
+                        <img  :key="item.weaponRarity" :src="getImgUrl(returnTrueFilePathByName(item.weaponRarity))"
+                             :alt="item.weaponRarity"
+                             :style="{
+                                  marginLeft: item.weaponRarity === 'R' ? '-7px' :
+                                              item.weaponRarity === 'SR' ? '-4px' : '0px'
+                             }"
+                        />
+                      </span>
                     </div>
                   </div>
                 </template>
@@ -340,7 +340,7 @@ onMounted(async () => {
       padding: 20px 20px 15px;
       display: flex;
 
-      .matrix-detail {
+      .weapons-detail {
         display: flex;
         align-items: flex-start;
         flex-direction: column;
@@ -364,7 +364,7 @@ onMounted(async () => {
         }
 
         .desc {
-          color: #555;
+          color: var(--text-main);
           flex: 1;
           word-break: break-all;
           align-items: flex-start;
@@ -506,14 +506,19 @@ onMounted(async () => {
 }
 
 .task-title {
-  font-size: 13px;
+  font-size: 12px;
   display: inline-block;
 }
 
 .task-cat {
-  font-size: 10px;
-  display: block;
-  color: #888;
+  display: flex;        /* 横向排列 */
+  align-items: center;  /* 垂直居中 */
+  gap: 7px;             /* 图片间距 */
+}
+
+.task-cat img {   /* 自行调整大小 */
+  height: 14px;
+  object-fit: contain;  /* 防止拉伸变形 */
 }
 
 
@@ -626,6 +631,10 @@ onMounted(async () => {
     margin: 0;
     height: auto;
     min-height: auto;
+
+    :after{
+      display: none;
+    }
   }
   .gallery-container__content {
     flex-direction: column;

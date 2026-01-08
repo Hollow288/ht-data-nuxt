@@ -46,10 +46,12 @@
               </li>
             </NuxtLink>
 
-            <li class="menu__item menu__item--green">
-              <span class="task-title">武器</span>
-              <span class="task-cat">待制作...</span>
-            </li>
+            <NuxtLink to="/hotta-page/weapons" active-class="active-link">
+              <li class="menu__item menu__item--green">
+                <span class="task-title">武器</span>
+                <span class="task-cat">待制作...</span>
+              </li>
+            </NuxtLink>
 
             <NuxtLink to="/hotta-page/matrix" active-class="active-link">
               <li class="menu__item menu__item--green">
@@ -310,7 +312,7 @@ onMounted(() => {
 /* =========================================
    移动端适配代码 (Mobile Adaptation)
    ========================================= */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 850px) {
   /* 1. 隐藏侧边栏 */
   .sidebar.sidebar--left {
     display: none !important;

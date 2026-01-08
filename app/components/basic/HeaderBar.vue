@@ -1,20 +1,17 @@
 <template>
   <header class="header-container">
-    <!-- 1. 返回按钮 -->
-
+    <!-- 1. 返回按钮 (桌面端) -->
     <div class="back-div">
       <button class="back-btn" @click="goBack" aria-label="返回">
         <i class="ri-arrow-left-line"></i>
       </button>
-
     </div>
 
-
-    <!-- 2. 移动端菜单切换按钮 -->
-    <div style="display: flex;">
+    <!-- 2. 移动端：菜单切换 & 主题切换 -->
+    <div class="mobile-controls">
       <button
           ref="toggleBtnRef"
-          class="mobile-menu-toggle"
+          class="mobile-btn"
           @click="toggleMobileMenu"
           aria-label="菜单"
       >
@@ -23,33 +20,47 @@
 
       <button
           @click="toggleTheme($event)"
-          class="mobile-menu-toggle"
+          class="mobile-btn"
       >
         <i v-if="colorMode.value === 'dark'" class="ri-moon-clear-fill"></i>
         <i v-else class="ri-sun-fill"></i>
       </button>
     </div>
 
-
-
-
+    <!-- 移动端中间显示的名称 -->
     <div class="header-name">
       <span>Hollow's Space</span>
     </div>
 
+    <!-- 移动端显示的头像 -->
     <div class="header-img">
       <img width="40" src="https://avatars.githubusercontent.com/u/87030922?v=4" alt="头像" class="avatar"/>
     </div>
 
     <!-- 3. 主导航 -->
-    <!-- 注意：这里的 CSS 会控制它从左侧滑出来 -->
     <nav ref="navRef" class="main-nav" :class="{ 'mobile-active': isMobileMenuOpen }">
       <ul class="main-menu">
         <li @click="closeMobileMenu">
-          <NuxtLink to="/" active-class="active-link">首页</NuxtLink>
+          <NuxtLink to="/" active-class="active-link">
+            <i class="ri-home-3-line nav-icon"></i>
+            <span>首页</span>
+            <div class="arrow-icon-right">
+              <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path fill="currentColor" d="M190.6 469.1l192-192c12.5-12.5 12.5-32.8 0-45.3l-192-192c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L302.7 256 145.3 423.8c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0z"></path>
+              </svg>
+            </div>
+          </NuxtLink>
         </li>
         <li @click="closeMobileMenu">
-          <NuxtLink to="/blog-page" active-class="active-link">文章</NuxtLink>
+          <NuxtLink to="/blog-page" active-class="active-link">
+            <i class="ri-article-line nav-icon"></i>
+            <span>文章</span>
+            <div class="arrow-icon-right">
+              <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path fill="currentColor" d="M190.6 469.1l192-192c12.5-12.5 12.5-32.8 0-45.3l-192-192c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L302.7 256 145.3 423.8c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0z"></path>
+              </svg>
+            </div>
+          </NuxtLink>
         </li>
 
         <!-- Hotta 下拉菜单 -->
@@ -59,16 +70,15 @@
             class="has-submenu"
         >
           <div class="menu-label-wrapper" @click="handleSubmenuClick">
-            <NuxtLink active-class="active-link" class="menu-link-txt">
-              Hotta
+            <a class="menu-link-txt">
+              <i class="ri-gamepad-line nav-icon"></i>
+              <span>Hotta</span>
               <div class="arrow-icon" :class="{ 'rotated': isSubmenuVisible }">
-                <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg"
-                     viewBox="0 0 512 512" style="width: 10px; height: 10px;">
-                  <path fill="currentColor"
-                        d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path>
+                <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <path fill="currentColor" d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path>
                 </svg>
               </div>
-            </NuxtLink>
+            </a>
           </div>
 
           <transition name="fade-slide">
@@ -76,25 +86,31 @@
               <li @click="closeMobileMenu">
                 <NuxtLink class="submenu-li" to="/hotta-page/artifact" active-class="active-link">
                   <i class="ri-box-3-line" style="font-size: 14px"></i>
-                  <span style="margin-left: 10px">源器</span>
+                  <span style="margin-left: 15px">源器</span>
                 </NuxtLink>
               </li>
               <li @click="closeMobileMenu">
                 <NuxtLink class="submenu-li" to="/hotta-page/food" active-class="active-link">
                   <i class="ri-cake-3-line" style="font-size: 14px"></i>
-                  <span style="margin-left: 10px">食物</span>
+                  <span style="margin-left: 15px">食物</span>
                 </NuxtLink>
               </li>
               <li @click="closeMobileMenu">
                 <NuxtLink class="submenu-li" to="/hotta-page/recipes" active-class="active-link">
                   <i class="ri-book-2-line" style="font-size: 14px"></i>
-                  <span style="margin-left: 10px">食谱</span>
+                  <span style="margin-left: 15px">食谱</span>
+                </NuxtLink>
+              </li>
+              <li @click="closeMobileMenu">
+                <NuxtLink class="submenu-li" to="/hotta-page/weapons" active-class="active-link">
+                  <i class="ri-sword-fill" style="font-size: 14px"></i>
+                  <span style="margin-left: 15px">武器</span>
                 </NuxtLink>
               </li>
               <li @click="closeMobileMenu">
                 <NuxtLink class="submenu-li" to="/hotta-page/matrix" active-class="active-link">
-                  <i class="ri-cpu-line" style="font-size: 14px"></i>
-                  <span style="margin-left: 10px">意志</span>
+                  <i class="ri-aed-line" style="font-size: 14px"></i>
+                  <span style="margin-left: 15px">意志</span>
                 </NuxtLink>
               </li>
             </ul>
@@ -119,13 +135,14 @@
       </div>
     </div>
 
-    <div class="other-btn">
-      <button
-          @click="toggleTheme($event)"
-          class="other-menu-toggle"
-      >
+    <!-- 右侧功能按钮 (桌面) -->
+    <div class="desktop-controls">
+      <button @click="toggleTheme($event)" class="icon-btn">
         <i v-if="colorMode.value === 'dark'" class="ri-moon-clear-fill"></i>
         <i v-else class="ri-sun-fill"></i>
+      </button>
+      <button onclick="window.open('https://github.com/hollow288', '_blank')" class="icon-btn">
+        <i class="ri-github-line"></i>
       </button>
     </div>
 
@@ -134,8 +151,7 @@
       <div v-show="showDropdown" class="dropdown-box" @mousedown.prevent>
         <div class="search-results-list">
           <div v-show="!isLoading">
-            <div v-for="item in articles" :key="item.blogId" class="search-item"
-                 @click="navigateToArticle(item.blogId)">
+            <div v-for="item in articles" :key="item.blogId" class="search-item" @click="navigateToArticle(item.blogId)">
               <div class="search-item-content">
                 <div class="search-item-header">
                   <n-highlight
@@ -155,17 +171,9 @@
               </div>
             </div>
           </div>
+          <!-- 骨架屏 -->
           <div v-show="isLoading">
             <n-skeleton round :style="{ height: '20px', width: '150px', borderRadius : '10px', marginTop : '13px' }"/>
-            <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
-            <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
-            <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
-            <n-skeleton round :style="{ height: '20px', width: '150px', borderRadius : '10px', marginTop : '13px' }"/>
-            <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
-            <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
-            <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
-            <n-skeleton round :style="{ height: '20px', width: '150px', borderRadius : '10px', marginTop : '13px' }"/>
-            <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
             <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
             <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
           </div>
@@ -178,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, onUnmounted, watch} from 'vue'
+import {ref, onMounted, onUnmounted, watch, nextTick} from 'vue'
 import {useRouter} from 'vue-router'
 import type {BlogDateListRes, BlogItem} from "~/types/blog";
 import {BaseAPI} from "~/utils/api";
@@ -197,8 +205,8 @@ const isSubmenuVisible = ref(false)
 const isMobileMenuOpen = ref(false)
 const isDesktop = ref(true)
 
-const navRef = ref<HTMLElement | null>(null) // 新增：用于绑定菜单DOM
-const toggleBtnRef = ref<HTMLElement | null>(null) // 新增：用于绑定按钮DOM
+const navRef = ref<HTMLElement | null>(null)
+const toggleBtnRef = ref<HTMLElement | null>(null)
 
 // 获取 colorMode 实例
 const colorMode = useColorMode()
@@ -211,36 +219,28 @@ const toggleTheme = (event?: MouseEvent) => {
       Math.max(y, window.innerHeight - y)
   )
 
-  // 1. 如果浏览器不支持 View Transitions，直接切换（降级处理）
   if (!document.startViewTransition) {
     colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
     return
   }
 
-  // 2. 开始视图过渡
   const transition = document.startViewTransition(async () => {
-    // 这里是真正改变主题的地方，浏览器会在这里截图（新状态）
     colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark'
-    // 等待 Vue 响应式更新完成（可选，但在 Nuxt 中通常建议）
     await nextTick()
   })
 
-  // 3. 定义动画效果 (圆圈扩散)
   transition.ready.then(() => {
     const clipPath = [
       `circle(0px at ${x}px ${y}px)`,
       `circle(${endRadius}px at ${x}px ${y}px)`
     ]
-
-    // 判断是变暗还是变亮，决定动画方向
     const isDark = colorMode.value === 'dark'
-
     document.documentElement.animate(
         {
           clipPath: isDark ? [...clipPath] : [...clipPath].reverse(),
         },
         {
-          duration: 400, // 动画时长
+          duration: 400,
           easing: 'ease-in',
           pseudoElement: isDark ? '::view-transition-new(root)' : '::view-transition-old(root)',
         }
@@ -250,33 +250,17 @@ const toggleTheme = (event?: MouseEvent) => {
 
 const handleClickOutside = (event: MouseEvent) => {
   if (isDesktop.value || !isMobileMenuOpen.value) return
-
   const target = event.target as Node
-  // 如果点击的不是菜单内部，也不是切换按钮，则关闭菜单
   if (navRef.value && !navRef.value.contains(target) &&
       toggleBtnRef.value && !toggleBtnRef.value.contains(target)) {
     isMobileMenuOpen.value = false
-    isSubmenuVisible.value = false // 同时折叠子菜单
+    isSubmenuVisible.value = false
   }
 }
 
-onMounted(() => {
-  checkScreenSize()
-  window.addEventListener('resize', checkScreenSize)
-  window.addEventListener('click', handleClickOutside) // 新增监听
-})
-
-onUnmounted(() => {
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('resize', checkScreenSize)
-    window.removeEventListener('click', handleClickOutside) // 移除监听
-    // document.body.style.overflow = '' // 这句也不需要了
-  }
-})
-
 const checkScreenSize = () => {
   if (typeof window !== 'undefined') {
-    isDesktop.value = window.innerWidth > 768
+    isDesktop.value = window.innerWidth > 850
     if (isDesktop.value) {
       isMobileMenuOpen.value = false
       isSubmenuVisible.value = false
@@ -284,7 +268,6 @@ const checkScreenSize = () => {
   }
 }
 
-// 禁止背景滚动
 watch(isMobileMenuOpen, (val) => {
   if (typeof document !== 'undefined') {
     document.body.style.overflow = val ? 'hidden' : ''
@@ -294,11 +277,13 @@ watch(isMobileMenuOpen, (val) => {
 onMounted(() => {
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)
+  window.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', checkScreenSize)
+    window.removeEventListener('click', handleClickOutside)
     document.body.style.overflow = ''
   }
 })
@@ -376,23 +361,13 @@ const handleFocus = () => {
 }
 </script>
 
-
 <style scoped>
-
-.other-btn{
-  width: 50px;
-  height: 100%;
-  display: flex;
-  align-items: center;     /* 关键：垂直居中 */
-  justify-content: center; /* 建议添加：水平居中 */
-  margin-top: -1px;
-}
-
-
-/* --- 1. Header 基础样式 --- */
+/* =========================================
+   1. Layout & Header Container
+   ========================================= */
 .header-container {
   position: sticky;
-  top: -60px; /* 原始样式 */
+  top: -60px;
   left: 0;
   z-index: 100;
   display: flex;
@@ -400,7 +375,7 @@ const handleFocus = () => {
   justify-content: space-between;
   width: 100%;
   height: 60px;
-  padding: 0 50px;
+  padding: 0 10px 0 50px;
   color: white;
   background-color: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(5px);
@@ -412,49 +387,76 @@ const handleFocus = () => {
   width: 200px;
 }
 
-/* --- 2. 按钮样式 --- */
+/* Mobile Name & Image (Hidden on Desktop) */
+.header-name,
+.header-img {
+  display: none;
+}
+
+.header-name span {
+  color: rgba(204, 204, 204, 0.9);
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.header-img img {
+  border-radius: 20px;
+}
+
+/* =========================================
+   2. Buttons (Desktop & Shared)
+   ========================================= */
+button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
 .back-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
   color: white;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  z-index: 102; /* 确保在最上层 */
+  z-index: 102;
 }
 
 .back-btn:hover {
   color: #4da6ff;
 }
 
-/* 移动端菜单开关按钮 */
-.mobile-menu-toggle {
-  display: none; /* 桌面端隐藏 */
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: white; /* 这里建议用白色以适配深色 Header 背景，或者根据你的主题调整 */
-  cursor: pointer;
-  z-index: 102;
-}
-
-.other-menu-toggle {
+/* Desktop right-side controls */
+.desktop-controls {
+  width: 100px;
+  height: 100%;
   display: flex;
-  background: none;
-  border: none;
-  font-size: 16px;
-  color: #999; /* 这里建议用白色以适配深色 Header 背景，或者根据你的主题调整 */
-  cursor: pointer;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: -1px;
+  padding-left: 12px;
+  gap: 12px;
+}
+
+.icon-btn {
+  display: flex;
+  font-size: 22px;
+  color: #999;
   z-index: 102;
 }
 
-.other-menu-toggle :hover{
+.icon-btn:hover {
   color: #78c1f3;
 }
 
-/* --- 3. 导航菜单 (默认桌面端样式) --- */
+/* Mobile Controls (Hidden on Desktop) */
+.mobile-controls {
+  display: none;
+}
+
+/* =========================================
+   3. Navigation (Desktop)
+   ========================================= */
 .main-nav {
   margin: 0 auto;
 }
@@ -464,46 +466,128 @@ const handleFocus = () => {
   margin: 0;
   padding: 0;
   display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
-.main-menu li {
-  display: inline-block;
-  padding: 0.75em 1.875em;
-}
-
-.main-menu li a {
+/* Links & Text */
+.main-menu li a,
+.menu-link-txt {
   position: relative;
   font-size: 1em;
   color: var(--text-main);
   text-decoration: none;
-  text-transform: uppercase;
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+.main-menu li a span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Icons */
+.nav-icon {
+  margin-right: 6px;
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+/* Arrows */
+.arrow-icon,
+.arrow-icon-right {
+  margin-left: 6px;
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease;
+  opacity: 0.7;
+}
+
+.arrow-icon-right {
+  display: none; /* Desktop 默认隐藏右侧箭头 */
+}
+
+.arrow-icon svg,
+.arrow-icon-right svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* States: Hover & Active */
+.main-menu li:hover a:hover,
+.menu-link-txt:hover  {
+  color: rgb(39, 162, 190);
+  background-color: rgba(209, 241, 253, 0.5);
+  border-radius: 10px;
+}
+
+.main-menu li a.active-link{
+  color: rgb(39, 162, 190);
+}
+
+
+.main-menu li a:hover .arrow-icon,
+.menu-label-wrapper:hover .arrow-icon {
+  opacity: 1;
+}
+
+.arrow-icon.rotated {
+  transform: rotate(180deg);
+}
+
+/* Submenu Wrapper */
 .menu-label-wrapper {
   display: flex;
   align-items: center;
   cursor: pointer;
+  height: 100%;
 }
 
-.arrow-icon {
-  margin-left: 8px;
-  display: flex;
-  align-items: center;
-  transition: transform 0.3s ease;
+.has-submenu {
+  position: relative;
 }
 
-.main-menu li a:hover, .menu-label-wrapper:hover .menu-link-txt {
-  color: #78c1f3;
+/* =========================================
+   4. Submenu (Desktop Dropdown)
+   ========================================= */
+.submenu {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  width: max-content;
+  min-width: 100px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background-color: var(--bg-card-glass-95);
+  backdrop-filter: blur(5px);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 11;
+  overflow: hidden;
+  text-align: center;
 }
 
-.main-menu li a.active-link {
-  color: #78c1f3;
+.submenu li a {
+  display: block;
+  padding: 10px 28px;
+  font-size: 0.9em;
+  color: var(--text-main);
+  text-transform: none;
+  white-space: nowrap;
 }
 
-/* --- 4. 搜索框 --- */
+.submenu li a:hover {
+  background-color: rgba(209, 241, 253, 0.5);
+}
+
+/* =========================================
+   5. Search Bar & Results
+   ========================================= */
 .search-container {
   position: relative;
   margin-left: 20px;
@@ -535,71 +619,11 @@ const handleFocus = () => {
   color: #999;
 }
 
-
 .search-icon:hover {
   color: #78c1f3;
 }
 
-/* --- 5. 子菜单 (桌面悬浮) --- */
-.has-submenu {
-  position: relative;
-}
-
-.submenu {
-  position: absolute;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: max-content;
-  margin: 0;
-  list-style: none;
-  background-color: var(--bg-card-glass-95);
-  backdrop-filter: blur(10px);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 11;
-  padding: 10px 0;
-  min-width: 120px;
-}
-
-.submenu {
-  position: absolute;
-  top: 40px;
-  left: 100px;
-  width: max-content;
-  margin: 0;
-  list-style: none;
-  background-color: var(--bg-card-glass-95);
-  backdrop-filter: blur(5px);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 11;
-  padding-inline-start: 0;
-  overflow: hidden;
-  min-width: 100px;
-  text-align: center;
-}
-
-.submenu li {
-  display: block;
-  padding: 0;
-}
-
-.submenu li a {
-  display: block;
-  padding: 10px 30px;
-  font-size: 0.9em;
-  color: var(--text-main);
-  text-transform: none;
-  white-space: nowrap;
-}
-
-.submenu li a:hover {
-  background-color: rgba(209, 241, 253, 0.5);
-  color: rgb(47, 183, 227);
-}
-
-/* --- 5. 搜索结果下拉框 --- */
+/* Dropdown Results */
 .dropdown-box {
   position: absolute;
   top: 65px;
@@ -626,11 +650,11 @@ const handleFocus = () => {
   padding: 10px 0;
   transition: background 0.2s ease;
   border-radius: 10px;
+  cursor: pointer;
 }
 
 .search-item:hover {
   background-color: rgba(225, 158, 186, 0.5);
-  cursor: pointer;
 }
 
 .search-item-content {
@@ -669,47 +693,12 @@ const handleFocus = () => {
   word-break: break-all;
 }
 
-.header-name {
-  display: none;
-  color: rgba(204, 204, 204, 0.9);
-  font-size: 18px;
-  font-weight: bold;
-
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap; /* 防止文字换行 */
-  z-index: 1; /* 确保层级，但不要遮挡下拉菜单 */
-}
-
-.header-img {
-  display: none;
-  img {
-    border-radius: 20px;
-  }
-}
-
 /* =========================================
-   移动端适配 (核心修复)
+   6. Mobile Adaptation (max-width: 850px)
    ========================================= */
-/* =========================================
-   移动端美化适配 (Modern Mobile Style)
-   ========================================= */
-/* =========================================
-   移动端悬浮卡片适配 (Floating Popover Style)
-   ========================================= */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 850px) {
 
-  .header-img {
-    border-radius: 20px;
-    display: flex;
-  }
-
-  .header-name {
-    display: flex;
-  }
-
-  /* 1. Header 调整 */
+  /* --- Mobile Header Layout --- */
   .header-container {
     padding: 0 20px;
     background-color: var(--bg-card-glass-95);
@@ -717,15 +706,38 @@ const handleFocus = () => {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   }
 
-  .back-btn, .back-div {
-    display: none;
+  .header-name,
+  .header-img {
+    display: flex;
+    position: absolute;
   }
 
-  .search-container, .dropdown-box {
+  .header-name {
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    z-index: 1;
+  }
+
+  .header-img {
+    right: 20px;
+  }
+
+  /* --- Hide Desktop Elements --- */
+  .back-btn,
+  .back-div,
+  .search-container,
+  .dropdown-box,
+  .desktop-controls {
     display: none !important;
   }
 
-  .mobile-menu-toggle {
+  /* --- Show Mobile Controls --- */
+  .mobile-controls {
+    display: flex;
+  }
+
+  .mobile-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -735,141 +747,108 @@ const handleFocus = () => {
     height: 40px;
     border-radius: 8px;
     transition: background 0.2s;
+    z-index: 102;
   }
 
-  .mobile-menu-toggle:active {
+  .mobile-btn:active {
     background-color: rgba(0, 0, 0, 0.05);
   }
 
- .other-btn,.other-menu-toggle {
-    display: none;
-  }
-
-  /* 2. 主导航 - 悬浮气泡样式 */
+  /* --- Floating Card Menu (Mobile Nav) --- */
   .main-nav {
-    position: absolute; /* 绝对定位，不再是 fixed */
-    top: 70px; /* 距离 Header 底部一点距离 */
-    left: 10px; /* 靠右对齐 */
-    width: 150px; /* 固定宽度，做成卡片 */
-    height: auto; /* 高度随内容自适应 */
+    position: absolute;
+    top: 70px;
+    left: 10px;
+    width: 150px;
+    height: auto;
     background-color: var(--bg-card-glass-95);
-    border-radius: 12px; /* 圆角 */
-    padding: 8px; /* 整体内边距 */
-
-    /* 核心：卡片阴影 */
+    border-radius: 12px;
+    padding: 8px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06),
-    0 0 0 1px rgba(0, 0, 0, 0.05); /* 模拟细边框 */
+    0 0 0 1px rgba(0, 0, 0, 0.05);
 
-    /* 动画初始状态：缩放 + 透明 */
-    transform-origin: top right; /* 从右上角放大出来 */
+    transform-origin: top left;
     transform: scale(0.9) translateY(-10px);
     opacity: 0;
-    pointer-events: none; /* 隐藏时不可点击 */
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.2s ease;
+    pointer-events: none;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
     z-index: 1000;
   }
 
-  /* 激活状态 */
   .main-nav.mobile-active {
     transform: scale(1) translateY(0);
     opacity: 1;
     pointer-events: auto;
   }
 
-  /* 3. 菜单列表布局 */
+  /* --- Mobile Menu Items --- */
   .main-menu {
     flex-direction: column;
     width: 100%;
     align-items: stretch;
+    gap: 2px;
   }
 
   .main-menu li {
-    display: block;
-    width: 100%;
-    padding: 0;
-    border: none;
-    margin-bottom: 2px;
-  }
-
-  /* 菜单链接样式 */
-  .main-menu li a, .menu-label-wrapper {
-    padding: 10px 12px; /* 紧凑一点的内边距 */
-    font-size: 15px;
-    font-weight: bold;
-    color: var(--text-main);
-    border-radius: 8px; /* 每一项也是圆角 */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: all 0.2s;
-    cursor: pointer;
     width: 100%;
   }
 
+  .main-menu li a,
   .menu-label-wrapper {
-    padding: 0;
+    font-size: 15px;
+    border-radius: 8px;
+    justify-content: space-between;
+    width: 100%;
+    box-shadow: none !important;
   }
 
-  /* 悬停/激活/点击态 */
-  .main-menu li a:hover,
+  .nav-icon {
+    margin-right: 10px;
+    font-size: 16px;
+  }
+
+  .arrow-icon-right {
+    display: flex;
+    color: #9ca3af;
+  }
+
+  /* Active/Hover states in Mobile */
+  .main-menu li:hover a:hover,
   .submenu-li:hover,
-  .menu-label-wrapper:hover {
-    background-color: var(--bg-card);
-  }
-
   .main-menu li a.active-link {
-    background-color: rgba(77, 166, 255, 0.1); /* 淡蓝背景 */
+    background-color: rgba(77, 166, 255, 0.1);
     color: #4da6ff;
   }
 
-  /* 4. Arrow 图标 */
-  .arrow-icon svg {
-    width: 10px;
-    height: 10px;
-    color: #9ca3af; /* 浅灰色箭头 */
+  .main-menu li a.active-link,
+  .submenu-li.active-link {
+    background-color: transparent; /* 移动端选中背景设为透明，避免过重 */
   }
 
-  .arrow-icon.rotated {
-    transform: rotate(180deg);
-  }
-
-  /* 5. 子菜单 (折叠/展开) */
+  /* --- Mobile Submenu (Accordion style) --- */
   .submenu {
     position: static;
     transform: none;
     box-shadow: none;
-    background: transparent; /* 不需要背景色，直接融入 */
+    background: transparent;
     width: 100%;
     border-radius: 0;
-    padding: 0;
-    margin-top: 0;
+    margin: 0;
     overflow: hidden;
+    text-align: left;
   }
 
   .submenu li a {
-    padding-left: 24px; /* 简单的缩进 */
-    font-size: 14px;
-    color: var(--text-main);
-    height: 40px; /* 子菜单稍微矮一点 */
+    padding: 0 12px 0 24px; /* 缩进 */
+    height: 40px;
     line-height: 40px;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  .submenu li span {
-    margin-left: 0;
-    margin-right: 30px;
     font-size: 14px;
-    height: 36px; /* 子菜单稍微矮一点 */
-    line-height: 36px;
-    padding-top: 0;
-    padding-bottom: 0;
+    justify-content: flex-start;
   }
 
-  .main-menu li a:hover, .menu-label-wrapper:hover .menu-link-txt {
-    color: #78c1f3;
+  .submenu li a span {
+    margin-left: 0;
   }
 }
 </style>
