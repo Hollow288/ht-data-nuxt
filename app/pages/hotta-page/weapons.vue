@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {NButton, NPopover, NText, NVirtualList} from "naive-ui";
+import {NButton, NPopover, NText, NVirtualList, NTabs, NTabPane} from "naive-ui";
 import {ref} from "vue";
 import type {Weapons, WeaponsListDto, WeaponsListDtoRes, WeaponsRes} from "~/types/weapons";
 import {onMounted} from 'vue'
