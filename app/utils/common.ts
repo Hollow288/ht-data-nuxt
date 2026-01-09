@@ -21,7 +21,9 @@ const filePath : Record<string, string> = {
     'R': 'yizhi_tips_zi_r.png',
 }
 
-export function returnTrueFilePathByName(type: string): string | undefined  {
+export function returnTrueFilePathByName(type: string | undefined): string | undefined  {
+    if (typeof type === 'undefined')
+        return undefined
     return filePath[type]
 }
 

@@ -321,7 +321,7 @@ watch(activeTocId, async (newId) => {
 }
 
 .sidebar {
-  flex: 0 0 25%;
+  flex: 0 0 25vw;
   min-width: 180px;
   max-width: 300px;
   padding: 15px;

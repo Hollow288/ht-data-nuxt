@@ -278,7 +278,7 @@ watch(date, fetchArticles)
 }
 
 .basic-aside {
-  flex: 0 0 25%;
+  flex: 0 0 25vw;
   min-width: 180px;
   max-width: 300px;
   box-sizing: border-box;

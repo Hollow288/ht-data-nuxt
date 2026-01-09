@@ -63,7 +63,7 @@ const showThisWeaponsInfo = async (weaponKey: string) => {
 const initializePage = async () => {
   await queryWeaponsList()
   if (allItems.value.length > 0) {
-    thisShowKey.value = allItems.value[0]?.weaponKey
+    thisShowKey.value = allItems.value[20]?.weaponKey
   }
   await findWeaponsInfoByKey()
 };
@@ -89,20 +89,103 @@ onMounted(async () => {
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else class="gallery-container__content">
-        <div class="gallery-container__content__left">
-<!--          <img width="150" :src="thisWeaponsInfo?.weaponIcon" :alt="thisWeaponsInfo?.weaponName" class="gallery-card__image" loading="lazy"/>-->
-          <div class="level">{{ thisWeaponsInfo?.weaponRarity }}</div>
-          <div class="name">{{ thisWeaponsInfo?.weaponName }}</div>
-<!--          <div class="description" v-html="replaceTagWithColor(thisWeaponsInfo?.useDescription,'shuzhi','C94F4F')"></div>-->
+        <div class="gallery-container__content__row">
+            <div >
+              <img width="180" :src="thisWeaponsInfo?.weaponIcon" :alt="thisWeaponsInfo?.weaponName" class="gallery-card__image" loading="lazy"/>
+            </div>
+            <div>
+              <div style="display: flex;align-items: flex-end;">
+                <div class="name">{{ thisWeaponsInfo?.weaponName }}</div>
+                <div class="level">{{ thisWeaponsInfo?.weaponRarity }}</div>
+              </div>
+              <div style="display: flex;align-items: flex-end;">
+                <div >破防： {{ thisWeaponsInfo?.armorBroken }} 破防： {{ thisWeaponsInfo?.armorBroken }}</div>
+              </div>
+              <span class="task-cat">
+                        <img  :src="getImgUrl(returnTrueFilePathByName(thisWeaponsInfo?.weaponElement?.weaponElementType))"  :alt="thisWeaponsInfo?.weaponElement?.weaponElementType"/>
+                        <img  :src="getImgUrl(returnTrueFilePathByName(thisWeaponsInfo?.weaponCategory))"  :alt="thisWeaponsInfo?.weaponCategory"/>
+                      </span>
+              <div class="description" v-html="replaceTagWithColor(thisWeaponsInfo?.description,'shuzhi','C94F4F')"></div>
+            </div>
         </div>
-        <div class="gallery-container__content__right">
+        <div class="gallery-container__content__row">
           <div class="weapons-detail">
-            <span class="level">星级效果：</span>
+            <span class="level">特质：</span>
+            <div>
+              <span>{{thisWeaponsInfo?.weaponElement?.weaponElementName}}</span><span>{{thisWeaponsInfo?.weaponElement?.weaponElementDesc}}</span>
+            </div>
 <!--            <div v-for="(items,index) in thisWeaponsInfo?.weaponDetail" style="display: flex;margin-bottom: 10px">-->
 <!--              <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>-->
 <!--              <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>-->
 <!--            </div>-->
+
           </div>
+        </div>
+        <div class="gallery-container__content__row">
+          <div class="weapons-detail">
+            <span class="level">专属：</span>
+            <div>
+              <span style="white-space: pre-line">{{thisWeaponsInfo?.remouldDetail}}</span>
+            </div>
+            <!--            <div v-for="(items,index) in thisWeaponsInfo?.weaponDetail" style="display: flex;margin-bottom: 10px">-->
+            <!--              <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>-->
+            <!--              <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>-->
+            <!--            </div>-->
+
+          </div>
+        </div>
+
+        <div class="gallery-container__content__row">
+          <div class="weapons-detail">
+            <n-tabs type="segment" animated>
+              <n-tab-pane name="chap1" tab="星级效果">
+                <div v-for="(items,index) in thisWeaponsInfo?.weaponUpgradeStarPack" style="display: flex;margin-bottom: 10px">
+                  <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>
+                  <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>
+                </div>
+              </n-tab-pane>
+              <n-tab-pane name="chap2" tab="通感效果" v-if="(thisWeaponsInfo?.weaponSensualityLevelData || []).length > 0">
+                <div v-for="(items,index) in thisWeaponsInfo?.weaponSensualityLevelData" style="display: flex;margin-bottom: 10px">
+                  <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>
+                  <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>
+                </div>
+              </n-tab-pane>
+            </n-tabs>
+
+
+          </div>
+        </div>
+        <div class="gallery-container__content__row">
+          <n-tabs type="segment" animated>
+            <n-tab-pane name="chap1" tab="普攻">
+              我这辈子最疯狂的事，发生在我在 Amazon
+              当软件工程师的时候，故事是这样的：<br><br>
+              那时我和女朋友住在一起，正在家里远程工作。忽然同事给我发来了紧急消息：”我们的服务出现了
+              SEV 2 级别的故障！需要所有的人马上协助！“我们组的应用全挂掉了。<br><br>
+              当我还在费力的寻找修复方法的时候，忽然闻到隔壁房间的的焦味，防火报警器开始鸣叫。
+            </n-tab-pane>
+            <n-tab-pane name="chap2" tab="闪避">
+              “威尔！着火了！快来帮忙！”我听到女朋友大喊。现在一个难题在我面前——是恢复一个重要的
+              Amazon 服务，还是救公寓的火。<br><br>
+              我的脑海中忽然出现了 Amazon
+              著名的领导力准则”客户至上“，有很多的客户还依赖我们的服务，我不能让他们失望！所以着火也不管了，女朋友喊我也无所谓，我开始
+              debug 这个线上问题。
+            </n-tab-pane>
+            <n-tab-pane name="chap3" tab="技能">
+              但是忽然，公寓的烟味消失，火警也停了。我的女朋友走进了房间，让我震惊的是，她摘下了自己的假发，她是
+              Jeff Bezos（Amazon 老板）假扮的！<br><br>
+              “我对你坚持顾客至上的原则感到十分骄傲”，说完，他递给我一张五美金的亚马逊礼品卡，从我家窗户翻了出去，跳上了一辆
+              Amazon 会员服务的小货车，一溜烟离开了。<br><br>虽然现在我已不在 Amazon
+              工作，但我还是非常感激在哪里学的到的经验，这些经验我终身难忘。你们同意么？
+            </n-tab-pane>
+            <n-tab-pane name="chap4" tab="联携">
+              但是忽然，公寓的烟味消失，火警也停了。我的女朋友走进了房间，让我震惊的是，她摘下了自己的假发，她是
+              Jeff Bezos（Amazon 老板）假扮的！<br><br>
+              “我对你坚持顾客至上的原则感到十分骄傲”，说完，他递给我一张五美金的亚马逊礼品卡，从我家窗户翻了出去，跳上了一辆
+              Amazon 会员服务的小货车，一溜烟离开了。<br><br>虽然现在我已不在 Amazon
+              工作，但我还是非常感激在哪里学的到的经验，这些经验我终身难忘。你们同意么？
+            </n-tab-pane>
+          </n-tabs>
         </div>
       </div>
     </div>
@@ -293,30 +376,18 @@ onMounted(async () => {
   &__content {
     display: flex;
     height: 100%;
+    flex-direction: column;
 
-    &__left {
-      width: 40%;
+    &__row {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      height: 100%;
+      flex-direction: row;
       position: relative;
       padding-top: 20px;
 
-      ::after {
-        content: "";
-        position: absolute;
-        top: 10%;
-        bottom: 10%;
-        right: 0;
-        width: 1px;
-        background-image: linear-gradient(to bottom, transparent, #ccc, transparent);
-      }
 
       .level {
         text-transform: uppercase;
-        font-size: 12px;
+        font-size: 16px;
         font-weight: 700;
         margin-bottom: 3px;
         color: #EC9B3B;
@@ -326,19 +397,12 @@ onMounted(async () => {
         font-size: 26px;
         color: var(--text-main);
         font-weight: 900;
-        margin-bottom: 5px;
+        margin-right: 20px;
       }
 
       .description {
-        padding: 20px 20px 30px;
         word-break: break-all;
       }
-    }
-
-    &__right {
-      width: 60%;
-      padding: 20px 20px 15px;
-      display: flex;
 
       .weapons-detail {
         display: flex;
@@ -372,12 +436,13 @@ onMounted(async () => {
         }
       }
     }
+
   }
 }
 
 /* PC Sidebar 样式 */
 .sidebar {
-  flex: 0 0 25%;
+  flex: 0 0 25vw;
   min-height: calc(100vh - 100px);
   max-height: calc(100vh - 100px);
   min-width: 180px;
@@ -632,9 +697,6 @@ onMounted(async () => {
     height: auto;
     min-height: auto;
 
-    :after{
-      display: none;
-    }
   }
   .gallery-container__content {
     flex-direction: column;

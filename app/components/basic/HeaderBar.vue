@@ -381,6 +381,7 @@ const handleFocus = () => {
   backdrop-filter: blur(5px);
   user-select: none;
   transition: all 0.3s;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .back-div {

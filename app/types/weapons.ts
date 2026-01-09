@@ -17,12 +17,14 @@ export interface Weapons {
     weaponName: string
     weaponIcon: string
     weaponRarity: string
-    weaponElement: WeaponElement[]
+    weaponCategory: string
+    weaponElement: WeaponElement
     armorBroken: number
     charging: number
     description: string
     remouldDetail: string
     weaponSensualityLevelData: string[]
+    weaponUpgradeStarPack: string[]
     weaponSkill: WeaponSkill[]
 }
 export type WeaponsRes = BaseRes<Weapons>

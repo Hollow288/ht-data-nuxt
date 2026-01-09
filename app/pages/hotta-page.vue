@@ -106,7 +106,7 @@ onMounted(() => {
 }
 
 .sidebar {
-  flex: 0 0 25%;
+  flex: 0 0 25vw;
   min-height: calc(100vh - 100px);
   max-height: calc(100vh - 100px);
   min-width: 180px;
