@@ -1,7 +1,46 @@
-export function replaceTagWithColor(input: string | undefined, tag: string, color: string): string {
+export function replaceOnce(input: string | undefined, tag: string, color: string): string {
     const regex = new RegExp(`<${tag}>(.*?)</>`, 'g');
     return '' + input?.replace(regex, (_, content) => `<span style="color:#${color}">${content}</span>`);
 }
+
+export function replaceTagWithColor(
+    input: string | undefined,
+    tag?: string,
+    color?: string
+): string {
+    if (!input) return '';
+
+    // ✅ 只传 input：走默认规则
+    if (!tag && !color) {
+        let result = input;
+        result = replaceOnce(result, 'shuzhi', 'C94F4F');
+        result = replaceOnce(result, 'yellow_lbl_14_1', 'C3A652');
+        return result;
+    }
+
+    // ✅ 正常单次替换（保持原有逻辑）
+    if (tag && color) {
+        return replaceOnce(input, tag, color);
+    }
+
+    // 兜底
+    return input;
+}
+
+export function fillTemplate(
+    template: string,
+    values: number[][],
+    index: number
+): string {
+    return template.replace(/\{(\d+)\}/g, (_, n) => {
+        const arrayIndex = Number(n);
+        const value = values[arrayIndex]?.[index - 1];
+
+        // 防止越界或 undefined
+        return value !== undefined ? String(value) : '';
+    });
+}
+
 
 const filePath : Record<string, string> = {
     '寒冰': 'icon_element_bing.webp',
