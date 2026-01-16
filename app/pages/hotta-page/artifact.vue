@@ -248,9 +248,10 @@ onMounted(async () => {
 /* PC 端布局容器 */
 .page-container-wrapper {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 20px;
   width: 100%;
+  max-width: 1200px;
 }
 
 .gallery-container {
@@ -260,6 +261,9 @@ onMounted(async () => {
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  flex: 1;
+  width: 0;
 
   &__status {
     display: flex;

@@ -39,6 +39,7 @@ export interface WeaponSkill {
     type: string
     name: string
     dynamicDes: string
+    tags: string[]
     icon: string
     dynamicValue: number[][]
 }

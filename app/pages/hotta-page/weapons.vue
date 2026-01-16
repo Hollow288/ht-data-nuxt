@@ -99,10 +99,10 @@ onMounted(async () => {
                 <div class="name">{{ thisWeaponsInfo?.weaponName }}</div>
                 <div class="level">{{ thisWeaponsInfo?.weaponRarity }}</div>
               </div>
-              <div style="display: flex;align-items: flex-end;">
-                <div >破防： {{ thisWeaponsInfo?.armorBroken }} 破防： {{ thisWeaponsInfo?.armorBroken }}</div>
+              <div style="display: flex;align-items: flex-end;font-size: 14px;">
+                <div >破防： {{ thisWeaponsInfo?.armorBroken }}   &nbsp;  充能： {{ thisWeaponsInfo?.charging }}</div>
               </div>
-              <span class="task-cat">
+              <span class="task-cat-main">
                         <img  :src="getImgUrl(returnTrueFilePathByName(thisWeaponsInfo?.weaponElement?.weaponElementType))"  :alt="thisWeaponsInfo?.weaponElement?.weaponElementType"/>
                         <img  :src="getImgUrl(returnTrueFilePathByName(thisWeaponsInfo?.weaponCategory))"  :alt="thisWeaponsInfo?.weaponCategory"/>
                       </span>
@@ -115,31 +115,22 @@ onMounted(async () => {
             <div>
               <span>{{thisWeaponsInfo?.weaponElement?.weaponElementName}}</span><span style="white-space: pre-line" v-html="replaceTagWithColor(thisWeaponsInfo?.weaponElement?.weaponElementDesc)"></span>
             </div>
-<!--            <div v-for="(items,index) in thisWeaponsInfo?.weaponDetail" style="display: flex;margin-bottom: 10px">-->
-<!--              <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>-->
-<!--              <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>-->
-<!--            </div>-->
 
           </div>
         </div>
-        <div class="gallery-container__content__row">
+        <div class="gallery-container__content__row" v-if="thisWeaponsInfo?.remouldDetail">
           <div class="weapons-detail">
             <span class="level">专属：</span>
             <div>
               <span style="white-space: pre-line" v-html="replaceTagWithColor(thisWeaponsInfo?.remouldDetail)"></span>
             </div>
-            <!--            <div v-for="(items,index) in thisWeaponsInfo?.weaponDetail" style="display: flex;margin-bottom: 10px">-->
-            <!--              <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>-->
-            <!--              <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>-->
-            <!--            </div>-->
-
           </div>
         </div>
 
         <div class="gallery-container__content__row">
           <div class="weapons-detail">
             <n-tabs type="segment" animated>
-              <n-tab-pane name="chap1" tab="星级效果">
+              <n-tab-pane name="chap1" tab="星级效果" v-if="(thisWeaponsInfo?.weaponUpgradeStarPack || []).length > 0">
                 <div v-for="(items,index) in thisWeaponsInfo?.weaponUpgradeStarPack" style="display: flex;margin-bottom: 10px">
                   <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>
                   <span class="desc" v-html="replaceTagWithColor(items)"></span>
@@ -157,53 +148,25 @@ onMounted(async () => {
           </div>
         </div>
         <div class="gallery-container__content__row">
-          <n-tabs type="segment" animated>
-            <n-tab-pane :name="item + index" :tab="item"  v-for="(item,index) in ['普攻','闪避','技能','联携']">
-              <div style="display: flex;margin-bottom: 15px" v-for="(items,indexs) in thisWeaponsInfo?.weaponSkill.filter(n=>n.type===item)">
-                <div style="">
-                  <img style="filter: invert(1); " width="40" :src="items.icon" :alt="items.name"/>
+            <n-tabs type="segment" animated>
+              <n-tab-pane :name="item + index" :tab="item"  v-for="(item,index) in ['普攻','闪避','技能','联携']">
+                <div style="display: flex;margin-bottom: 15px" v-for="(items,indexs) in thisWeaponsInfo?.weaponSkill.filter(n=>n.type===item)">
+                  <div style="margin-right: 5px">
+                    <img style="filter: var(--img-filter);" width="40" :src="items.icon" :alt="items.name"/>
+                  </div>
+                  <div style="display: flex;flex-direction: column;gap: 2px;">
+                    <span style="font-weight: bold;color: var(--text-main)">{{items.name}}</span>
+                    <div>
+                      <n-tag size="small" class="skill-tag" v-for="item in items.tags">
+                        {{ item }}
+                      </n-tag>
+                    </div>
+                    <span style="white-space: pre-line;color: var(--text-main)" v-html="fillTemplate(replaceTagWithColor(items.dynamicDes),items.dynamicValue,weaponsLevel)"></span>
+                  </div>
                 </div>
-                <div style="display: flex;flex-direction: column;">
-                  <span style="font-weight: bold">{{items.name}}</span>
-                  <span style="white-space: pre-line" v-html="fillTemplate(replaceTagWithColor(items.dynamicDes),items.dynamicValue,weaponsLevel)"></span>
-                </div>
-              </div>
 
-            </n-tab-pane>
-<!--            <n-tab-pane name="chap2" tab="闪避">-->
-<!--              <div style="display: flex;margin-bottom: 15px" v-for="(items,index) in thisWeaponsInfo?.weaponSkill.filter(n=>n.type==='闪避')">-->
-<!--                <div style="width: 50px;">-->
-<!--                  <img style="filter: invert(1); " width="50" :src="items.icon" :alt="items.name"/>-->
-<!--                </div>-->
-<!--                <div style="display: flex;flex-direction: column;">-->
-<!--                  <span>{{items.name}}</span>-->
-<!--                  <span v-html="fillTemplate(replaceTagWithColor(items.dynamicDes),items.dynamicValue,weaponsLevel)"></span>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </n-tab-pane>-->
-<!--            <n-tab-pane name="chap3" tab="技能">-->
-<!--              <div style="display: flex;margin-bottom: 15px" v-for="(items,index) in thisWeaponsInfo?.weaponSkill.filter(n=>n.type==='技能')">-->
-<!--                <div style="width: 50px;">-->
-<!--                  <img style="filter: invert(1); " width="50" :src="items.icon" :alt="items.name"/>-->
-<!--                </div>-->
-<!--                <div style="display: flex;flex-direction: column;">-->
-<!--                  <span>{{items.name}}</span>-->
-<!--                  <span v-html="fillTemplate(replaceTagWithColor(items.dynamicDes),items.dynamicValue,weaponsLevel)"></span>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </n-tab-pane>-->
-<!--            <n-tab-pane name="chap4" tab="联携">-->
-<!--              <div style="display: flex;margin-bottom: 15px" v-for="(items,index) in thisWeaponsInfo?.weaponSkill.filter(n=>n.type==='联携')">-->
-<!--                <div style="width: 50px;">-->
-<!--                  <img style="filter: invert(1); " width="50" :src="items.icon" :alt="items.name"/>-->
-<!--                </div>-->
-<!--                <div style="display: flex;flex-direction: column;">-->
-<!--                  <span>{{items.name}}</span>-->
-<!--                  <span v-html="fillTemplate(replaceTagWithColor(items.dynamicDes),items.dynamicValue,weaponsLevel)"></span>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </n-tab-pane>-->
-          </n-tabs>
+              </n-tab-pane>
+            </n-tabs>
         </div>
       </div>
     </div>
@@ -270,11 +233,6 @@ onMounted(async () => {
       </div>
     </aside>
 
-    <!-- 3. 移动端悬浮按钮 (PC端隐藏) -->
-<!--    <div class="mobile-fab" @click="showDrawer = true">-->
-<!--      <i class="ri-list-check"></i>-->
-<!--      <span>列表</span>-->
-<!--    </div>-->
 
     <button class="toc-toggle-btn" @click="showDrawer = true" aria-label="搜索">
       <i class="ri-search-line"></i>
@@ -369,9 +327,10 @@ onMounted(async () => {
 /* PC 端布局容器 */
 .page-container-wrapper {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 20px;
   width: 100%;
+  max-width: 1200px;
 }
 
 .gallery-container {
@@ -381,6 +340,10 @@ onMounted(async () => {
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  max-width: 800px;
+
+  flex: 1;
+  width: 0;
 
   &__status {
     display: flex;
@@ -400,7 +363,12 @@ onMounted(async () => {
       display: flex;
       flex-direction: row;
       position: relative;
-      padding: 20px 10px 0;
+      padding: 20px 15px 0;
+
+
+      .skill-tag{
+        margin-right: 5px;
+      }
 
 
       .level {
@@ -420,6 +388,7 @@ onMounted(async () => {
 
       .description {
         word-break: break-all;
+        color: #666;
       }
 
       .weapons-detail {
@@ -438,7 +407,7 @@ onMounted(async () => {
 
         .stars {
           font-size: 12px;
-          width: 80px;
+          width: 100px;
           display: inline-block;
           line-height: 1.2;
           user-select: none;
@@ -601,6 +570,19 @@ onMounted(async () => {
 
 .task-cat img {   /* 自行调整大小 */
   height: 14px;
+  object-fit: contain;  /* 防止拉伸变形 */
+}
+
+
+.task-cat-main {
+  margin: 10px 0;
+  display: flex;        /* 横向排列 */
+  align-items: center;  /* 垂直居中 */
+  gap: 7px;             /* 图片间距 */
+}
+
+.task-cat-main img {   /* 自行调整大小 */
+  height: 20px;
   object-fit: contain;  /* 防止拉伸变形 */
 }
 
