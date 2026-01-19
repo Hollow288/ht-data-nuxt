@@ -197,7 +197,7 @@ onMounted(async () => {
   justify-content: flex-start;
   gap: 20px;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1000px;
 }
 
 /* 主内容区域 */

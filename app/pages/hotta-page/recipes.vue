@@ -266,7 +266,7 @@ onMounted(async () => {
   justify-content: flex-start;
   gap: 20px;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1000px;
 }
 
 /* 主内容区域 */
@@ -280,7 +280,6 @@ onMounted(async () => {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-  flex: 1;
   width: 0;
 
   &__status {

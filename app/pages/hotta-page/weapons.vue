@@ -19,7 +19,10 @@ const thisWeaponsInfo = ref<Weapons>()
 const showDrawer = ref(false)
 // weapons filter
 const weaponRarity = ref<string>('')
-const weaponsLevel = ref<number>(1)
+const weaponsLevel = ref<number>(0)
+const weaponsSkillLevel = ref<number>(1)
+
+const formatTooltip = (value: number) => `武器等级 lv. ${value}`
 
 const changeWeaponsRarity = async (rarity: string) => {
   if (weaponRarity.value === rarity) {
@@ -64,7 +67,7 @@ const showThisWeaponsInfo = async (weaponKey: string) => {
 const initializePage = async () => {
   await queryWeaponsList()
   if (allItems.value.length > 0) {
-    thisShowKey.value = allItems.value[20]?.weaponKey
+    thisShowKey.value = allItems.value[0]?.weaponKey
   }
   await findWeaponsInfoByKey()
 };
@@ -74,6 +77,12 @@ watch(showDrawer, (val) => {
     document.body.style.overflow = 'hidden'
   } else {
     document.body.style.overflow = ''
+  }
+})
+
+watch(weaponsLevel, (val) => {
+  if (val) {
+    weaponsSkillLevel.value = Math.floor(val / 10) + 1
   }
 })
 
@@ -148,20 +157,32 @@ onMounted(async () => {
           </div>
         </div>
         <div class="gallery-container__content__row">
+          <n-slider v-model:value="weaponsLevel" :step="1" :max="200" :format-tooltip="formatTooltip">
+            <template #thumb>
+              <n-icon-wrapper :size="24" :border-radius="12">
+                <i class="ri-equalizer-line" ></i>
+              </n-icon-wrapper>
+            </template>
+          </n-slider>
+        </div>
+        <div class="gallery-container__content__row">
+
             <n-tabs type="segment" animated>
               <n-tab-pane :name="item + index" :tab="item"  v-for="(item,index) in ['普攻','闪避','技能','联携']">
                 <div style="display: flex;margin-bottom: 15px" v-for="(items,indexs) in thisWeaponsInfo?.weaponSkill.filter(n=>n.type===item)">
                   <div style="margin-right: 5px">
                     <img style="filter: var(--img-filter);" width="40" :src="items.icon" :alt="items.name"/>
                   </div>
-                  <div style="display: flex;flex-direction: column;gap: 2px;">
-                    <span style="font-weight: bold;color: var(--text-main)">{{items.name}}</span>
+                  <div style="display: flex;flex-direction: column;gap: 2px;width: 100%">
+                    <div style="font-weight: bold;display: flex;justify-content: space-between;">
+                      <span style="color: var(--text-main)">{{items.name}}</span><span style="color: #a15235">Lv: {{weaponsSkillLevel}}</span>
+                    </div>
                     <div>
                       <n-tag size="small" class="skill-tag" v-for="item in items.tags">
                         {{ item }}
                       </n-tag>
                     </div>
-                    <span style="white-space: pre-line;color: var(--text-main)" v-html="fillTemplate(replaceTagWithColor(items.dynamicDes),items.dynamicValue,weaponsLevel)"></span>
+                    <span style="white-space: pre-line;color: var(--text-main)" v-html="fillTemplate(replaceTagWithColor(items.dynamicDes),items.dynamicValue,weaponsSkillLevel)"></span>
                   </div>
                 </div>
 
@@ -330,7 +351,7 @@ onMounted(async () => {
   justify-content: flex-start;
   gap: 20px;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1000px;
 }
 
 .gallery-container {
@@ -340,7 +361,6 @@ onMounted(async () => {
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  max-width: 800px;
 
   flex: 1;
   width: 0;
