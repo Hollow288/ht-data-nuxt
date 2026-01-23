@@ -63,6 +63,7 @@ body {
     --white-black-50: rgba(255, 255, 255, 0.5);
     --n-popover-border:rgb(239, 239, 245);
     --img-filter:invert(1);
+    --img-filter-opposite:invert(0);
     --skill-tag-color: #FFF;
     --skill-tag-border-color: rgb(224, 224, 230);
 
@@ -88,6 +89,7 @@ html.dark {
     --white-black-50: rgba(97, 96, 96, 0.5);
     --n-popover-border: rgb(165, 165, 165);
     --img-filter:invert(0);
+    --img-filter-opposite:invert(1);
     --skill-tag-color: rgb(165, 165, 165);
     --skill-tag-border-color: #666;
 }

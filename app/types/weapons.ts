@@ -26,6 +26,9 @@ export interface Weapons {
     weaponSensualityLevelData: string[]
     weaponUpgradeStarPack: string[]
     weaponSkill: WeaponSkill[]
+    weaponModifyData: WeaponModifyData[]
+    weaponAttributeCoefficientList: WeaponAttributeCoefficient[]
+    weaponUpgradeAttribute: number[][]
 }
 export type WeaponsRes = BaseRes<Weapons>
 
@@ -42,4 +45,20 @@ export interface WeaponSkill {
     tags: string[]
     icon: string
     dynamicValue: number[][]
+}
+
+export interface WeaponModifyData {
+    propName: string
+    propChsName: string
+    propValue: number
+    modifierOp: string
+    attributeIcon: string
+}
+
+
+export interface WeaponAttributeCoefficient {
+    CommonAtkAdded: number
+    ElementDef: number
+    MaxHealthAdded: number
+    CritAdded: number
 }

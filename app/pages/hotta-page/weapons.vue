@@ -2,7 +2,7 @@
 
 import {NButton, NPopover, NText, NVirtualList, NTabs, NTabPane} from "naive-ui";
 import {ref} from "vue";
-import type {Weapons, WeaponsListDto, WeaponsListDtoRes, WeaponsRes} from "~/types/weapons";
+import type {WeaponAttributeCoefficient, Weapons, WeaponsListDto, WeaponsListDtoRes, WeaponsRes} from "~/types/weapons";
 import {onMounted} from 'vue'
 import { watch } from 'vue'
 import {fillTemplate, getImgUrl, replaceTagWithColor, returnTrueFilePathByName} from "~/utils/common";
@@ -20,9 +20,11 @@ const showDrawer = ref(false)
 // weapons filter
 const weaponRarity = ref<string>('')
 const weaponsLevel = ref<number>(0)
+const weaponsStart = ref<number>(0)
 const weaponsSkillLevel = ref<number>(1)
 
-const formatTooltip = (value: number) => `武器等级 lv. ${value}`
+const formatTooltipLevel = (value: number) => `武器等级 lv. ${value}`
+const formatTooltipStart = (value: number) => `武器星级 lv. ${value}`
 
 const changeWeaponsRarity = async (rarity: string) => {
   if (weaponRarity.value === rarity) {
@@ -52,10 +54,55 @@ const findWeaponsInfoByKey = async () => {
     loading.value = true
     const weaponsRes: WeaponsRes = await BaseAPI.apiGet(`weapons/${thisShowKey.value}`)
     thisWeaponsInfo.value = weaponsRes.data
+    if(thisWeaponsInfo.value.weaponAttributeCoefficientList.length === 0){
+      weaponsStart.value = 0
+    }
   } finally {
     loading.value = false
   }
 }
+
+const currentAttributeSum : ComputedRef<{
+  propChsName: string;
+  attributeIcon: string;
+  value: number;
+}[]> = computed(() => {
+
+  const attributes = thisWeaponsInfo.value?.weaponUpgradeAttribute ?? [];
+
+  const prop : WeaponAttributeCoefficient = weaponsStart.value === 0 ? {
+        "CommonAtkAdded" : 1,
+        "ElementDef" : 1,
+        "MaxHealthAdded" : 1,
+        "CritAdded" : 1,
+      } : thisWeaponsInfo.value?.weaponAttributeCoefficientList[weaponsStart.value - 1]!
+
+
+
+  return thisWeaponsInfo.value?.weaponModifyData.map((item, index) => {
+
+    const coefficient = prop[item.propName as keyof WeaponAttributeCoefficient] ?? 1;
+
+    const value = Math.trunc(
+        (item.propValue +
+            attributes
+                .slice(0, weaponsLevel.value)
+                .reduce((acc, curr) => acc + (curr?.[index] ?? 0), 0)) *
+        coefficient
+    );
+
+    return {
+      propChsName: item.propChsName,
+      attributeIcon: item.attributeIcon,
+      value: value
+    };
+  }) || [];
+
+});
+
+const isStartDisabled = computed(() => {
+  return !thisWeaponsInfo.value?.weaponAttributeCoefficientList?.length;
+});
 
 const showThisWeaponsInfo = async (weaponKey: string) => {
   thisShowKey.value = weaponKey
@@ -107,9 +154,17 @@ onMounted(async () => {
               <div style="display: flex;align-items: flex-end;">
                 <div class="name">{{ thisWeaponsInfo?.weaponName }}</div>
                 <div class="level">{{ thisWeaponsInfo?.weaponRarity }}</div>
+                <div class="wea-star">{{ weaponsStart }}&nbsp;<i class="ri-star-fill"></i></div>
+                <div class="level">Lv. {{weaponsLevel}}</div>
               </div>
               <div style="display: flex;align-items: flex-end;font-size: 14px;">
                 <div >破防： {{ thisWeaponsInfo?.armorBroken }}   &nbsp;  充能： {{ thisWeaponsInfo?.charging }}</div>
+              </div>
+              <div style="display: flex;gap: 20px">
+                <div v-for="item in currentAttributeSum" class="task-cat-main">
+                  <img style="filter: var(--img-filter-opposite);" :src="item.attributeIcon"  :alt="item.propChsName"/>
+                  {{item.value}}
+                </div>
               </div>
               <span class="task-cat-main">
                         <img  :src="getImgUrl(returnTrueFilePathByName(thisWeaponsInfo?.weaponElement?.weaponElementType))"  :alt="thisWeaponsInfo?.weaponElement?.weaponElementType"/>
@@ -136,12 +191,12 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div class="gallery-container__content__row">
+        <div class="gallery-container__content__row" v-if="(thisWeaponsInfo?.weaponUpgradeStarPack || []).length > 0 || (thisWeaponsInfo?.weaponSensualityLevelData || []).length > 0">
           <div class="weapons-detail">
             <n-tabs type="segment" animated>
               <n-tab-pane name="chap1" tab="星级效果" v-if="(thisWeaponsInfo?.weaponUpgradeStarPack || []).length > 0">
                 <div v-for="(items,index) in thisWeaponsInfo?.weaponUpgradeStarPack" style="display: flex;margin-bottom: 10px">
-                  <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>
+                  <span class="stars" >{{ '⭐'.repeat(index + 1) }}</span>
                   <span class="desc" v-html="replaceTagWithColor(items)"></span>
                 </div>
               </n-tab-pane>
@@ -157,7 +212,15 @@ onMounted(async () => {
           </div>
         </div>
         <div class="gallery-container__content__row">
-          <n-slider v-model:value="weaponsLevel" :step="1" :max="200" :format-tooltip="formatTooltip">
+          <n-slider v-model:value="weaponsStart" :step="1" :max="6" :format-tooltip="formatTooltipStart" :disabled="isStartDisabled" style="margin-right: 15px">
+            <template #thumb>
+              <n-icon-wrapper :size="24" :border-radius="12">
+                <i class="ri-star-s-fill"></i>
+              </n-icon-wrapper>
+            </template>
+          </n-slider>
+
+          <n-slider v-model:value="weaponsLevel" :step="1" :max="200" :format-tooltip="formatTooltipLevel">
             <template #thumb>
               <n-icon-wrapper :size="24" :border-radius="12">
                 <i class="ri-equalizer-line" ></i>
@@ -241,8 +304,8 @@ onMounted(async () => {
                         <img :key="item.weaponRarity" :src="getImgUrl(returnTrueFilePathByName(item.weaponRarity))"
                           :alt="item.weaponRarity"
                           :style="{
-                            marginLeft: item.weaponRarity === 'R' ? '-10px' :
-                                        item.weaponRarity === 'SR' ? '-3px' : '0px'
+                            marginLeft: item.weaponRarity === 'R' ? '-7px' :
+                                        item.weaponRarity === 'SR' ? '-4px' : '0px'
                           }"
                     />
                   </span>
@@ -399,11 +462,27 @@ onMounted(async () => {
         color: #EC9B3B;
       }
 
+      .wea-star {
+        background-color: rgba(170, 170, 170, 0.3);
+        color: #EC9B3B;
+        border-radius: 8px;
+        padding: 2px 6px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 12px;
+        margin-right: 10px;
+
+        margin-bottom: 5px;
+        margin-left: auto;
+
+
+      }
+
       .name {
         font-size: 26px;
         color: var(--text-main);
         font-weight: 900;
-        margin-right: 20px;
+        margin-right: 10px;
       }
 
       .description {
@@ -595,7 +674,7 @@ onMounted(async () => {
 
 
 .task-cat-main {
-  margin: 10px 0;
+  margin: 5px 0;
   display: flex;        /* 横向排列 */
   align-items: center;  /* 垂直居中 */
   gap: 7px;             /* 图片间距 */
