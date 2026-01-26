@@ -147,20 +147,19 @@ onMounted(async () => {
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else class="gallery-container__content">
         <div class="gallery-container__content__row">
-            <div >
-              <img width="180" :src="thisWeaponsInfo?.weaponIcon" :alt="thisWeaponsInfo?.weaponName" class="gallery-card__image" loading="lazy"/>
-            </div>
             <div>
-              <div style="display: flex;align-items: flex-end;">
+              <img :src="thisWeaponsInfo?.weaponIcon" :alt="thisWeaponsInfo?.weaponName" class="gallery-card__image" loading="lazy"/>
+            </div>
+            <div style="flex:1;">
+
+              <div style="display: flex;align-items: flex-end;justify-content: space-between;">
                 <div class="name">{{ thisWeaponsInfo?.weaponName }}</div>
                 <div class="level">{{ thisWeaponsInfo?.weaponRarity }}</div>
-                <div class="wea-star">{{ weaponsStart }}&nbsp;<i class="ri-star-fill"></i></div>
-                <div class="level">Lv. {{weaponsLevel}}</div>
               </div>
               <div style="display: flex;align-items: flex-end;font-size: 14px;">
                 <div >破防： {{ thisWeaponsInfo?.armorBroken }}   &nbsp;  充能： {{ thisWeaponsInfo?.charging }}</div>
               </div>
-              <div style="display: flex;gap: 20px">
+              <div style="display: flex;gap: 10px">
                 <div v-for="item in currentAttributeSum" class="task-cat-main">
                   <img style="filter: var(--img-filter-opposite);" :src="item.attributeIcon"  :alt="item.propChsName"/>
                   {{item.value}}
@@ -169,7 +168,9 @@ onMounted(async () => {
               <span class="task-cat-main">
                         <img  :src="getImgUrl(returnTrueFilePathByName(thisWeaponsInfo?.weaponElement?.weaponElementType))"  :alt="thisWeaponsInfo?.weaponElement?.weaponElementType"/>
                         <img  :src="getImgUrl(returnTrueFilePathByName(thisWeaponsInfo?.weaponCategory))"  :alt="thisWeaponsInfo?.weaponCategory"/>
-                      </span>
+                <span class="wea-star">{{ weaponsStart }}&nbsp;<i class="ri-star-fill"></i></span>
+                <span class="level">Lv. {{weaponsLevel}}</span>
+              </span>
               <div class="description" v-html="replaceTagWithColor(thisWeaponsInfo?.description)"></div>
             </div>
         </div>
@@ -415,6 +416,10 @@ onMounted(async () => {
   gap: 20px;
   width: 100%;
   max-width: 1000px;
+}
+
+.gallery-card__image{
+  width: 180px
 }
 
 .gallery-container {
@@ -795,6 +800,13 @@ onMounted(async () => {
     margin: 0;
     height: auto;
     min-height: auto;
+    &__content {
+      &__row {
+        .name {
+          font-size: 20px;
+        }
+      }
+    }
 
   }
   .gallery-container__content {
@@ -808,6 +820,10 @@ onMounted(async () => {
   .gallery-container__content__right {
     width: 100%;
     padding: 20px;
+  }
+
+  .gallery-card__image{
+    width: 120px
   }
 }
 </style>

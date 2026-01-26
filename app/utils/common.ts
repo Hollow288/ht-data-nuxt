@@ -13,7 +13,8 @@ export function replaceTagWithColor(
     // ✅ 只传 input：走默认规则
     if (!tag && !color) {
         let result = input;
-        result = replaceOnce(result, 'shuzhi', 'C94F4F');
+        result = replaceOnce(result, 'red', 'C94F4F');
+        result = replaceOnce(result, 'shuzhi', '41A5EE');
         result = replaceOnce(result, 'yellow_lbl_14_1', 'C3A652');
         return result;
     }
