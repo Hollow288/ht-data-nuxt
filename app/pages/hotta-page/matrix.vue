@@ -1,12 +1,13 @@
 <script setup lang="ts">
 
-import {NButton, NPopover, NText, NVirtualList} from "naive-ui";
+import {NButton, NPopover, NTabPane, NTabs, NText, NVirtualList} from "naive-ui";
 import {ref} from "vue";
 import type {Matrix, MatrixListDto, MatrixListDtoRes, MatrixRes} from "~/types/matrix";
 import {onMounted} from 'vue'
 import { watch } from 'vue'
-import {replaceTagWithColor} from "~/utils/common";
+import {fillTemplate, replaceTagWithColor} from "~/utils/common";
 import {BaseAPI} from "~/utils/api";
+import type {WeaponAttributeCoefficient} from "~/types/weapons";
 
 const searchText = ref<string>('')
 const thisShowKey = ref<string | undefined>()
@@ -19,6 +20,11 @@ const thisMatrixInfo = ref<Matrix>()
 const showDrawer = ref(false)
 // matrix filter
 const matrixQuality = ref<string>('')
+const matrixLevel = ref<number>(0)
+const matrixStart = ref<number>(0)
+
+const formatTooltipLevel = (value: number) => `意志等级 lv. ${value}`
+const formatTooltipStart = (value: number) => `意志星级 lv. ${value}`
 
 const changeMatrixRarity = async (rarity: string) => {
   if (matrixQuality.value === rarity) {
@@ -48,6 +54,11 @@ const findMatrixInfoByKey = async () => {
     loading.value = true
     const matrixRes: MatrixRes = await BaseAPI.apiGet(`matrix/${thisShowKey.value}`)
     thisMatrixInfo.value = matrixRes.data
+
+    matrixStart.value = thisMatrixInfo.value.matrixSuitList[0]?.matrixMaxStarLevel || 0
+
+    matrixLevel.value = thisMatrixInfo.value.matrixSuitList[0]?.matrixMaxStrengthenLevel || 0
+
   } finally {
     loading.value = false
   }
@@ -67,6 +78,34 @@ const initializePage = async () => {
   }
   await findMatrixInfoByKey()
 };
+
+const currentAttributeSum = (slotIndex: string) => {
+
+
+  let temSuit = thisMatrixInfo.value?.matrixSuitList?.find(
+      item => item.slotIndex === slotIndex
+  )
+
+  const prop = (temSuit?.matrixCoefficientList?.[matrixStart.value] ?? 0) + 1
+
+  return temSuit?.matrixModifyData?.map(((modify,index)=>{
+    const value = Math.trunc(
+        (modify.propValue +
+            temSuit?.matrixUpgradeAttribute
+                .slice(0, matrixLevel.value)
+                .reduce((acc, curr) => acc + (curr?.[index] ?? 0), 0)) *
+        prop
+    );
+
+    return {
+      propChsName: modify.propChsName,
+      attributeIcon: modify.attributeIcon,
+      value: value
+    }
+
+  }))
+
+}
 
 watch(showDrawer, (val) => {
   if (val) {
@@ -106,6 +145,42 @@ onMounted(async () => {
               </div>
 
             </div>
+          </div>
+        </div>
+      </div>
+      <div style="display: flex;padding: 20px 15px 0;">
+        <n-slider v-model:value="matrixStart" :step="1" :max="thisMatrixInfo?.matrixSuitList[0]?.matrixMaxStarLevel" :format-tooltip="formatTooltipStart" :disabled="thisMatrixInfo?.matrixSuitList[0]?.matrixMaxStarLevel === 0" style="margin-right: 15px">
+          <template #thumb>
+            <n-icon-wrapper :size="24" :border-radius="12">
+              <i class="ri-star-s-fill"></i>
+            </n-icon-wrapper>
+          </template>
+        </n-slider>
+
+        <n-slider v-model:value="matrixLevel" :step="1" :max="thisMatrixInfo?.matrixSuitList[0]?.matrixMaxStrengthenLevel" :format-tooltip="formatTooltipLevel">
+          <template #thumb>
+            <n-icon-wrapper :size="24" :border-radius="12">
+              <i class="ri-equalizer-line" ></i>
+            </n-icon-wrapper>
+          </template>
+        </n-slider>
+      </div>
+      <div class="gallery-container__suit">
+        <div v-for="suit in thisMatrixInfo?.matrixSuitList" class="gallery-container__suit__details">
+          <div style="display: flex;flex-direction: column;align-items: center;">
+            <img style="width: 51px" :src="suit?.typeIcon" alt="">
+            <span>{{suit?.type}}</span>
+          </div>
+          <div style="flex: 1;">
+            <div style="font-weight: bold;color: var(--text-main)">{{suit?.itemName}}</div>
+            <div style="display: flex;gap: 10px">
+              <div v-for="item in currentAttributeSum(suit?.slotIndex)" class="task-cat-main">
+                <img style="filter: var(--img-filter-opposite);" :src="item.attributeIcon"  :alt="item.propChsName"/>
+                {{item.value}}
+              </div>
+            </div>
+            <div style="color: var(--text-main)">{{suit?.description}}</div>
+
           </div>
         </div>
       </div>
@@ -296,7 +371,6 @@ onMounted(async () => {
 
   &__content {
     display: flex;
-    height: 100%;
 
     &__left {
       width: 40%;
@@ -377,6 +451,30 @@ onMounted(async () => {
       }
     }
   }
+
+  &__suit{
+    padding: 10px;
+
+
+    &__details {
+      display: flex;
+      padding: 5px 0;
+      gap: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+  }
+}
+
+.task-cat-main {
+  margin: 5px 0;
+  display: flex;        /* 横向排列 */
+  align-items: center;  /* 垂直居中 */
+  gap: 7px;             /* 图片间距 */
+}
+
+.task-cat-main img {   /* 自行调整大小 */
+  height: 20px;
+  object-fit: contain;  /* 防止拉伸变形 */
 }
 
 /* PC Sidebar 样式 */
