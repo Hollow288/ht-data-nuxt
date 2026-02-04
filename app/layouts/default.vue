@@ -49,10 +49,6 @@
           <span class="drop" v-for="n in 10" :key="n"></span>
         </div>
 
-        <!-- 文字提示 -->
-        <div class="text">
-          窗外细雨静待晴，只盼晴光破云来~
-        </div>
       </div>
     </div>
   </div>
@@ -194,6 +190,107 @@ svg { width: 220px; height: 220px; }
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+  /* 缩小整体 SVG 尺寸 */
+  svg {
+    width: 150px;
+    height: 150px;
+  }
+
+  /* 缩小太阳 */
+  #sun {
+    width: 70px;
+    height: 70px;
+    left: 40px;
+    top: 15px;
+  }
+
+  /* 缩小云朵 */
+  #cloud {
+    width: 110px;
+    height: 110px;
+  }
+
+  /* 缩小雨滴区域 */
+  .rain {
+    width: 95px;
+    height: 95px;
+    margin-top: -22px;
+    margin-left: 7px;
+  }
+
+  /* 缩小雨滴尺寸 */
+  .drop {
+    width: 3px;
+    height: 10px;
+    margin-left: 5px;
+    border-radius: 0 0 8px 8px;
+  }
+
+  /* 调整雨滴动画高度 */
+  @keyframes drop {
+    50% { height: 30px; opacity: 0; }
+    51% { opacity: 0; }
+    100% { height: 1px; opacity: 0; }
+  }
+
+  /* 缩小文字 */
+  .text {
+    font-size: 14px;
+    margin-top: 8px;
+    margin-left: -40px;
+    max-width: 90vw;
+    padding: 0 10px;
+  }
+}
+
+/* 超小屏幕适配 */
+@media screen and (max-width: 480px) {
+  svg {
+    width: 120px;
+    height: 120px;
+  }
+
+  #sun {
+    width: 55px;
+    height: 55px;
+    left: 32px;
+    top: 12px;
+  }
+
+  #cloud {
+    width: 90px;
+    height: 90px;
+  }
+
+  .rain {
+    width: 75px;
+    height: 75px;
+    margin-top: -18px;
+    margin-left: 5px;
+  }
+
+  .drop {
+    width: 2px;
+    height: 8px;
+    margin-left: 4px;
+    border-radius: 0 0 6px 6px;
+  }
+
+  @keyframes drop {
+    50% { height: 24px; opacity: 0; }
+    51% { opacity: 0; }
+    100% { height: 1px; opacity: 0; }
+  }
+
+  .text {
+    font-size: 12px;
+    margin-top: 5px;
+    margin-left: -30px;
+  }
 }
 
 </style>
