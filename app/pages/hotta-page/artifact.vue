@@ -89,13 +89,13 @@ onMounted(async () => {
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else class="gallery-container__content">
-        <div class="gallery-container__content__left">
+        <div class="gallery-container__left">
           <img width="150" :src="thisArtifactInfo?.artifactIcon" :alt="thisArtifactInfo?.artifactName" class="gallery-card__image" loading="lazy"/>
           <div class="level">{{ thisArtifactInfo?.artifactRarity }}</div>
           <div class="name">{{ thisArtifactInfo?.artifactName }}</div>
           <div class="description" v-html="replaceTagWithColor(thisArtifactInfo?.useDescription,'shuzhi','C94F4F')"></div>
         </div>
-        <div class="gallery-container__content__right">
+        <div class="gallery-container__right">
           <div class="artifact-detail">
             <span class="level">星级效果：</span>
             <div v-for="(items,index) in thisArtifactInfo?.artifactDetail" style="display: flex;margin-bottom: 10px">
@@ -149,8 +149,8 @@ onMounted(async () => {
                    @click="showThisArtifactInfo(item.artifactKey)">
                 <img :key="item.artifactKey" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt="">
                 <div class="result-item__details">
-                  <span class="task-title">{{ item.artifactName }}</span>
-                  <span class="task-cat">{{ item.artifactRarity }}</span>
+                  <span class="result-item__title">{{ item.artifactName }}</span>
+                  <span class="result-item__meta">{{ item.artifactRarity }}</span>
                 </div>
               </div>
             </template>
@@ -228,8 +228,8 @@ onMounted(async () => {
                   >
                     <img :key="item.artifactKey" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt=""/>
                     <div class="result-item__details">
-                      <span class="task-title">{{ item.artifactName }}</span>
-                      <span class="task-cat">{{ item.artifactRarity }}</span>
+                      <span class="result-item__title">{{ item.artifactName }}</span>
+                      <span class="result-item__meta">{{ item.artifactRarity }}</span>
                     </div>
                   </div>
                 </template>
@@ -277,83 +277,83 @@ onMounted(async () => {
   &__content {
     display: flex;
     height: 100%;
+  }
 
-    &__left {
-      width: 40%;
+  &__left {
+    width: 40%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    padding-top: 20px;
+
+    ::after {
+      content: "";
+      position: absolute;
+      top: 10%;
+      bottom: 10%;
+      right: 0;
+      width: 1px;
+      background-image: linear-gradient(to bottom, transparent, #ccc, transparent);
+    }
+
+    .level {
+      text-transform: uppercase;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 3px;
+      color: #EC9B3B;
+    }
+
+    .name {
+      font-size: 26px;
+      color: var(--text-main);
+      font-weight: 900;
+      margin-bottom: 5px;
+    }
+
+    .description {
+      padding: 20px 20px 30px;
+      word-break: break-all;
+    }
+  }
+
+  &__right {
+    width: 60%;
+    padding: 20px 20px 15px;
+    display: flex;
+
+    .artifact-detail {
       display: flex;
-      justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       flex-direction: column;
-      height: 100%;
-      position: relative;
-      padding-top: 20px;
-
-      ::after {
-        content: "";
-        position: absolute;
-        top: 10%;
-        bottom: 10%;
-        right: 0;
-        width: 1px;
-        background-image: linear-gradient(to bottom, transparent, #ccc, transparent);
-      }
+      justify-content: center;
 
       .level {
         text-transform: uppercase;
-        font-size: 12px;
+        font-size: 15px;
         font-weight: 700;
-        margin-bottom: 3px;
+        margin-bottom: 10px;
         color: #EC9B3B;
       }
 
-      .name {
-        font-size: 26px;
+      .stars {
+        font-size: 12px;
+        width: 80px;
+        display: inline-block;
+        line-height: 1.2;
+        user-select: none;
+        margin-right: 10px;
+      }
+
+      .desc {
         color: var(--text-main);
-        font-weight: 900;
-        margin-bottom: 5px;
-      }
-
-      .description {
-        padding: 20px 20px 30px;
+        flex: 1;
         word-break: break-all;
-      }
-    }
-
-    &__right {
-      width: 60%;
-      padding: 20px 20px 15px;
-      display: flex;
-
-      .artifact-detail {
-        display: flex;
         align-items: flex-start;
-        flex-direction: column;
-        justify-content: center;
-
-        .level {
-          text-transform: uppercase;
-          font-size: 15px;
-          font-weight: 700;
-          margin-bottom: 10px;
-          color: #EC9B3B;
-        }
-
-        .stars {
-          font-size: 12px;
-          width: 80px;
-          display: inline-block;
-          line-height: 1.2;
-          user-select: none;
-          margin-right: 10px;
-        }
-
-        .desc {
-          color: var(--text-main);
-          flex: 1;
-          word-break: break-all;
-          align-items: flex-start;
-          margin-top: -4px;
-        }
+        margin-top: -4px;
       }
     }
   }
@@ -489,12 +489,12 @@ onMounted(async () => {
   flex: 1;
 }
 
-.task-title {
+.result-item__title {
   font-size: 13px;
   display: inline-block;
 }
 
-.task-cat {
+.result-item__meta {
   font-size: 10px;
   display: block;
   color: #888;
@@ -618,12 +618,12 @@ onMounted(async () => {
   .gallery-container__content {
     flex-direction: column;
   }
-  .gallery-container__content__left {
+  .gallery-container__left {
     width: 100%;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 20px;
   }
-  .gallery-container__content__right {
+  .gallery-container__right {
     width: 100%;
     padding: 20px;
   }
