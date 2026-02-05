@@ -91,40 +91,45 @@ onMounted(async () => {
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else class="gallery-container__content">
-        <!-- 优化了内联样式为 class，以便移动端适配 -->
-        <div class="recipes-info-wrapper">
-          <img width="100" :src="thisRecipesInfo?.recipesIcon" :alt="thisRecipesInfo?.recipesName" loading="lazy"/>
-          <div class="recipes-name">
-            {{ thisRecipesInfo?.recipesName }}
-          </div>
-          <div class="recipes-des">
-            {{ thisRecipesInfo?.recipesDes == '' ? '//**无基本介绍**//' : thisRecipesInfo?.recipesDes }}
-          </div>
-          <div class="recipes-categories">
-            {{ thisRecipesInfo?.categories == '' ? '//**无分类介绍**//' : thisRecipesInfo?.categories }}
-          </div>
-          <div class="recipes-buffs-description"
-               v-html="(thisRecipesInfo?.useDescription == '' ? '' : replaceTagWithColor(replaceTagWithColor(thisRecipesInfo?.useDescription,'shuzhi','C94F4F'),'ComLblGreen','4C9717') + '<br>') + replaceTagWithColor(replaceTagWithColor(thisRecipesInfo?.buffs,'shuzhi','C94F4F'),'ComLblGreen','4C9717')"></div>
-
-          <div class="details with-line">
-            制 作 方 式
+        <!-- 卡片式设计 -->
+        <div class="recipes-card">
+          <div class="recipes-card__header">
+            <div class="recipes-icon-wrapper">
+              <img :src="thisRecipesInfo?.recipesIcon" :alt="thisRecipesInfo?.recipesName" loading="lazy"/>
+            </div>
+            <h2 class="recipes-card__title">{{ thisRecipesInfo?.recipesName }}</h2>
           </div>
 
-          <div class="ingredients-list">
-            <div v-for="item in thisRecipesInfo?.ingredientsList" :key="item.ingredientName" class="ingredient-item">
-              <div class="img-container">
-                <img :src="item.ingredientIcon"
-                     :alt="item.ingredientName" class="item-image"/>
-                <div class="ingredient-name">{{ item.ingredientName }}</div>
-                <div class="quantity">{{ item.ingredientNum }}</div>
+          <div class="recipes-card__body">
+            <div class="info-section" v-if="thisRecipesInfo?.recipesDes">
+              <div class="info-label">描述</div>
+              <div class="info-content">{{ thisRecipesInfo?.recipesDes }}</div>
+            </div>
+
+            <div class="info-section" v-if="thisRecipesInfo?.categories">
+              <div class="info-label">类别</div>
+              <div class="info-content">{{ thisRecipesInfo?.categories }}</div>
+            </div>
+
+            <div class="info-section" v-if="thisRecipesInfo?.useDescription || thisRecipesInfo?.buffs">
+              <div class="info-label">效果</div>
+              <div class="info-content recipes-buffs-description"
+                   v-html="(thisRecipesInfo?.useDescription == '' ? '' : replaceTagWithColor(replaceTagWithColor(thisRecipesInfo?.useDescription,'shuzhi','C94F4F'),'ComLblGreen','4C9717') + '<br>') + replaceTagWithColor(replaceTagWithColor(thisRecipesInfo?.buffs,'shuzhi','C94F4F'),'ComLblGreen','4C9717')"></div>
+            </div>
+
+            <div class="info-section">
+              <div class="info-label">制作方式</div>
+              <div class="ingredients-list">
+                <div v-for="item in thisRecipesInfo?.ingredientsList" :key="item.ingredientName" class="ingredient-item">
+                  <div class="img-container">
+                    <img :src="item.ingredientIcon" :alt="item.ingredientName" class="item-image"/>
+                    <div class="ingredient-name">{{ item.ingredientName }}</div>
+                    <div class="quantity">{{ item.ingredientNum }}</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-
-        </div>
-        <!-- 底部占位/装饰条 -->
-        <div style="background-color: #9eb4ed;height: 30px;width: 100%; margin-top: auto;">
-          <div style="background-color: #e19eba;height: 30px;width:30%"></div>
         </div>
       </div>
     </div>
@@ -273,14 +278,13 @@ onMounted(async () => {
 .gallery-container {
   min-height: calc(100vh - 100px);
   overflow-y: auto;
-  flex: 1; /* 自适应宽度 */
-  max-width: 1000px; /* 限制最大宽度 */
+  flex: 1;
+  width: 0;
+  max-width: 1000px;
   background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  width: 0;
 
   &__status {
     display: flex;
@@ -295,72 +299,119 @@ onMounted(async () => {
     height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
   }
 }
 
-/* 食谱详情信息样式 */
-.recipes-info-wrapper {
-  height: 100%;
-  width: 60%; /* PC 端宽度 */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  text-align: center;
-  justify-content: center;
-  padding: 40px 20px; /* 增加内边距 */
+/* 卡片样式 */
+.recipes-card {
+  background: var(--bg-card);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 700px;
+  overflow: hidden;
+
+  &__header {
+    background: var(--markdown-body-table-tr-2);
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  &__title {
+    color: var(--text-main);
+    font-size: 28px;
+    font-weight: 600;
+    margin: 15px 0 0 0;
+    letter-spacing: 0.5px;
+  }
+
+  &__body {
+    padding: 30px;
+    background: var(--bg-card);
+  }
 }
 
-.recipes-name {
-  color: rgb(84, 47, 19);
-  font-size: 24px;
+/* 食谱图标样式 */
+.recipes-icon-wrapper {
+  display: inline-block;
+  position: relative;
+
+  img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 140px;
+    height: 140px;
+    background: radial-gradient(circle, rgba(0, 0, 0, 0.02) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: -1;
+  }
 }
 
-.recipes-des, .recipes-categories, .recipes-buffs-description {
-  color: #c4c8cB;
+/* 信息区块样式 */
+.info-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: var(--markdown-body-table-tr-2);
+  border-left: 3px solid var(--border-color);
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: var(--back-btn-hover);
+    border-left-color: var(--custom-tag);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  &--highlight {
+    background: var(--markdown-body-table-tr-2);
+    border-left-color: var(--custom-tag);
+  }
+
+  &--ingredients {
+    background: var(--bg-card);
+    border-left-color: var(--border-color);
+  }
+}
+
+.info-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--custom-tag);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.info-content {
+  color: var(--text-main);
   font-size: 14px;
-  word-break: break-all; /* 避免长文本溢出 */
+  line-height: 1.6;
 }
 
-/* 制作方式标题 */
-.details {
-  justify-content: center;
-  margin-top: 20px; /* 增加上边距 */
-  margin-bottom: 15px;
-  display: flex;
-  padding: 10px;
-  border-radius: 5px;
-  flex-direction: column;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.details.with-line::after {
-  content: "";
-  display: block;
-  width: 60px;
-  height: 3px;
-  margin: 2px auto 0;
-  border-radius: 3px;
-  font-weight: 900;
-  background: linear-gradient(
-          90deg,
-          #9eb4ed 0%,
-          #9eb4ed 30%,
-          #e19eba 30%,
-          #e19eba 100%
-  );
+.recipes-buffs-description {
+  line-height: 1.8;
 }
 
 /* 食材列表样式 */
 .ingredients-list {
   display: flex;
-  flex-wrap: wrap; /* 允许换行 */
-  justify-content: center;
-  padding: 10px;
-  gap: 20px; /* 调整间距 */
-  margin-bottom: 15px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 20px;
+  margin-top: 10px;
 }
 
 .ingredient-item {
@@ -379,7 +430,7 @@ onMounted(async () => {
   width: 50px;
   height: 50px;
   border-radius: 10px;
-  object-fit: cover; /* 确保图片不变形 */
+  object-fit: cover;
 }
 
 .quantity {
@@ -391,7 +442,7 @@ onMounted(async () => {
   font-size: 12px;
   width: 15px;
   height: 15px;
-  line-height: 15px; /* 垂直居中数字 */
+  line-height: 15px;
   text-align: center;
   border-radius: 50%;
   display: flex;
@@ -403,10 +454,10 @@ onMounted(async () => {
   font-size: 12px;
   color: var(--text-main);
   padding: 2px 0px;
-  width: 80px; /* 确保名称有足够的宽度显示 */
+  width: 80px;
   text-align: center;
-  word-break: break-all; /* 允许名称换行 */
-  margin-top: 5px; /* 与图片保持一定距离 */
+  word-break: break-all;
+  margin-top: 5px;
 }
 
 
@@ -601,7 +652,7 @@ onMounted(async () => {
   box-shadow: -4px 0 15px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  background-color: #fff;
+  background-color: var(--bg-card);
 }
 
 .drawer-layout {
@@ -650,25 +701,61 @@ onMounted(async () => {
     min-height: auto;
   }
 
-  /* 移动端详情宽度占满 */
-  .recipes-info-wrapper {
-    width: 90%;
-    padding: 20px 10px;
+  /* 移动端卡片样式 */
+  .recipes-card {
+    width: 100%;
+
+    &__header {
+      padding: 30px 20px;
+    }
+
+    &__title {
+      font-size: 22px;
+    }
+
+    &__body {
+      padding: 20px 15px;
+    }
+  }
+
+  .recipes-icon-wrapper {
+    img {
+      width: 100px;
+      height: 100px;
+    }
+
+    &::before {
+      width: 120px;
+      height: 120px;
+    }
+  }
+
+  .info-section {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+
+  .info-label {
+    font-size: 11px;
+  }
+
+  .info-content {
+    font-size: 13px;
   }
 
   .ingredients-list {
-    flex-direction: row; /* 在小屏幕上横向排列 */
+    flex-direction: row;
     justify-content: center;
-    gap: 15px; /* 调整间距 */
+    gap: 15px;
   }
 
   .ingredient-item {
-    min-width: 70px; /* 确保每个食材项有最小宽度 */
+    min-width: 70px;
     max-width: 80px;
   }
 
   .ingredient-name {
-    width: auto; /* 自动调整宽度 */
+    width: auto;
   }
 }
 
