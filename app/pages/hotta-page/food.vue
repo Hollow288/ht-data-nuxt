@@ -134,8 +134,8 @@ onMounted(async () => {
                    @click="showThisFoodInfo(item.foodKey)">
                 <img :key="item.foodKey" decoding="async" class="result-item__avatar" :src="item.foodIcon" alt="">
                 <div class="result-item__details">
-                  <span class="task-title">{{ item.foodName }}</span>
-                  <span class="task-cat">{{ item.foodKey }}</span>
+                  <span class="result-item__title">{{ item.foodName }}</span>
+                  <span class="result-item__meta">{{ item.foodKey }}</span>
                 </div>
               </div>
             </template>
@@ -181,8 +181,8 @@ onMounted(async () => {
                   >
                     <img :key="item.foodKey" decoding="async" class="result-item__avatar" :src="item.foodIcon" alt=""/>
                     <div class="result-item__details">
-                      <span class="task-title">{{ item.foodName }}</span>
-                      <span class="task-cat">{{ item.foodKey }}</span>
+                      <span class="result-item__title">{{ item.foodName }}</span>
+                      <span class="result-item__meta">{{ item.foodKey }}</span>
                     </div>
                   </div>
                 </template>
@@ -466,12 +466,12 @@ onMounted(async () => {
   flex: 1;
 }
 
-.task-title {
+.result-item__title {
   font-size: 13px;
   display: inline-block;
 }
 
-.task-cat {
+.result-item__meta {
   font-size: 10px;
   display: block;
   color: #888;

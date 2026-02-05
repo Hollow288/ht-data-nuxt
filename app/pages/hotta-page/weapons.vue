@@ -146,7 +146,7 @@ onMounted(async () => {
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else class="gallery-container__content">
-        <div class="gallery-container__content__row">
+        <div class="gallery-container__row">
             <div>
               <img :src="thisWeaponsInfo?.weaponIcon" :alt="thisWeaponsInfo?.weaponName" class="gallery-card__image" loading="lazy"/>
             </div>
@@ -160,12 +160,12 @@ onMounted(async () => {
                 <div >破防： {{ thisWeaponsInfo?.armorBroken }}   &nbsp;  充能： {{ thisWeaponsInfo?.charging }}</div>
               </div>
               <div style="display: flex;gap: 10px">
-                <div v-for="item in currentAttributeSum" class="task-cat-main">
+                <div v-for="item in currentAttributeSum" class="result-item__meta-main">
                   <img style="filter: var(--img-filter-opposite);" :src="item.attributeIcon"  :alt="item.propChsName"/>
                   {{item.value}}
                 </div>
               </div>
-              <span class="task-cat-main">
+              <span class="result-item__meta-main">
                         <img  :src="getImgUrl(returnTrueFilePathByName(thisWeaponsInfo?.weaponElement?.weaponElementType))"  :alt="thisWeaponsInfo?.weaponElement?.weaponElementType"/>
                         <img  :src="getImgUrl(returnTrueFilePathByName(thisWeaponsInfo?.weaponCategory))"  :alt="thisWeaponsInfo?.weaponCategory"/>
                 <span class="wea-star">{{ weaponsStart }}&nbsp;<i class="ri-star-fill"></i></span>
@@ -174,7 +174,7 @@ onMounted(async () => {
               <div class="description" v-html="replaceTagWithColor(thisWeaponsInfo?.description)"></div>
             </div>
         </div>
-        <div class="gallery-container__content__row">
+        <div class="gallery-container__row">
           <div class="weapons-detail">
             <span class="level">特质：</span>
             <div>
@@ -183,7 +183,7 @@ onMounted(async () => {
 
           </div>
         </div>
-        <div class="gallery-container__content__row" v-if="thisWeaponsInfo?.remouldDetail">
+        <div class="gallery-container__row" v-if="thisWeaponsInfo?.remouldDetail">
           <div class="weapons-detail">
             <span class="level">专属：</span>
             <div>
@@ -192,7 +192,7 @@ onMounted(async () => {
           </div>
         </div>
 
-        <div class="gallery-container__content__row" v-if="(thisWeaponsInfo?.weaponUpgradeStarPack || []).length > 0 || (thisWeaponsInfo?.weaponSensualityLevelData || []).length > 0">
+        <div class="gallery-container__row" v-if="(thisWeaponsInfo?.weaponUpgradeStarPack || []).length > 0 || (thisWeaponsInfo?.weaponSensualityLevelData || []).length > 0">
           <div class="weapons-detail">
             <n-tabs type="segment" animated>
               <n-tab-pane name="chap1" tab="星级效果" v-if="(thisWeaponsInfo?.weaponUpgradeStarPack || []).length > 0">
@@ -212,7 +212,7 @@ onMounted(async () => {
 
           </div>
         </div>
-        <div class="gallery-container__content__row">
+        <div class="gallery-container__row">
           <n-slider v-model:value="weaponsStart" :step="1" :max="6" :format-tooltip="formatTooltipStart" :disabled="isStartDisabled" style="margin-right: 15px">
             <template #thumb>
               <n-icon-wrapper :size="24" :border-radius="12">
@@ -229,7 +229,7 @@ onMounted(async () => {
             </template>
           </n-slider>
         </div>
-        <div class="gallery-container__content__row">
+        <div class="gallery-container__row">
 
             <n-tabs type="segment" animated>
               <n-tab-pane :name="item + index" :tab="item"  v-for="(item,index) in ['普攻','闪避','技能','联携']">
@@ -298,8 +298,8 @@ onMounted(async () => {
                    @click="showThisWeaponsInfo(item.weaponKey)">
                 <img :key="item.weaponKey" decoding="async" class="result-item__avatar" :src="item.weaponIcon" alt="">
                 <div class="result-item__details">
-                  <span class="task-title">{{ item.weaponName }}</span>
-                  <span class="task-cat">
+                  <span class="result-item__title">{{ item.weaponName }}</span>
+                  <span class="result-item__meta">
                         <img :key="item.weaponElementType" :src="getImgUrl(returnTrueFilePathByName(item.weaponElementType))"  :alt="item.weaponElementType"/>
                         <img :key="item.weaponCategory" :src="getImgUrl(returnTrueFilePathByName(item.weaponCategory))"  :alt="item.weaponCategory"/>
                         <img :key="item.weaponRarity" :src="getImgUrl(returnTrueFilePathByName(item.weaponRarity))"
@@ -382,8 +382,8 @@ onMounted(async () => {
                   >
                     <img :key="item.weaponKey" decoding="async" class="result-item__avatar" :src="item.weaponIcon" alt=""/>
                     <div class="result-item__details">
-                      <span class="task-title">{{ item.weaponName }}</span>
-                      <span class="task-cat">
+                      <span class="result-item__title">{{ item.weaponName }}</span>
+                      <span class="result-item__meta">
                         <img :key="item.weaponElementType" :src="getImgUrl(returnTrueFilePathByName(item.weaponElementType))"  :alt="item.weaponElementType"/>
                         <img :key="item.weaponCategory" :src="getImgUrl(returnTrueFilePathByName(item.weaponCategory))"  :alt="item.weaponCategory"/>
                         <img  :key="item.weaponRarity" :src="getImgUrl(returnTrueFilePathByName(item.weaponRarity))"
@@ -446,8 +446,9 @@ onMounted(async () => {
     display: flex;
     height: 100%;
     flex-direction: column;
+  }
 
-    &__row {
+  &__row {
       display: flex;
       flex-direction: row;
       position: relative;
@@ -527,8 +528,6 @@ onMounted(async () => {
         }
       }
     }
-
-  }
 }
 
 /* PC Sidebar 样式 */
@@ -661,31 +660,31 @@ onMounted(async () => {
   flex: 1;
 }
 
-.task-title {
+.result-item__title {
   font-size: 12px;
   display: inline-block;
 }
 
-.task-cat {
+.result-item__meta {
   display: flex;        /* 横向排列 */
   align-items: center;  /* 垂直居中 */
   gap: 7px;             /* 图片间距 */
 }
 
-.task-cat img {   /* 自行调整大小 */
+.result-item__meta img {   /* 自行调整大小 */
   height: 14px;
   object-fit: contain;  /* 防止拉伸变形 */
 }
 
 
-.task-cat-main {
+.result-item__meta-main {
   margin: 5px 0;
   display: flex;        /* 横向排列 */
   align-items: center;  /* 垂直居中 */
   gap: 7px;             /* 图片间距 */
 }
 
-.task-cat-main img {   /* 自行调整大小 */
+.result-item__meta-main img {   /* 自行调整大小 */
   height: 20px;
   object-fit: contain;  /* 防止拉伸变形 */
 }
@@ -800,26 +799,14 @@ onMounted(async () => {
     margin: 0;
     height: auto;
     min-height: auto;
-    &__content {
-      &__row {
-        .name {
-          font-size: 20px;
-        }
-      }
-    }
-
   }
+
   .gallery-container__content {
     flex-direction: column;
   }
-  .gallery-container__content__left {
-    width: 100%;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 20px;
-  }
-  .gallery-container__content__right {
-    width: 100%;
-    padding: 20px;
+
+  .gallery-container__row .name {
+    font-size: 20px;
   }
 
   .gallery-card__image{

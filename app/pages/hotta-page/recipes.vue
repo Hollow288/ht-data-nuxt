@@ -177,8 +177,8 @@ onMounted(async () => {
                 <img :key="item.recipesKey" decoding="async" class="result-item__avatar"
                      :src="item.recipesIcon" alt="">
                 <div class="result-item__details">
-                  <span class="task-title">{{ item.recipesName }}</span>
-                  <span class="task-cat">{{ item.recipesKey }}</span>
+                  <span class="result-item__title">{{ item.recipesName }}</span>
+                  <span class="result-item__meta">{{ item.recipesKey }}</span>
                 </div>
               </div>
             </template>
@@ -248,8 +248,8 @@ onMounted(async () => {
                   >
                     <img :key="item.recipesKey" decoding="async" class="result-item__avatar" :src="item.recipesIcon" alt=""/>
                     <div class="result-item__details">
-                      <span class="task-title">{{ item.recipesName }}</span>
-                      <span class="task-cat">{{ item.recipesKey }}</span>
+                      <span class="result-item__title">{{ item.recipesName }}</span>
+                      <span class="result-item__meta">{{ item.recipesKey }}</span>
                     </div>
                   </div>
                 </template>
@@ -591,12 +591,12 @@ onMounted(async () => {
   flex: 1;
 }
 
-.task-title {
+.result-item__title {
   font-size: 13px;
   display: inline-block;
 }
 
-.task-cat {
+.result-item__meta {
   font-size: 10px;
   display: block;
   color: #888;

@@ -128,13 +128,13 @@ onMounted(async () => {
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else class="gallery-container__content">
-        <div class="gallery-container__content__left">
+        <div class="gallery-container__left">
           <img width="150" :src="thisMatrixInfo?.matrixIcon" :alt="thisMatrixInfo?.matrixName" class="gallery-card__image" loading="lazy"/>
           <div class="level">{{ thisMatrixInfo?.matrixQuality }}</div>
           <div class="name">{{ thisMatrixInfo?.matrixName }}</div>
 <!--          <div class="description" v-html="replaceTagWithColor(thisMatrixInfo?.useDescription,'shuzhi','C94F4F')"></div>-->
         </div>
-        <div class="gallery-container__content__right">
+        <div class="gallery-container__right">
           <div class="matrix-detail">
 
             <div v-for="(items,index) in thisMatrixInfo?.matrixDetail" style="display: flex;margin-bottom: 10px">
@@ -174,7 +174,7 @@ onMounted(async () => {
           <div style="flex: 1;">
             <div style="font-weight: bold;color: var(--text-main)">{{suit?.itemName}}</div>
             <div style="display: flex;gap: 10px">
-              <div v-for="item in currentAttributeSum(suit?.slotIndex)" class="task-cat-main">
+              <div v-for="item in currentAttributeSum(suit?.slotIndex)" class="result-item__meta-main">
                 <img style="filter: var(--img-filter-opposite);" :src="item.attributeIcon"  :alt="item.propChsName"/>
                 {{item.value}}
               </div>
@@ -234,8 +234,8 @@ onMounted(async () => {
                    @click="showThisMatrixInfo(item.matrixKey)">
                 <img :key="item.matrixKey" decoding="async" class="result-item__avatar" :src="item.matrixThumbnail" alt="">
                 <div class="result-item__details">
-                  <span class="task-title">{{ item.matrixName }}</span>
-                  <span class="task-cat">{{ item.matrixQuality }}</span>
+                  <span class="result-item__title">{{ item.matrixName }}</span>
+                  <span class="result-item__meta">{{ item.matrixQuality }}</span>
                 </div>
               </div>
             </template>
@@ -323,8 +323,8 @@ onMounted(async () => {
                   >
                     <img :key="item.matrixKey" decoding="async" class="result-item__avatar" :src="item.matrixThumbnail" alt=""/>
                     <div class="result-item__details">
-                      <span class="task-title">{{ item.matrixName }}</span>
-                      <span class="task-cat">{{ item.matrixQuality }}</span>
+                      <span class="result-item__title">{{ item.matrixName }}</span>
+                      <span class="result-item__meta">{{ item.matrixQuality }}</span>
                     </div>
                   </div>
                 </template>
@@ -371,8 +371,9 @@ onMounted(async () => {
 
   &__content {
     display: flex;
+  }
 
-    &__left {
+  &__left {
       width: 40%;
       display: flex;
       justify-content: center;
@@ -413,7 +414,7 @@ onMounted(async () => {
       }
     }
 
-    &__right {
+  &__right {
       width: 60%;
       padding: 20px 20px 15px;
       display: flex;
@@ -450,7 +451,6 @@ onMounted(async () => {
         }
       }
     }
-  }
 
   &__suit{
     padding: 10px;
@@ -465,14 +465,14 @@ onMounted(async () => {
   }
 }
 
-.task-cat-main {
+.result-item__meta-main {
   margin: 5px 0;
   display: flex;        /* 横向排列 */
   align-items: center;  /* 垂直居中 */
   gap: 7px;             /* 图片间距 */
 }
 
-.task-cat-main img {   /* 自行调整大小 */
+.result-item__meta-main img {   /* 自行调整大小 */
   height: 20px;
   object-fit: contain;  /* 防止拉伸变形 */
 }
@@ -607,12 +607,12 @@ onMounted(async () => {
   flex: 1;
 }
 
-.task-title {
+.result-item__title {
   font-size: 13px;
   display: inline-block;
 }
 
-.task-cat {
+.result-item__meta {
   font-size: 10px;
   display: block;
   color: #888;
@@ -732,12 +732,12 @@ onMounted(async () => {
   .gallery-container__content {
     flex-direction: column;
   }
-  .gallery-container__content__left {
+  .gallery-container__left {
     width: 100%;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 20px;
   }
-  .gallery-container__content__right {
+  .gallery-container__right {
     width: 100%;
     padding: 20px;
   }
