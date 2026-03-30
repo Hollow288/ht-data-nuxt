@@ -97,8 +97,8 @@ function onLoad() {
   overflow: auto;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: sticky;
-  top: 84px;
-  max-height: calc(100vh - 104px);
+  top: 104px;
+  max-height: calc(100vh - 124px);
 }
 
 .username.with-line::after {
@@ -287,6 +287,9 @@ function onLoad() {
     margin-right: 0; /* 去除右侧间距 */
     margin-bottom: 20px; /* 改为底部间距 */
     height: auto; /* 高度自动，取消可能的内部滚动 */
+    position: static; /* 取消 sticky，避免覆盖正文 */
+    top: auto;
+    max-height: none;
     overflow: visible; /* 允许内容撑开 */
   }
 
