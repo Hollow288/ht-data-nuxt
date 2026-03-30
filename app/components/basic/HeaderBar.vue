@@ -69,17 +69,15 @@
             @mouseleave="isDesktop ? hideSubmenu() : null"
             class="has-submenu"
         >
-          <div class="menu-label-wrapper" @click="handleSubmenuClick">
-            <a class="menu-link-txt">
-              <i class="ri-gamepad-line nav-icon"></i>
-              <span>Hotta</span>
-              <div class="arrow-icon" :class="{ 'rotated': isSubmenuVisible }">
-                <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                  <path fill="currentColor" d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path>
-                </svg>
-              </div>
-            </a>
-          </div>
+          <button type="button" class="menu-link-txt" @click="handleSubmenuClick">
+            <i class="ri-gamepad-line nav-icon"></i>
+            <span>Hotta</span>
+            <div class="arrow-icon" :class="{ 'rotated': isSubmenuVisible }">
+              <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path fill="currentColor" d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path>
+              </svg>
+            </div>
+          </button>
 
           <transition name="fade-slide">
             <ul v-show="isSubmenuVisible" class="submenu">
@@ -512,6 +510,13 @@ button {
   justify-content: center;
   padding: 7px 18px;
   border-radius: 10px;
+  border: none;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  line-height: inherit;
+  font-family: inherit;
+  box-sizing: border-box;
   transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
@@ -566,20 +571,12 @@ button {
 }
 
 .main-menu li a:hover .arrow-icon,
-.menu-label-wrapper:hover .arrow-icon {
+.menu-link-txt:hover .arrow-icon {
   opacity: 1;
 }
 
 .arrow-icon.rotated {
   transform: rotate(180deg);
-}
-
-/* Submenu Wrapper */
-.menu-label-wrapper {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  height: 100%;
 }
 
 .has-submenu {
@@ -870,7 +867,7 @@ button {
   }
 
   .main-menu li a,
-  .menu-label-wrapper {
+  .menu-link-txt {
     font-size: 14px;
     border-radius: 10px;
     justify-content: space-between;
