@@ -89,18 +89,26 @@ onMounted(async () => {
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else class="gallery-container__content">
-        <div class="gallery-container__left">
-          <img width="150" :src="thisArtifactInfo?.artifactIcon" :alt="thisArtifactInfo?.artifactName" class="gallery-card__image" loading="lazy"/>
-          <div class="level">{{ thisArtifactInfo?.artifactRarity }}</div>
-          <div class="name">{{ thisArtifactInfo?.artifactName }}</div>
-          <div class="description" v-html="replaceTagWithColor(thisArtifactInfo?.useDescription,'shuzhi','C94F4F')"></div>
+        <div class="artifact-hero">
+          <img class="artifact-hero__icon" :src="thisArtifactInfo?.artifactIcon" :alt="thisArtifactInfo?.artifactName" loading="lazy"/>
+          <span v-if="thisArtifactInfo?.artifactRarity" class="artifact-hero__tag">{{ thisArtifactInfo?.artifactRarity }}</span>
+          <h2 class="artifact-hero__name">{{ thisArtifactInfo?.artifactName }}</h2>
         </div>
-        <div class="gallery-container__right">
-          <div class="artifact-detail">
-            <span class="level">星级效果：</span>
-            <div v-for="(items,index) in thisArtifactInfo?.artifactDetail" style="display: flex;margin-bottom: 10px">
-              <span class="stars">{{ '⭐'.repeat(index + 1) }}</span>
-              <span class="desc" v-html="replaceTagWithColor(items,'shuzhi','C94F4F')"></span>
+
+        <div class="artifact-body">
+          <div v-if="thisArtifactInfo?.useDescription" class="artifact-section">
+            <div class="artifact-section__label">效果</div>
+            <div class="artifact-section__content"
+                 v-html="replaceTagWithColor(thisArtifactInfo?.useDescription,'shuzhi','C94F4F')"></div>
+          </div>
+
+          <div v-if="thisArtifactInfo?.artifactDetail?.length" class="artifact-section">
+            <div class="artifact-section__label">星级效果</div>
+            <div class="artifact-rank-list">
+              <div v-for="(item, index) in thisArtifactInfo?.artifactDetail" :key="`${thisShowKey}-${index}`" class="artifact-rank-item">
+                <div class="artifact-rank-item__stars">{{ '⭐'.repeat(index + 1) }}</div>
+                <div class="artifact-rank-item__desc" v-html="replaceTagWithColor(item,'shuzhi','C94F4F')"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -277,86 +285,107 @@ onMounted(async () => {
 
   &__content {
     display: flex;
-    height: 100%;
-  }
-
-  &__left {
-    width: 40%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
-    height: 100%;
-    position: relative;
-    padding-top: 20px;
+  }
+}
 
-    ::after {
-      content: "";
-      position: absolute;
-      top: 10%;
-      bottom: 10%;
-      right: 0;
-      width: 1px;
-      background-image: linear-gradient(to bottom, transparent, #ccc, transparent);
-    }
+.artifact-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 30px 24px 24px;
+  border-bottom: 1px solid var(--border-color);
 
-    .level {
-      text-transform: uppercase;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 3px;
-      color: #EC9B3B;
-    }
-
-    .name {
-      font-size: 26px;
-      color: var(--text-main);
-      font-weight: 900;
-      margin-bottom: 5px;
-    }
-
-    .description {
-      padding: 20px 20px 30px;
-      word-break: break-all;
-    }
+  &__icon {
+    width: 132px;
+    height: 132px;
+    object-fit: contain;
+    border-radius: 24px;
+    background: var(--markdown-body-table-tr-2);
+    padding: 16px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
   }
 
-  &__right {
-    width: 60%;
-    padding: 20px 20px 15px;
-    display: flex;
+  &__tag {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: rgba(236, 155, 59, 0.14);
+    color: #EC9B3B;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+  }
 
-    .artifact-detail {
-      display: flex;
-      align-items: flex-start;
-      flex-direction: column;
-      justify-content: center;
+  &__name {
+    margin: 12px 0 0;
+    color: var(--text-main);
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+}
 
-      .level {
-        text-transform: uppercase;
-        font-size: 15px;
-        font-weight: 700;
-        margin-bottom: 10px;
-        color: #EC9B3B;
-      }
+.artifact-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
 
-      .stars {
-        font-size: 12px;
-        width: 80px;
-        display: inline-block;
-        line-height: 1.2;
-        user-select: none;
-        margin-right: 10px;
-      }
+.artifact-section {
+  background: var(--markdown-body-table-tr-2);
+  border-radius: 10px;
+  padding: 16px 20px;
 
-      .desc {
-        color: var(--text-main);
-        flex: 1;
-        word-break: break-all;
-        align-items: flex-start;
-        margin-top: -4px;
-      }
-    }
+  &__label {
+    margin-bottom: 10px;
+    color: var(--custom-tag);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  &__content {
+    color: var(--text-main);
+    font-size: 13px;
+    line-height: 1.7;
+    word-break: break-word;
+  }
+}
+
+.artifact-rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.artifact-rank-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+
+  &__stars {
+    flex: 0 0 72px;
+    color: #EC9B3B;
+    font-size: 12px;
+    line-height: 1.5;
+    user-select: none;
+  }
+
+  &__desc {
+    flex: 1;
+    color: var(--text-main);
+    font-size: 13px;
+    line-height: 1.7;
+    word-break: break-word;
   }
 }
 
@@ -610,22 +639,39 @@ onMounted(async () => {
     margin: 0;
     height: auto;
     min-height: auto;
+  }
 
-    :after{
-      display: none;
+  .artifact-hero {
+    padding: 24px 16px 20px;
+
+    &__icon {
+      width: 104px;
+      height: 104px;
+      border-radius: 20px;
+      padding: 14px;
+    }
+
+    &__name {
+      font-size: 22px;
     }
   }
-  .gallery-container__content {
+
+  .artifact-body {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .artifact-section {
+    padding: 14px 16px;
+  }
+
+  .artifact-rank-item {
     flex-direction: column;
-  }
-  .gallery-container__left {
-    width: 100%;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 20px;
-  }
-  .gallery-container__right {
-    width: 100%;
-    padding: 20px;
+    gap: 8px;
+
+    &__stars {
+      flex-basis: auto;
+    }
   }
 }
 </style>
