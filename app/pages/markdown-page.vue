@@ -315,6 +315,7 @@ watch(activeTocId, async (newId) => {
 .page-layout {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   gap: 20px;
   margin: 20px;
   flex-direction: row;
@@ -327,8 +328,8 @@ watch(activeTocId, async (newId) => {
   padding: 15px;
   box-sizing: border-box;
   position: sticky;
-  top: 40px;
-  max-height: calc(100vh - 100px);
+  top: 84px;
+  max-height: calc(100vh - 104px);
   border-radius: 10px;
   background: var(--bg-card);
   backdrop-filter: blur(8px);

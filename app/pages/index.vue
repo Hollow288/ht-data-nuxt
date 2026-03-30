@@ -77,6 +77,7 @@ function onLoad() {
 .container {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   padding: 40px 20px;
 }
 
@@ -84,7 +85,6 @@ function onLoad() {
 /* 左侧栏 */
 .sidebar {
   width: 300px;
-  height: 100%;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -93,10 +93,12 @@ function onLoad() {
   padding: 0;
   box-sizing: border-box;
   background: var(--bg-card);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); /* 阴影效果 */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   overflow: auto;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-
+  position: sticky;
+  top: 84px;
+  max-height: calc(100vh - 104px);
 }
 
 .username.with-line::after {

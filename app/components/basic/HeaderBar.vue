@@ -119,24 +119,22 @@
       </ul>
     </nav>
 
-    <!-- 4. 搜索框 (桌面显示/移动隐藏) -->
-    <div class="search-container">
-      <input
-          ref="searchInputRef"
-          type="text"
-          placeholder="请输入"
-          v-model="searchText"
-          @blur="handleBlur"
-          @focus="handleFocus"
-          @input="searchBlog"
-      />
-      <div @click="handleIconClick">
-        <i class="ri-search-line search-icon"></i>
-      </div>
-    </div>
-
-    <!-- 右侧功能按钮 (桌面) -->
+    <!-- 右侧：搜索 + 功能按钮 (桌面) -->
     <div class="desktop-controls">
+      <div class="search-container">
+        <input
+            ref="searchInputRef"
+            type="text"
+            placeholder="请输入"
+            v-model="searchText"
+            @blur="handleBlur"
+            @focus="handleFocus"
+            @input="searchBlog"
+        />
+        <div @click="handleIconClick">
+          <i class="ri-search-line search-icon"></i>
+        </div>
+      </div>
       <button @click="toggleTheme($event)" class="icon-btn">
         <i v-if="colorMode.value === 'dark'" class="ri-moon-clear-fill"></i>
         <i v-else class="ri-sun-fill"></i>
@@ -367,25 +365,30 @@ const handleFocus = () => {
    ========================================= */
 .header-container {
   position: sticky;
-  top: -60px;
+  top: 0;
   left: 0;
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  height: 60px;
-  padding: 0 10px 0 50px;
-  color: white;
-  background-color: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(5px);
+  height: 64px;
+  padding: 0 24px;
+  color: var(--text-main);
+  background-color: var(--bg-card-glass-95);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
   user-select: none;
-  transition: all 0.3s;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s, box-shadow 0.3s;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .back-div {
-  width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
 }
 
 /* Mobile Name & Image (Hidden on Desktop) */
@@ -395,13 +398,21 @@ const handleFocus = () => {
 }
 
 .header-name span {
-  color: rgba(204, 204, 204, 0.9);
-  font-size: 18px;
-  font-weight: bold;
+  color: var(--text-main);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .header-img img {
-  border-radius: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+.header-img img:hover {
+  border-color: #5b9bd5;
+  transform: scale(1.05);
 }
 
 /* =========================================
@@ -418,36 +429,47 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  color: white;
+  width: 36px;
+  height: 36px;
+  font-size: 1.25rem;
+  color: var(--text-main);
+  border-radius: 10px;
+  transition: background-color 0.2s, color 0.2s;
   z-index: 102;
 }
 
 .back-btn:hover {
-  color: #4da6ff;
+  color: #5b9bd5;
+  background-color: rgba(91, 155, 213, 0.1);
 }
 
 /* Desktop right-side controls */
 .desktop-controls {
-  width: 100px;
-  height: 100%;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  margin-top: -1px;
-  padding-left: 12px;
-  gap: 12px;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
 }
 
 .icon-btn {
   display: flex;
-  font-size: 22px;
-  color: #999;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  color: var(--summary-50);
+  border-radius: 10px;
+  transition: background-color 0.2s, color 0.2s, transform 0.2s;
   z-index: 102;
 }
 
 .icon-btn:hover {
-  color: #78c1f3;
+  color: #5b9bd5;
+  background-color: rgba(91, 155, 213, 0.08);
+  transform: translateY(-1px);
 }
 
 /* Mobile Controls (Hidden on Desktop) */
@@ -459,7 +481,9 @@ button {
    3. Navigation (Desktop)
    ========================================= */
 .main-nav {
-  margin: 0 auto;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .main-menu {
@@ -467,7 +491,7 @@ button {
   margin: 0;
   padding: 0;
   display: flex;
-  gap: 8px;
+  gap: 4px;
   align-items: center;
 }
 
@@ -475,15 +499,17 @@ button {
 .main-menu li a,
 .menu-link-txt {
   position: relative;
-  font-size: 1em;
+  font-size: 0.9em;
+  font-weight: 500;
   color: var(--text-main);
   text-decoration: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 16px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 7px 18px;
+  border-radius: 10px;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .main-menu li a span {
@@ -494,22 +520,22 @@ button {
 /* Icons */
 .nav-icon {
   margin-right: 6px;
-  font-size: 18px;
-  transition: transform 0.3s ease;
+  font-size: 17px;
+  transition: transform 0.25s ease, color 0.25s ease;
 }
 
 /* Arrows */
 .arrow-icon,
 .arrow-icon-right {
-  margin-left: 6px;
+  margin-left: 5px;
   display: flex;
   align-items: center;
-  transition: transform 0.3s ease;
-  opacity: 0.7;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  opacity: 0.5;
 }
 
 .arrow-icon-right {
-  display: none; /* Desktop 默认隐藏右侧箭头 */
+  display: none;
 }
 
 .arrow-icon svg,
@@ -519,17 +545,22 @@ button {
 }
 
 /* States: Hover & Active */
-.main-menu li:hover a:hover,
-.menu-link-txt:hover  {
-  color: rgb(39, 162, 190);
-  background-color: rgba(209, 241, 253, 0.5);
-  border-radius: 10px;
+.main-menu li a:hover,
+.menu-link-txt:hover {
+  color: #5b9bd5;
+  background-color: rgba(91, 155, 213, 0.08);
 }
 
-.main-menu li a.active-link{
-  color: rgb(39, 162, 190);
+.main-menu li a:hover .nav-icon,
+.menu-link-txt:hover .nav-icon {
+  transform: translateY(-1px);
+  color: #5b9bd5;
 }
 
+.main-menu li a.active-link {
+  color: #5b9bd5;
+  background-color: rgba(91, 155, 213, 0.1);
+}
 
 .main-menu li a:hover .arrow-icon,
 .menu-label-wrapper:hover .arrow-icon {
@@ -557,33 +588,40 @@ button {
    ========================================= */
 .submenu {
   position: absolute;
-  top: 40px;
+  top: 42px;
   left: 50%;
+  transform: translateX(-50%);
   width: max-content;
-  min-width: 100px;
+  min-width: 120px;
   margin: 0;
-  padding: 0;
+  padding: 6px;
   list-style: none;
   background-color: var(--bg-card-glass-95);
-  backdrop-filter: blur(5px);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
   z-index: 11;
   overflow: hidden;
   text-align: center;
 }
 
 .submenu li a {
-  display: block;
-  padding: 10px 28px;
-  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  padding: 9px 20px;
+  font-size: 0.88em;
   color: var(--text-main);
   text-transform: none;
   white-space: nowrap;
+  border-radius: 8px;
+  transition: background-color 0.2s, color 0.2s;
 }
 
 .submenu li a:hover {
-  background-color: rgba(209, 241, 253, 0.5);
+  background-color: rgba(91, 155, 213, 0.08);
+  color: #5b9bd5;
 }
 
 /* =========================================
@@ -591,100 +629,114 @@ button {
    ========================================= */
 .search-container {
   position: relative;
-  margin-left: 20px;
+  margin-left: 16px;
 }
 
 .search-container input {
-  width: 150px;
-  padding: 5px 20px 5px 0;
-  font-size: 14px;
-  color: var(--summary-50);
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid #bcb7b7;
+  width: 160px;
+  padding: 7px 32px 7px 14px;
+  font-size: 13px;
+  color: var(--text-main);
+  background: rgba(128, 128, 128, 0.08);
+  border: 1px solid transparent;
+  border-radius: 10px;
   outline: none;
+  transition: width 0.3s ease, background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.search-container input:focus {
+  width: 200px;
+  background: rgba(128, 128, 128, 0.05);
+  border-color: rgba(91, 155, 213, 0.4);
+  box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.1);
 }
 
 .search-container input::placeholder {
-  color: #888;
+  color: #999;
   opacity: 1;
 }
 
 .search-icon {
   position: absolute;
-  right: 0;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
   color: #999;
+  transition: color 0.2s;
 }
 
 .search-icon:hover {
-  color: #78c1f3;
+  color: #5b9bd5;
 }
 
 /* Dropdown Results */
 .dropdown-box {
   position: absolute;
-  top: 65px;
+  top: 70px;
   right: 20px;
   z-index: 20;
-  width: 500px;
-  height: 430px;
-  padding: 10px 3px;
+  width: 480px;
+  max-height: 420px;
+  padding: 8px;
   color: var(--text-main);
   background-color: var(--bg-card-glass-95);
-  border-radius: 4px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .search-results-list {
   width: 100%;
   height: 100%;
-  padding: 0 10px;
+  max-height: 400px;
+  padding: 0 4px;
   overflow-y: auto;
 }
 
 .search-item {
   width: 100%;
-  padding: 10px 0;
-  transition: background 0.2s ease;
+  padding: 10px 8px;
+  transition: background-color 0.2s ease;
   border-radius: 10px;
   cursor: pointer;
 }
 
 .search-item:hover {
-  background-color: rgba(225, 158, 186, 0.5);
+  background-color: rgba(91, 155, 213, 0.08);
 }
 
 .search-item-content {
   display: flex;
   flex-direction: column;
-  padding: 0 10px;
+  padding: 0 8px;
 }
 
 .search-item-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .search-title {
-  margin-bottom: 5px;
-  font-weight: bold;
+  margin-bottom: 4px;
+  font-weight: 600;
   word-break: break-all;
 }
 
 .search-item:hover .search-title {
-  color: #DF1C5F;
+  color: #5b9bd5;
 }
 
 .search-date {
   font-size: 12px;
-  color: #666666;
+  color: var(--summary-50);
   min-width: 80px;
+  text-align: right;
 }
 
 .search-summary {
@@ -692,19 +744,36 @@ button {
   color: var(--summary-50);
   letter-spacing: 0.01em;
   word-break: break-all;
+  line-height: 1.5;
 }
 
 /* =========================================
-   6. Mobile Adaptation (max-width: 850px)
+   6. Transitions
+   ========================================= */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* =========================================
+   7. Mobile Adaptation (max-width: 850px)
    ========================================= */
 @media screen and (max-width: 850px) {
 
   /* --- Mobile Header Layout --- */
   .header-container {
-    padding: 0 20px;
+    padding: 0 16px;
+    height: 56px;
     background-color: var(--bg-card-glass-95);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--border-color);
   }
 
   .header-name,
@@ -721,14 +790,12 @@ button {
   }
 
   .header-img {
-    right: 20px;
+    right: 16px;
   }
 
   /* --- Hide Desktop Elements --- */
   .back-btn,
   .back-div,
-  .search-container,
-  .dropdown-box,
   .desktop-controls {
     display: none !important;
   }
@@ -736,6 +803,7 @@ button {
   /* --- Show Mobile Controls --- */
   .mobile-controls {
     display: flex;
+    gap: 2px;
   }
 
   .mobile-btn {
@@ -744,33 +812,35 @@ button {
     justify-content: center;
     font-size: 20px;
     color: var(--text-main);
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    transition: background 0.2s;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    transition: background-color 0.2s, color 0.2s;
     z-index: 102;
   }
 
   .mobile-btn:active {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(91, 155, 213, 0.1);
+    color: #5b9bd5;
   }
 
   /* --- Floating Card Menu (Mobile Nav) --- */
   .main-nav {
     position: absolute;
-    top: 70px;
+    top: 64px;
     left: 10px;
-    width: 150px;
+    width: 160px;
     height: auto;
     background-color: var(--bg-card-glass-95);
-    border-radius: 12px;
-    padding: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06),
-    0 0 0 1px rgba(0, 0, 0, 0.05);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    padding: 6px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
 
     transform-origin: top left;
-    transform: scale(0.9) translateY(-10px);
+    transform: scale(0.92) translateY(-8px);
     opacity: 0;
     pointer-events: none;
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
@@ -797,11 +867,12 @@ button {
 
   .main-menu li a,
   .menu-label-wrapper {
-    font-size: 15px;
-    border-radius: 8px;
+    font-size: 14px;
+    border-radius: 10px;
     justify-content: space-between;
     width: 100%;
     box-shadow: none !important;
+    padding: 8px 14px;
   }
 
   .nav-icon {
@@ -815,16 +886,16 @@ button {
   }
 
   /* Active/Hover states in Mobile */
-  .main-menu li:hover a:hover,
+  .main-menu li a:hover,
   .submenu-li:hover,
   .main-menu li a.active-link {
-    background-color: rgba(77, 166, 255, 0.1);
-    color: #4da6ff;
+    background-color: rgba(91, 155, 213, 0.08);
+    color: #5b9bd5;
   }
 
   .main-menu li a.active-link,
   .submenu-li.active-link {
-    background-color: transparent; /* 移动端选中背景设为透明，避免过重 */
+    background-color: rgba(91, 155, 213, 0.06);
   }
 
   /* --- Mobile Submenu (Accordion style) --- */
@@ -835,17 +906,20 @@ button {
     background: transparent;
     width: 100%;
     border-radius: 0;
+    border: none;
     margin: 0;
+    padding: 0;
     overflow: hidden;
     text-align: left;
   }
 
   .submenu li a {
-    padding: 0 12px 0 24px; /* 缩进 */
-    height: 40px;
-    line-height: 40px;
-    font-size: 14px;
+    padding: 0 12px 0 24px;
+    height: 38px;
+    line-height: 38px;
+    font-size: 13px;
     justify-content: flex-start;
+    border-radius: 8px;
   }
 
   .submenu li a span {

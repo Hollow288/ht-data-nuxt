@@ -11,7 +11,7 @@ const store = useProgressStore()
 .progress-bar {
   height: 3px;
   position: fixed;
-  top: 60px;
+  top: 64px;
   left: 0;
   z-index: 1;
   width: 0;

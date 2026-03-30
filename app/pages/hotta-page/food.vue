@@ -87,31 +87,24 @@ onMounted(async () => {
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else class="gallery-container__content">
-        <!-- 卡片式设计 -->
-        <div class="food-card">
-          <div class="food-card__header">
-            <div class="food-icon-wrapper">
-              <img :src="thisFoodInfo?.foodIcon" :alt="thisFoodInfo?.foodName" loading="lazy"/>
-            </div>
-            <h2 class="food-card__title">{{ thisFoodInfo?.foodName }}</h2>
+        <!-- 顶部展示区：图标 + 名称 + 描述 -->
+        <div class="food-hero">
+          <img class="food-hero__icon" :src="thisFoodInfo?.foodIcon" :alt="thisFoodInfo?.foodName" loading="lazy"/>
+          <h2 class="food-hero__name">{{ thisFoodInfo?.foodName }}</h2>
+          <p v-if="thisFoodInfo?.foodDes" class="food-hero__desc">{{ thisFoodInfo?.foodDes }}</p>
+        </div>
+
+        <!-- 下方信息区 -->
+        <div class="food-body">
+          <div v-if="thisFoodInfo?.source" class="food-section">
+            <div class="food-section__label">来源</div>
+            <div class="food-section__content">{{ thisFoodInfo?.source }}</div>
           </div>
 
-          <div class="food-card__body">
-            <div class="info-section" v-if="thisFoodInfo?.foodDes">
-              <div class="info-label">描述</div>
-              <div class="info-content">{{ thisFoodInfo?.foodDes }}</div>
-            </div>
-
-            <div class="info-section" v-if="thisFoodInfo?.source">
-              <div class="info-label">来源</div>
-              <div class="info-content">{{ thisFoodInfo?.source }}</div>
-            </div>
-
-            <div class="info-section" v-if="thisFoodInfo?.useDescription || thisFoodInfo?.buffs">
-              <div class="info-label">效果</div>
-              <div class="info-content food-detail-html"
-                   v-html="(thisFoodInfo?.useDescription == '' ? '' : replaceTagWithColor(replaceTagWithColor(thisFoodInfo?.useDescription,'shuzhi','C94F4F'),'ComLblGreen','4C9717') + '<br>') + replaceTagWithColor(replaceTagWithColor(thisFoodInfo?.buffs,'shuzhi','C94F4F'),'ComLblGreen','4C9717')"></div>
-            </div>
+          <div v-if="thisFoodInfo?.useDescription || thisFoodInfo?.buffs" class="food-section">
+            <div class="food-section__label">效果</div>
+            <div class="food-section__content"
+                 v-html="(thisFoodInfo?.useDescription == '' ? '' : replaceTagWithColor(replaceTagWithColor(thisFoodInfo?.useDescription,'shuzhi','C94F4F'),'ComLblGreen','4C9717') + '<br>') + replaceTagWithColor(replaceTagWithColor(thisFoodInfo?.buffs,'shuzhi','C94F4F'),'ComLblGreen','4C9717')"></div>
           </div>
         </div>
       </div>
@@ -202,6 +195,7 @@ onMounted(async () => {
 .page-container-wrapper {
   display: flex;
   justify-content: flex-start;
+  align-items: flex-start;
   gap: 20px;
   width: 100%;
   max-width: 1000px;
@@ -209,8 +203,8 @@ onMounted(async () => {
 
 /* 主内容区域 */
 .gallery-container {
-  min-height: calc(100vh - 100px);
-  overflow-y: auto;
+  min-height: calc(100vh - 104px);
+  overflow-y: visible;
   flex: 1;
   width: 0;
   max-width: 1000px;
@@ -230,122 +224,89 @@ onMounted(async () => {
   }
 
   &__content {
-    height: 100%;
     display: flex;
     flex-direction: column;
-    //align-items: center;
-    //justify-content: center;
   }
 }
 
-/* 卡片样式 */
-.food-card {
-  background: var(--bg-card);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  width: 100%;
-  max-width: 700px;
-  overflow: hidden;
+/* =========================================
+   食物内容区样式
+   ========================================= */
 
-  &__header {
-    background: var(--markdown-body-table-tr-2);
-    padding: 40px 30px;
-    text-align: center;
-    position: relative;
-    border-bottom: 1px solid var(--border-color);
-  }
+/* 顶部展示区 */
+.food-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 30px 24px 24px;
+  border-bottom: 1px solid var(--border-color);
 
-  &__title {
-    color: var(--text-main);
-    font-size: 28px;
-    font-weight: 600;
-    margin: 15px 0 0 0;
-    letter-spacing: 0.5px;
-  }
-
-  &__body {
-    padding: 30px;
-    background: var(--bg-card);
-  }
-}
-
-/* 食物图标样式 */
-.food-icon-wrapper {
-  display: inline-block;
-  position: relative;
-
-  img {
-    width: 120px;
-    height: 120px;
+  &__icon {
+    width: 88px;
+    height: 88px;
     object-fit: contain;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 140px;
-    height: 140px;
-    background: radial-gradient(circle, rgba(0, 0, 0, 0.02) 0%, transparent 70%);
-    border-radius: 50%;
-    z-index: -1;
-  }
-}
-
-/* 信息区块样式 */
-.info-section {
-  margin-bottom: 20px;
-  padding: 15px;
-  background: var(--markdown-body-table-tr-2);
-  border-left: 3px solid var(--border-color);
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: var(--back-btn-hover);
-    border-left-color: var(--custom-tag);
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  &--highlight {
+    border-radius: 16px;
     background: var(--markdown-body-table-tr-2);
-    border-left-color: var(--custom-tag);
+    padding: 10px;
+  }
+
+  &__name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 14px 0 0;
+    line-height: 1.3;
+  }
+
+  &__desc {
+    margin: 12px 0 0;
+    font-size: 13px;
+    color: var(--summary-50);
+    line-height: 1.6;
+    max-width: 420px;
   }
 }
 
-.info-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--custom-tag);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
+/* 下方信息区 */
+.food-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.info-content {
-  color: var(--text-main);
-  font-size: 14px;
-  line-height: 1.6;
-}
+/* 通用 section */
+.food-section {
+  background: var(--markdown-body-table-tr-2);
+  border-radius: 10px;
+  padding: 16px 20px;
 
-.food-detail-html {
-  line-height: 1.8;
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--custom-tag);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  &__content {
+    color: var(--text-main);
+    font-size: 13px;
+    line-height: 1.7;
+  }
 }
 
 /* Sidebar 样式 */
 .sidebar {
   flex: 0 0 25vw;
-  min-height: calc(100vh - 100px);
-  max-height: calc(100vh - 100px);
+  height: calc(100vh - 104px);
   min-width: 180px;
   max-width: 300px;
   box-sizing: border-box;
   position: sticky;
-  top: 40px;
+  top: 84px;
   background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -573,49 +534,28 @@ onMounted(async () => {
     margin: 0;
     height: auto;
     min-height: auto;
-    //padding: 20px 10px;
   }
 
-  /* 移动端卡片样式 */
-  .food-card {
-    width: 100%;
+  .food-hero {
+    padding: 24px 16px 20px;
 
-    &__header {
-      padding: 30px 20px;
+    &__icon {
+      width: 72px;
+      height: 72px;
     }
 
-    &__title {
-      font-size: 22px;
-    }
-
-    &__body {
-      padding: 20px 15px;
+    &__name {
+      font-size: 20px;
     }
   }
 
-  .food-icon-wrapper {
-    img {
-      width: 100px;
-      height: 100px;
-    }
-
-    &::before {
-      width: 120px;
-      height: 120px;
-    }
+  .food-body {
+    padding: 16px;
+    gap: 12px;
   }
 
-  .info-section {
-    padding: 12px;
-    margin-bottom: 15px;
-  }
-
-  .info-label {
-    font-size: 11px;
-  }
-
-  .info-content {
-    font-size: 13px;
+  .food-section {
+    padding: 14px 16px;
   }
 }
 

@@ -213,6 +213,7 @@ watch(date, fetchArticles)
 .page-layout {
   display: flex;
   justify-content: center;
+  align-items: flex-start;
   gap: 20px;
   margin: 20px;
   flex-direction: row;
@@ -283,8 +284,8 @@ watch(date, fetchArticles)
   max-width: 300px;
   box-sizing: border-box;
   position: sticky;
-  top: 40px;
-  height: calc(100vh - 100px);
+  top: 84px;
+  height: calc(100vh - 104px);
   user-select: none;
   cursor: default;
 }
@@ -396,7 +397,7 @@ watch(date, fetchArticles)
 .left-sidebar {
   margin-top: 20px;
   flex: 1;
-  max-height: calc(100vh - 170px);
+  max-height: calc(100vh - 174px);
   padding: 15px;
   box-sizing: border-box;
   position: sticky;

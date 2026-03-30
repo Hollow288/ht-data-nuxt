@@ -91,42 +91,33 @@ onMounted(async () => {
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else class="gallery-container__content">
-        <!-- 卡片式设计 -->
-        <div class="recipes-card">
-          <div class="recipes-card__header">
-            <div class="recipes-icon-wrapper">
-              <img :src="thisRecipesInfo?.recipesIcon" :alt="thisRecipesInfo?.recipesName" loading="lazy"/>
-            </div>
-            <h2 class="recipes-card__title">{{ thisRecipesInfo?.recipesName }}</h2>
+        <!-- 顶部展示区：图标 + 名称 + 类别 + 描述 -->
+        <div class="recipes-hero">
+          <img class="recipes-hero__icon" :src="thisRecipesInfo?.recipesIcon" :alt="thisRecipesInfo?.recipesName" loading="lazy"/>
+          <h2 class="recipes-hero__name">{{ thisRecipesInfo?.recipesName }}</h2>
+          <span v-if="thisRecipesInfo?.categories" class="recipes-hero__tag">{{ thisRecipesInfo?.categories }}</span>
+          <p v-if="thisRecipesInfo?.recipesDes" class="recipes-hero__desc">{{ thisRecipesInfo?.recipesDes }}</p>
+        </div>
+
+        <!-- 下方信息区 -->
+        <div class="recipes-body">
+          <!-- 效果 -->
+          <div v-if="thisRecipesInfo?.useDescription || thisRecipesInfo?.buffs" class="recipes-section">
+            <div class="recipes-section__label">效果</div>
+            <div class="recipes-section__content"
+                 v-html="(thisRecipesInfo?.useDescription == '' ? '' : replaceTagWithColor(replaceTagWithColor(thisRecipesInfo?.useDescription,'shuzhi','C94F4F'),'ComLblGreen','4C9717') + '<br>') + replaceTagWithColor(replaceTagWithColor(thisRecipesInfo?.buffs,'shuzhi','C94F4F'),'ComLblGreen','4C9717')"></div>
           </div>
 
-          <div class="recipes-card__body">
-            <div class="info-section" v-if="thisRecipesInfo?.recipesDes">
-              <div class="info-label">描述</div>
-              <div class="info-content">{{ thisRecipesInfo?.recipesDes }}</div>
-            </div>
-
-            <div class="info-section" v-if="thisRecipesInfo?.categories">
-              <div class="info-label">类别</div>
-              <div class="info-content">{{ thisRecipesInfo?.categories }}</div>
-            </div>
-
-            <div class="info-section" v-if="thisRecipesInfo?.useDescription || thisRecipesInfo?.buffs">
-              <div class="info-label">效果</div>
-              <div class="info-content recipes-buffs-description"
-                   v-html="(thisRecipesInfo?.useDescription == '' ? '' : replaceTagWithColor(replaceTagWithColor(thisRecipesInfo?.useDescription,'shuzhi','C94F4F'),'ComLblGreen','4C9717') + '<br>') + replaceTagWithColor(replaceTagWithColor(thisRecipesInfo?.buffs,'shuzhi','C94F4F'),'ComLblGreen','4C9717')"></div>
-            </div>
-
-            <div class="info-section">
-              <div class="info-label">制作方式</div>
-              <div class="ingredients-list">
-                <div v-for="item in thisRecipesInfo?.ingredientsList" :key="item.ingredientName" class="ingredient-item">
-                  <div class="img-container">
-                    <img :src="item.ingredientIcon" :alt="item.ingredientName" class="item-image"/>
-                    <div class="ingredient-name">{{ item.ingredientName }}</div>
-                    <div class="quantity">{{ item.ingredientNum }}</div>
-                  </div>
+          <!-- 制作方式 -->
+          <div class="recipes-section">
+            <div class="recipes-section__label">制作方式</div>
+            <div class="ingredients-list">
+              <div v-for="item in thisRecipesInfo?.ingredientsList" :key="item.ingredientName" class="ingredient-item">
+                <div class="img-container">
+                  <img :src="item.ingredientIcon" :alt="item.ingredientName" class="item-image"/>
+                  <div class="quantity">{{ item.ingredientNum }}</div>
                 </div>
+                <span class="ingredient-name">{{ item.ingredientName }}</span>
               </div>
             </div>
           </div>
@@ -269,6 +260,7 @@ onMounted(async () => {
 .page-container-wrapper {
   display: flex;
   justify-content: flex-start;
+  align-items: flex-start;
   gap: 20px;
   width: 100%;
   max-width: 1000px;
@@ -276,7 +268,7 @@ onMounted(async () => {
 
 /* 主内容区域 */
 .gallery-container {
-  min-height: calc(100vh - 100px);
+  min-height: calc(100vh - 104px);
   overflow-y: auto;
   flex: 1;
   width: 0;
@@ -296,181 +288,155 @@ onMounted(async () => {
   }
 
   &__content {
-    height: 100%;
     display: flex;
     flex-direction: column;
   }
 }
 
-/* 卡片样式 */
-.recipes-card {
-  background: var(--bg-card);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  width: 100%;
-  max-width: 700px;
-  overflow: hidden;
+/* =========================================
+   食谱内容区样式
+   ========================================= */
 
-  &__header {
-    background: var(--markdown-body-table-tr-2);
-    padding: 40px 30px;
-    text-align: center;
-    position: relative;
-    border-bottom: 1px solid var(--border-color);
-  }
+/* 顶部展示区 */
+.recipes-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 30px 24px 24px;
+  border-bottom: 1px solid var(--border-color);
 
-  &__title {
-    color: var(--text-main);
-    font-size: 28px;
-    font-weight: 600;
-    margin: 15px 0 0 0;
-    letter-spacing: 0.5px;
-  }
-
-  &__body {
-    padding: 30px;
-    background: var(--bg-card);
-  }
-}
-
-/* 食谱图标样式 */
-.recipes-icon-wrapper {
-  display: inline-block;
-  position: relative;
-
-  img {
-    width: 120px;
-    height: 120px;
+  &__icon {
+    width: 88px;
+    height: 88px;
     object-fit: contain;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 140px;
-    height: 140px;
-    background: radial-gradient(circle, rgba(0, 0, 0, 0.02) 0%, transparent 70%);
-    border-radius: 50%;
-    z-index: -1;
-  }
-}
-
-/* 信息区块样式 */
-.info-section {
-  margin-bottom: 20px;
-  padding: 15px;
-  background: var(--markdown-body-table-tr-2);
-  border-left: 3px solid var(--border-color);
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: var(--back-btn-hover);
-    border-left-color: var(--custom-tag);
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  &--highlight {
+    border-radius: 16px;
     background: var(--markdown-body-table-tr-2);
-    border-left-color: var(--custom-tag);
+    padding: 10px;
   }
 
-  &--ingredients {
-    background: var(--bg-card);
-    border-left-color: var(--border-color);
+  &__name {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 14px 0 0;
+    line-height: 1.3;
+  }
+
+  &__tag {
+    display: inline-block;
+    font-size: 12px;
+    color: #9E8BA8;
+    background: rgba(158, 139, 168, 0.1);
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    margin-top: 8px;
+  }
+
+  &__desc {
+    margin: 12px 0 0;
+    font-size: 13px;
+    color: var(--summary-50);
+    line-height: 1.6;
+    max-width: 420px;
   }
 }
 
-.info-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--custom-tag);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
+/* 下方信息区 */
+.recipes-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.info-content {
-  color: var(--text-main);
-  font-size: 14px;
-  line-height: 1.6;
+/* 通用 section */
+.recipes-section {
+  background: var(--markdown-body-table-tr-2);
+  border-radius: 10px;
+  padding: 16px 20px;
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--custom-tag);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  &__content {
+    color: var(--text-main);
+    font-size: 13px;
+    line-height: 1.7;
+  }
 }
 
-.recipes-buffs-description {
-  line-height: 1.8;
-}
-
-/* 食材列表样式 */
+/* 食材列表 */
 .ingredients-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  gap: 20px;
-  margin-top: 10px;
+  gap: 16px;
 }
 
 .ingredient-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
+  gap: 6px;
+  width: 60px;
 }
 
 .img-container {
   position: relative;
-  display: inline-block;
+  width: 44px;
+  height: 44px;
 }
 
 .item-image {
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   border-radius: 10px;
   object-fit: cover;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
 }
 
 .quantity {
   position: absolute;
-  top: -10px;
-  right: -10px;
-  background-color: rgba(255, 12, 12, 0.7);
+  top: -6px;
+  right: -6px;
+  background-color: rgba(220, 50, 50, 0.85);
   color: white;
-  font-size: 12px;
-  width: 15px;
-  height: 15px;
-  line-height: 15px;
-  text-align: center;
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 600;
 }
 
 .ingredient-name {
-  font-size: 12px;
-  color: var(--text-main);
-  padding: 2px 0px;
-  width: 80px;
+  font-size: 11px;
+  color: var(--summary-50);
   text-align: center;
   word-break: break-all;
-  margin-top: 5px;
+  line-height: 1.3;
 }
 
 
 /* PC Sidebar 样式 */
 .sidebar {
   flex: 0 0 25vw;
-  min-height: calc(100vh - 100px);
-  max-height: calc(100vh - 100px);
+  height: calc(100vh - 104px);
   min-width: 180px;
   max-width: 300px;
   box-sizing: border-box;
   position: sticky;
-  top: 40px;
+  top: 84px;
   background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -701,61 +667,31 @@ onMounted(async () => {
     min-height: auto;
   }
 
-  /* 移动端卡片样式 */
-  .recipes-card {
-    width: 100%;
+  .recipes-hero {
+    padding: 24px 16px 20px;
 
-    &__header {
-      padding: 30px 20px;
+    &__icon {
+      width: 72px;
+      height: 72px;
     }
 
-    &__title {
-      font-size: 22px;
-    }
-
-    &__body {
-      padding: 20px 15px;
+    &__name {
+      font-size: 20px;
     }
   }
 
-  .recipes-icon-wrapper {
-    img {
-      width: 100px;
-      height: 100px;
-    }
-
-    &::before {
-      width: 120px;
-      height: 120px;
-    }
+  .recipes-body {
+    padding: 16px;
+    gap: 12px;
   }
 
-  .info-section {
-    padding: 12px;
-    margin-bottom: 15px;
-  }
-
-  .info-label {
-    font-size: 11px;
-  }
-
-  .info-content {
-    font-size: 13px;
+  .recipes-section {
+    padding: 14px 16px;
   }
 
   .ingredients-list {
-    flex-direction: row;
     justify-content: center;
-    gap: 15px;
-  }
-
-  .ingredient-item {
-    min-width: 70px;
-    max-width: 80px;
-  }
-
-  .ingredient-name {
-    width: auto;
+    gap: 12px;
   }
 }
 

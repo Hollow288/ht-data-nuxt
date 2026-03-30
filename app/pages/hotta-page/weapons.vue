@@ -413,6 +413,7 @@ onMounted(async () => {
 .page-container-wrapper {
   display: flex;
   justify-content: flex-start;
+  align-items: flex-start;
   gap: 20px;
   width: 100%;
   max-width: 1000px;
@@ -423,8 +424,8 @@ onMounted(async () => {
 }
 
 .gallery-container {
-  min-height: calc(100vh - 100px);
-  overflow-y: auto;
+  min-height: calc(100vh - 104px);
+  overflow-y: visible;
   background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -533,13 +534,12 @@ onMounted(async () => {
 /* PC Sidebar 样式 */
 .sidebar {
   flex: 0 0 25vw;
-  min-height: calc(100vh - 100px);
-  max-height: calc(100vh - 100px);
+  height: calc(100vh - 104px);
   min-width: 180px;
   max-width: 300px;
   box-sizing: border-box;
   position: sticky;
-  top: 40px;
+  top: 84px;
   background: var(--bg-card);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
