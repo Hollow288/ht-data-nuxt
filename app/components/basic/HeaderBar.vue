@@ -135,6 +135,41 @@
           <i class="ri-search-line search-icon"></i>
         </div>
       </div>
+
+      <transition name="fade-slide">
+        <div v-show="showDropdown" class="dropdown-box" @mousedown.prevent>
+          <div class="search-results-list">
+            <div v-show="!isLoading">
+              <div v-for="item in articles" :key="item.blogId" class="search-item" @click="navigateToArticle(item.blogId)">
+                <div class="search-item-content">
+                  <div class="search-item-header">
+                    <n-highlight
+                        :highlight-style="{color: '#E19EBA', backgroundColor: 'transparent'}"
+                        class="search-title"
+                        :text="item.title"
+                        :patterns="[searchText]"
+                    />
+                    <span class="search-date"># {{ item.createdAt.substring(0, 10) }}</span>
+                  </div>
+                  <n-highlight
+                      :highlight-style="{color: '#E19EBA', backgroundColor: 'transparent'}"
+                      class="search-summary"
+                      :text="item.summary.replace(/[\r\n]+/g, '')"
+                      :patterns="[searchText]"
+                  />
+                </div>
+              </div>
+            </div>
+            <!-- 骨架屏 -->
+            <div v-show="isLoading">
+              <n-skeleton round :style="{ height: '20px', width: '150px', borderRadius : '10px', marginTop : '13px' }"/>
+              <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
+              <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
+            </div>
+          </div>
+        </div>
+      </transition>
+
       <button @click="toggleTheme($event)" class="icon-btn">
         <i v-if="colorMode.value === 'dark'" class="ri-moon-clear-fill"></i>
         <i v-else class="ri-sun-fill"></i>
@@ -145,39 +180,7 @@
     </div>
 
     <!-- 5. 搜索结果 -->
-    <transition name="fade-slide">
-      <div v-show="showDropdown" class="dropdown-box" @mousedown.prevent>
-        <div class="search-results-list">
-          <div v-show="!isLoading">
-            <div v-for="item in articles" :key="item.blogId" class="search-item" @click="navigateToArticle(item.blogId)">
-              <div class="search-item-content">
-                <div class="search-item-header">
-                  <n-highlight
-                      :highlight-style="{color: '#E19EBA', backgroundColor: 'transparent'}"
-                      class="search-title"
-                      :text="item.title"
-                      :patterns="[searchText]"
-                  />
-                  <span class="search-date"># {{ item.createdAt.substring(0, 10) }}</span>
-                </div>
-                <n-highlight
-                    :highlight-style="{color: '#E19EBA', backgroundColor: 'transparent'}"
-                    class="search-summary"
-                    :text="item.summary.replace(/[\r\n]+/g, '')"
-                    :patterns="[searchText]"
-                />
-              </div>
-            </div>
-          </div>
-          <!-- 骨架屏 -->
-          <div v-show="isLoading">
-            <n-skeleton round :style="{ height: '20px', width: '150px', borderRadius : '10px', marginTop : '13px' }"/>
-            <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
-            <n-skeleton round :style="{ height: '20px', width: '460px', borderRadius : '10px', marginTop : '13px' }"/>
-          </div>
-        </div>
-      </div>
-    </transition>
+
 
     <ProgressBar/>
   </header>
@@ -630,6 +633,7 @@ button {
 .search-container {
   position: relative;
   margin-left: 16px;
+  display: flex;
 }
 
 .search-container input {
@@ -678,7 +682,7 @@ button {
   right: 20px;
   z-index: 20;
   width: 480px;
-  max-height: 420px;
+  height: 420px;
   padding: 8px;
   color: var(--text-main);
   background-color: var(--bg-card-glass-95);
