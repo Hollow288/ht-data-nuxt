@@ -26,4 +26,10 @@ const store = useProgressStore()
   0% { background-position: 0% 0%; }
   100% { background-position: 100% 0%; }
 }
+
+@media screen and (max-width: 850px) {
+  .progress-bar {
+    top: 56px;
+  }
+}
 </style>
