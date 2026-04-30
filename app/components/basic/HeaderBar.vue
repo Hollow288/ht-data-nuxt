@@ -62,6 +62,17 @@
             </div>
           </NuxtLink>
         </li>
+        <li @click="closeMobileMenu">
+          <NuxtLink to="/ocr-page" active-class="active-link">
+            <i class="ri-scan-2-line nav-icon"></i>
+            <span>OCR</span>
+            <div class="arrow-icon-right">
+              <svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path fill="currentColor" d="M190.6 469.1l192-192c12.5-12.5 12.5-32.8 0-45.3l-192-192c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L302.7 256 145.3 423.8c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0z"></path>
+              </svg>
+            </div>
+          </NuxtLink>
+        </li>
 
         <!-- Hotta 下拉菜单 -->
         <li
