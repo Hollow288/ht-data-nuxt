@@ -186,6 +186,19 @@ function formatConfidence(c: number) {
   return `${(c * 100).toFixed(1)}%`
 }
 
+function formatBbox(bbox: number[][] | null | undefined) {
+  if (!bbox || bbox.length < 4) return '-'
+  const xs = bbox.map(p => p[0])
+  const ys = bbox.map(p => p[1])
+  const xMin = Math.min(...xs)
+  const yMin = Math.min(...ys)
+  const xMax = Math.max(...xs)
+  const yMax = Math.max(...ys)
+  const w = xMax - xMin
+  const h = yMax - yMin
+  return `${xMin.toFixed(0)}, ${yMin.toFixed(0)}, ${w.toFixed(0)} × ${h.toFixed(0)}`
+}
+
 onUnmounted(() => {
   stopPolling()
   if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
@@ -196,8 +209,22 @@ onUnmounted(() => {
   <div class="ocr-page">
     <div class="ocr-card">
       <header class="ocr-card__header">
-        <h2 class="ocr-card__title">OCR 文字识别</h2>
-        <small class="ocr-card__subtitle">上传图片或 PDF，自动识别其中文字</small>
+        <div class="ocr-card__header-text">
+          <h2 class="ocr-card__title">OCR 文字识别</h2>
+          <small class="ocr-card__subtitle">上传图片或 PDF，自动识别其中文字</small>
+        </div>
+        <n-button
+          class="ocr-card__action"
+          type="primary"
+          :loading="isWorking"
+          :disabled="!file || isWorking"
+          @click="handleSubmit"
+        >
+          <template #icon>
+            <i class="ri-scan-2-line"></i>
+          </template>
+          {{ isWorking ? '识别中...' : '开始识别' }}
+        </n-button>
       </header>
 
       <!-- 上传区 -->
@@ -262,20 +289,9 @@ onUnmounted(() => {
         </div>
       </section>
 
-      <!-- 操作 -->
-      <section class="ocr-section ocr-actions">
-        <n-button
-          type="primary"
-          :loading="isWorking"
-          :disabled="!file || isWorking"
-          @click="handleSubmit"
-        >
-          <template #icon>
-            <i class="ri-scan-2-line"></i>
-          </template>
-          {{ isWorking ? '识别中...' : '开始识别' }}
-        </n-button>
-        <span v-if="errorMsg" class="ocr-error">
+      <!-- 错误提示 -->
+      <section v-if="errorMsg" class="ocr-section ocr-actions">
+        <span class="ocr-error">
           <i class="ri-error-warning-line"></i> {{ errorMsg }}
         </span>
       </section>
@@ -314,6 +330,7 @@ onUnmounted(() => {
                 <th class="col-idx">#</th>
                 <th>文本</th>
                 <th class="col-conf">置信度</th>
+                <th class="col-bbox">位置 (x, y, w × h)</th>
                 <th v-if="task.pages" class="col-page">页码</th>
               </tr>
             </thead>
@@ -322,6 +339,7 @@ onUnmounted(() => {
                 <td class="col-idx">{{ idx + 1 }}</td>
                 <td class="col-text">{{ item.text }}</td>
                 <td class="col-conf">{{ formatConfidence(item.confidence) }}</td>
+                <td class="col-bbox">{{ formatBbox(item.bbox) }}</td>
                 <td v-if="task.pages" class="col-page">{{ item.page ?? '-' }}</td>
               </tr>
             </tbody>
@@ -362,7 +380,7 @@ onUnmounted(() => {
 
 .ocr-card {
   width: 100%;
-  max-width: 900px;
+  max-width: 1350px;
   background: var(--bg-card);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -371,6 +389,20 @@ onUnmounted(() => {
 
   &__header {
     margin-bottom: 22px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  &__header-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__action {
+    flex-shrink: 0;
+    margin-top: 4px;
   }
 
   &__title {
@@ -547,6 +579,10 @@ onUnmounted(() => {
     color: var(--text-main);
   }
 
+  :deep(.n-radio .n-radio__label) {
+    color: var(--text-main);
+  }
+
   &__control {
     flex: 1;
     min-width: 0;
@@ -681,6 +717,14 @@ onUnmounted(() => {
   .col-conf {
     width: 90px;
     font-variant-numeric: tabular-nums;
+  }
+
+  .col-bbox {
+    width: 180px;
+    color: var(--summary-50);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .col-page {
