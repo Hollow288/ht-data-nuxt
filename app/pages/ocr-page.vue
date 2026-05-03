@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onUnmounted } from 'vue'
-import { NButton, NRadio, NRadioGroup, NSlider, NSpin, NTag, NEmpty } from 'naive-ui'
+import { NButton, NRadio, NRadioGroup, NSlider, NSpin, NTag, NEmpty, NInput, NCheckbox } from 'naive-ui'
 import { BaseAPI } from '~/utils/api'
 import type { OcrMode, OcrStatus, OcrSubmitRes, OcrResultRes, OcrTask } from '~/types/ocr'
 
@@ -21,6 +21,8 @@ const polling = ref(false)
 const task = ref<OcrTask | null>(null)
 const errorMsg = ref<string>('')
 const copied = ref(false)
+const filterText = ref<string>('')
+const showBbox = ref<boolean>(true)
 
 let pollTimer: ReturnType<typeof setTimeout> | null = null
 let pollCount = 0
@@ -53,6 +55,30 @@ const statusType = computed<Record<OcrStatus, 'default' | 'info' | 'success' | '
 }))
 
 const isWorking = computed(() => submitting.value || polling.value)
+
+const filteredDetailResults = computed(() => {
+  const list = task.value?.results ?? []
+  const q = filterText.value.trim().toLowerCase()
+  if (!q) return list
+  return list.filter(r => r.text?.toLowerCase().includes(q))
+})
+
+const filteredTextList = computed(() => {
+  const list = task.value?.textList ?? []
+  const q = filterText.value.trim().toLowerCase()
+  if (!q) return list
+  return list.filter(t => t?.toLowerCase().includes(q))
+})
+
+const filteredFullText = computed(() => {
+  const text = task.value?.fullText ?? ''
+  const q = filterText.value.trim()
+  if (!q) return text
+  return text
+    .split(/\r?\n/)
+    .filter(line => line.toLowerCase().includes(q.toLowerCase()))
+    .join('\n')
+})
 
 function pickFile() {
   fileInputRef.value?.click()
@@ -102,6 +128,7 @@ function resetTask() {
   task.value = null
   errorMsg.value = ''
   copied.value = false
+  filterText.value = ''
 }
 
 function stopPolling() {
@@ -306,7 +333,26 @@ onUnmounted(() => {
           <span v-if="task.elapseSeconds != null" class="result-meta">
             耗时 {{ task.elapseSeconds.toFixed(2) }}s
           </span>
+          <n-checkbox
+            v-if="task.status === 'SUCCESS' && task.mode === 'detail'"
+            v-model:checked="showBbox"
+            class="result-toggle"
+          >
+            显示位置
+          </n-checkbox>
           <span v-if="task.pages != null" class="result-meta">页数 {{ task.pages }}</span>
+          <n-input
+            v-if="task.status === 'SUCCESS'"
+            v-model:value="filterText"
+            class="result-filter"
+            size="small"
+            placeholder="输入文本过滤"
+            clearable
+          >
+            <template #prefix>
+              <i class="ri-search-line"></i>
+            </template>
+          </n-input>
         </div>
 
         <!-- 进行中 -->
@@ -324,22 +370,23 @@ onUnmounted(() => {
         <!-- 成功 - detail -->
         <div v-else-if="task.status === 'SUCCESS' && task.mode === 'detail'" class="result-detail">
           <n-empty v-if="!task.results?.length" description="未识别到文字" />
+          <n-empty v-else-if="!filteredDetailResults.length" description="无匹配结果" />
           <table v-else class="result-table">
             <thead>
               <tr>
                 <th class="col-idx">#</th>
                 <th>文本</th>
                 <th class="col-conf">置信度</th>
-                <th class="col-bbox">位置 (x, y, w × h)</th>
+                <th v-if="showBbox" class="col-bbox">位置 (x, y, w × h)</th>
                 <th v-if="task.pages" class="col-page">页码</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, idx) in task.results" :key="idx">
+              <tr v-for="(item, idx) in filteredDetailResults" :key="idx">
                 <td class="col-idx">{{ idx + 1 }}</td>
                 <td class="col-text">{{ item.text }}</td>
                 <td class="col-conf">{{ formatConfidence(item.confidence) }}</td>
-                <td class="col-bbox">{{ formatBbox(item.bbox) }}</td>
+                <td v-if="showBbox" class="col-bbox">{{ formatBbox(item.bbox) }}</td>
                 <td v-if="task.pages" class="col-page">{{ item.page ?? '-' }}</td>
               </tr>
             </tbody>
@@ -349,20 +396,22 @@ onUnmounted(() => {
         <!-- 成功 - list -->
         <div v-else-if="task.status === 'SUCCESS' && task.mode === 'list'" class="result-list">
           <n-empty v-if="!task.textList?.length" description="未识别到文字" />
+          <n-empty v-else-if="!filteredTextList.length" description="无匹配结果" />
           <ol v-else>
-            <li v-for="(t, idx) in task.textList" :key="idx">{{ t }}</li>
+            <li v-for="(t, idx) in filteredTextList" :key="idx">{{ t }}</li>
           </ol>
         </div>
 
         <!-- 成功 - text -->
         <div v-else-if="task.status === 'SUCCESS' && task.mode === 'text'" class="result-text">
           <div class="result-text__toolbar">
-            <button class="copy-btn" @click="copyText(task.fullText || '')" :disabled="!task.fullText">
+            <button class="copy-btn" @click="copyText(filteredFullText)" :disabled="!filteredFullText">
               <i :class="copied ? 'ri-check-line' : 'ri-file-copy-line'"></i>
               {{ copied ? '已复制' : '复制' }}
             </button>
           </div>
-          <pre v-if="task.fullText">{{ task.fullText }}</pre>
+          <pre v-if="filteredFullText">{{ filteredFullText }}</pre>
+          <n-empty v-else-if="task.fullText" description="无匹配结果" />
           <n-empty v-else description="未识别到文字" />
         </div>
       </section>
@@ -643,6 +692,20 @@ onUnmounted(() => {
   word-break: break-all;
 }
 
+.result-filter {
+  width: 220px;
+  flex-shrink: 0;
+  order: 11;
+}
+
+.result-toggle {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--text-main);
+  order: 10;
+  margin-left: auto;
+}
+
 .result-pending {
   display: flex;
   align-items: center;
@@ -839,6 +902,16 @@ onUnmounted(() => {
     th, td {
       padding: 8px 10px;
     }
+  }
+
+  .result-toggle {
+    order: 0;
+  }
+
+  .result-filter {
+    order: 0;
+    width: 100%;
+    flex-basis: 100%;
   }
 }
 </style>
