@@ -696,6 +696,7 @@ onUnmounted(() => {
   width: 220px;
   flex-shrink: 0;
   order: 11;
+  margin-left: auto;
 }
 
 .result-toggle {
@@ -704,6 +705,10 @@ onUnmounted(() => {
   color: var(--text-main);
   order: 10;
   margin-left: auto;
+}
+
+.result-toggle ~ .result-filter {
+  margin-left: 0;
 }
 
 .result-pending {

@@ -6,6 +6,11 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: ['@pinia/nuxt', '@bg-dev/nuxt-naiveui', '@nuxtjs/color-mode'],
+  runtimeConfig: {
+    public: {
+      enableMock: process.env.NUXT_PUBLIC_ENABLE_MOCK === 'true'
+    }
+  },
   vite: {
     plugins: [tsconfigPaths()],
   },

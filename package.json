@@ -30,9 +30,15 @@
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^24.5.2",
     "@types/prismjs": "^1.26.5",
+    "msw": "^2.14.2",
     "sass-embedded": "^1.92.1",
     "typescript": "^5.9.2",
     "vite-tsconfig-paths": "^5.1.4",
     "vue-tsc": "^3.0.8"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
