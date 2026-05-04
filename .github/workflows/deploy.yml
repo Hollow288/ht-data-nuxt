@@ -19,6 +19,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Inject private links
+        env:
+          LINKS_JSON: ${{ secrets.LINKS_JSON }}
+        run: |
+          mkdir -p app/data
+          printf 'export default %s\n' "$LINKS_JSON" > app/data/links.local.ts
+
       - name: Build Docker image
         run: |
           docker build \

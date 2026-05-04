@@ -1,21 +1,39 @@
 <template>
   <div class="container">
     <aside class="sidebar">
-      <div class="avatar-wrap">
-        <img src="https://avatars.githubusercontent.com/u/87030922?v=4" alt="头像" class="avatar"/>
+      <div class="profile-card">
+        <div class="avatar-wrap">
+          <img src="https://avatars.githubusercontent.com/u/87030922?v=4" alt="头像" class="avatar"/>
+        </div>
+
+        <div class="info-card">
+          <span class="username with-line">Hollow</span>
+          <span class="briefly">我本微末凡尘，但也心向天空</span>
+<!--          <div class="icons">-->
+<!--            <div class="icon-button">-->
+<!--              <i class="ri-github-fill"></i>-->
+<!--            </div>-->
+<!--            <div class="icon-button">-->
+<!--              <i class="ri-bilibili-fill"></i>-->
+<!--            </div>-->
+<!--          </div>-->
+        </div>
       </div>
 
-      <div class="info-card">
-        <span class="username with-line">Hollow</span>
-        <span class="briefly">我本微末凡尘，但也心向天空</span>
-        <div class="icons">
-          <div class="icon-button">
-            <i class="ri-github-fill"></i>
-          </div>
-          <div class="icon-button">
-            <i class="ri-bilibili-fill"></i>
-          </div>
-        </div>
+      <div class="links-card">
+        <span class="links-title">外链</span>
+        <ul class="link-list">
+          <li v-for="link in links" :key="link.name" class="link-item">
+            <a :href="link.url" target="_blank" rel="noopener noreferrer" class="link-anchor">
+              <i :class="link.icon" class="link-icon"></i>
+              <div class="link-info">
+                <span class="link-name">{{ link.name }}</span>
+                <span class="link-desc">{{ link.desc }}</span>
+              </div>
+              <i class="ri-arrow-right-s-line link-arrow"></i>
+            </a>
+          </li>
+        </ul>
       </div>
     </aside>
 
@@ -62,6 +80,7 @@
 
 <script setup lang="ts">
 import {NSkeleton} from "naive-ui";
+import { links } from '~/data/links'
 
 const imgSrc = 'https://ghchart.rshah.org/Hollow288'
 const imgLoaded = ref(false)
@@ -69,7 +88,6 @@ const imgLoaded = ref(false)
 function onLoad() {
   imgLoaded.value = true
 }
-
 
 </script>
 
@@ -89,16 +107,19 @@ function onLoad() {
   flex-direction: column;
   flex-shrink: 0;
   margin-right: 25px;
-  border-radius: 10px;
   padding: 0;
   box-sizing: border-box;
-  background: var(--bg-card);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  overflow: auto;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow-y: auto;
   position: sticky;
   top: 104px;
   max-height: calc(100vh - 124px);
+}
+
+.profile-card {
+  background: var(--bg-card);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .username.with-line::after {
@@ -208,6 +229,104 @@ function onLoad() {
 
 .icon-button:hover i {
   color: #9eb4ed;
+}
+
+.links-card {
+  background: var(--bg-card);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 18px 16px;
+  margin-top: 25px;
+}
+
+.links-title {
+  font-weight: bold;
+  position: relative;
+  padding-left: 12px;
+  display: block;
+  margin-bottom: 14px;
+}
+
+.links-title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #9eb4ed;
+  border-radius: 2px;
+}
+
+.link-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.link-anchor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  color: var(--text-main);
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.link-anchor:hover {
+  background-color: rgba(158, 180, 237, 0.12);
+  transform: translateX(3px);
+}
+
+.link-icon {
+  font-size: 22px;
+  color: #9eb4ed;
+  flex-shrink: 0;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.link-anchor:hover .link-icon {
+  color: #e19eba;
+  transform: scale(1.1);
+}
+
+.link-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.link-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.link-desc {
+  font-size: 11px;
+  color: var(--summary-50);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.link-arrow {
+  font-size: 16px;
+  color: var(--summary-50);
+  transition: transform 0.3s ease, color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.link-anchor:hover .link-arrow {
+  transform: translateX(4px);
+  color: #e19eba;
 }
 
 .right-card {
