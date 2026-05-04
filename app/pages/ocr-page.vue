@@ -70,15 +70,6 @@ const filteredTextList = computed(() => {
   return list.filter(t => t?.toLowerCase().includes(q))
 })
 
-const filteredFullText = computed(() => {
-  const text = task.value?.fullText ?? ''
-  const q = filterText.value.trim()
-  if (!q) return text
-  return text
-    .split(/\r?\n/)
-    .filter(line => line.toLowerCase().includes(q.toLowerCase()))
-    .join('\n')
-})
 
 function pickFile() {
   fileInputRef.value?.click()
@@ -342,7 +333,7 @@ onUnmounted(() => {
           </n-checkbox>
           <span v-if="task.pages != null" class="result-meta">页数 {{ task.pages }}</span>
           <n-input
-            v-if="task.status === 'SUCCESS'"
+            v-if="task.status === 'SUCCESS' && task.mode !== 'text'"
             v-model:value="filterText"
             class="result-filter"
             size="small"
@@ -397,21 +388,31 @@ onUnmounted(() => {
         <div v-else-if="task.status === 'SUCCESS' && task.mode === 'list'" class="result-list">
           <n-empty v-if="!task.textList?.length" description="未识别到文字" />
           <n-empty v-else-if="!filteredTextList.length" description="无匹配结果" />
-          <ol v-else>
-            <li v-for="(t, idx) in filteredTextList" :key="idx">{{ t }}</li>
-          </ol>
+          <table v-else class="result-table result-table--list">
+            <thead>
+              <tr>
+                <th class="col-idx">#</th>
+                <th>文本</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(t, idx) in filteredTextList" :key="idx">
+                <td class="col-idx">{{ idx + 1 }}</td>
+                <td class="col-text">{{ t }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <!-- 成功 - text -->
         <div v-else-if="task.status === 'SUCCESS' && task.mode === 'text'" class="result-text">
           <div class="result-text__toolbar">
-            <button class="copy-btn" @click="copyText(filteredFullText)" :disabled="!filteredFullText">
+            <button class="copy-btn" @click="copyText(task.fullText ?? '')" :disabled="!task.fullText">
               <i :class="copied ? 'ri-check-line' : 'ri-file-copy-line'"></i>
               {{ copied ? '已复制' : '复制' }}
             </button>
           </div>
-          <pre v-if="filteredFullText">{{ filteredFullText }}</pre>
-          <n-empty v-else-if="task.fullText" description="无匹配结果" />
+          <pre v-if="task.fullText">{{ task.fullText }}</pre>
           <n-empty v-else description="未识别到文字" />
         </div>
       </section>
@@ -804,19 +805,12 @@ onUnmounted(() => {
 .result-list {
   background: var(--markdown-body-table-tr-2);
   border-radius: 10px;
-  padding: 16px 20px;
+  overflow-x: auto;
+  padding: 4px;
+}
 
-  ol {
-    margin: 0;
-    padding-left: 22px;
-    color: var(--text-main);
-    font-size: 13px;
-    line-height: 1.8;
-
-    li {
-      word-break: break-word;
-    }
-  }
+.result-table--list .col-idx {
+  user-select: none;
 }
 
 .result-text {
