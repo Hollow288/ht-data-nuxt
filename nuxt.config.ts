@@ -17,6 +17,11 @@ export default defineNuxtConfig({
     }
   },
   security: {
+    sri: false,
+    ssg: {
+      hashScripts: false,
+      hashStyles: false
+    },
     headers: {
       strictTransportSecurity: {
         maxAge: 63072000,
