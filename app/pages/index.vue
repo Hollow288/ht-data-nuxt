@@ -109,10 +109,6 @@ function onLoad() {
   margin-right: 25px;
   padding: 0;
   box-sizing: border-box;
-  overflow-y: auto;
-  position: sticky;
-  top: 104px;
-  max-height: calc(100vh - 124px);
 }
 
 .profile-card {
@@ -120,6 +116,7 @@ function onLoad() {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   border-radius: 10px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .username.with-line::after {
@@ -237,6 +234,7 @@ function onLoad() {
   border-radius: 10px;
   padding: 18px 16px;
   margin-top: 25px;
+  flex-shrink: 0;
 }
 
 .links-title {
