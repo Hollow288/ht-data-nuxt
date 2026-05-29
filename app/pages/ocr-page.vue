@@ -270,7 +270,7 @@ onUnmounted(() => {
           <template v-else>
             <div class="file-card">
               <div class="file-card__preview">
-                <img v-if="isImageFile && previewUrl" :src="previewUrl" alt="preview" />
+                <ImageThumb v-if="isImageFile && previewUrl" :src="previewUrl" />
                 <i v-else class="ri-file-pdf-2-line"></i>
               </div>
               <div class="file-card__info">
@@ -561,12 +561,6 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
 
     i {
       font-size: 32px;
