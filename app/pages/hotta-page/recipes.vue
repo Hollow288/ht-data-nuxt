@@ -11,7 +11,7 @@ const searchText = ref<string>('')
 const thisShowKey = ref<string | undefined>()
 const popoverVisible = ref(false)
 const popoverVisibleMobile = ref(false) // 新增：移动端筛选弹窗状态
-const loading = ref(false)
+const loading = ref(true)
 const items = ref<RecipesListDto[]>([])
 const allItems = ref<RecipesListDto[]>([])
 const thisRecipesInfo = ref<Recipes>()
@@ -64,6 +64,10 @@ const showThisRecipesInfo = async (recipesKey: string) => {
 
 const initializePage = async () => {
   await queryRecipesList()
+  if (allItems.value.length === 0) {
+    loading.value = false
+    return
+  }
   if (allItems.value.length > 0) {
     thisShowKey.value = allItems.value[0]?.recipesKey
   }
@@ -82,6 +86,7 @@ onMounted(async () => {
   await initializePage();
 });
 
+onUnmounted(() => { document.body.style.overflow = '' })
 </script>
 
 <template>
@@ -90,6 +95,7 @@ onMounted(async () => {
     <!-- 1. 主要内容区域 -->
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
+      <div v-else-if="!allItems.length" class="empty-state"><i class="ri-compass-3-line" aria-hidden="true" /><p>这个分类暂时没有资料。</p></div>
       <div v-else class="gallery-container__content">
         <!-- 顶部展示区：图标 + 名称 + 类别 + 描述 -->
         <div class="recipes-hero">
@@ -129,8 +135,8 @@ onMounted(async () => {
     <aside class="sidebar sidebar--right pc-sidebar">
       <div class="search-panel">
         <header class="search-panel__header">
-          <h4 class="search-panel__title">Search</h4>
-          <small class="search-panel__subtitle">Search by name and/or type</small>
+          <h4 class="search-panel__title">查找资料</h4>
+          <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
           <div class="search-panel__input-wrapper">
             <n-popover
                 trigger="click"
@@ -143,13 +149,13 @@ onMounted(async () => {
                 <i class="ri-filter-3-line" :class="{ 'active': popoverVisible }"></i>
               </template>
               <template #header>
-                <n-text style="color:var(--text-main)" strong depth="1">Type filter</n-text>
+                <n-text style="color:var(--text-main)" strong depth="1">类型筛选</n-text>
               </template>
               <div class="filter-group">
                 <p style="color:var(--text-main)">类别:</p>
                 <div class="button-group">
                   <div v-for="item in categoriesList" :key="item">
-                    <NButton color="#9E8BA8" :dashed="recipesCategories!==item" size="tiny"
+                    <NButton color="var(--accent)" :dashed="recipesCategories!==item" size="tiny"
                              @click="changeRecipesCategories(item)">{{ item }}
                     </NButton>
                   </div>
@@ -157,14 +163,15 @@ onMounted(async () => {
               </div>
             </n-popover>
             <input type="text" name="filter" id="filter" v-model="searchText" @input="onInputRecipesSearch()"
-                   placeholder="Search"/>
+                   placeholder="输入名称…" aria-label="按名称搜索资料"/>
           </div>
         </header>
         <div class="search-panel__content">
+          <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
           <n-virtual-list style="height: 100%" :item-size="50" :items="items">
             <template #default="{ item }">
               <div :key="item.recipesKey" class="result-item" :class="{'active': thisShowKey === item.recipesKey}"
-                   @click="showThisRecipesInfo(item.recipesKey)">
+                   role="button" tabindex="0" @keydown.enter="showThisRecipesInfo(item.recipesKey)" @click="showThisRecipesInfo(item.recipesKey)">
                 <img :key="item.recipesKey" decoding="async" class="result-item__avatar"
                      :src="item.recipesIcon" alt="">
                 <div class="result-item__details">
@@ -192,12 +199,13 @@ onMounted(async () => {
 
       <!-- 抽屉面板 -->
       <Transition name="slide">
-        <div v-if="showDrawer" class="custom-drawer-panel">
+        <div v-if="showDrawer" class="custom-drawer-panel hotta-drawer" role="dialog" aria-modal="true" aria-label="搜索幻塔资料" @keydown.esc="showDrawer = false">
           <div class="drawer-layout">
+            <button class="drawer-close" aria-label="关闭资料搜索" @click="showDrawer = false"><i class="ri-close-line" /></button>
             <!-- 抽屉头部 -->
             <header class="search-panel__header drawer-header">
-              <h4 class="search-panel__title">Search</h4>
-              <small class="search-panel__subtitle">Search by name and/or type</small>
+              <h4 class="search-panel__title">查找资料</h4>
+              <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
               <div class="search-panel__input-wrapper">
                 <n-popover
                     trigger="click"
@@ -210,32 +218,33 @@ onMounted(async () => {
                     <i class="ri-filter-3-line" :class="{ active: popoverVisibleMobile }"></i>
                   </template>
                   <template #header>
-                    <n-text style="color:var(--text-main)" strong depth="1">Type filter</n-text>
+                    <n-text style="color:var(--text-main)" strong depth="1">类型筛选</n-text>
                   </template>
                   <div class="filter-group">
                     <p style="color:var(--text-main)">类别:</p>
                     <div class="button-group">
                       <div v-for="item in categoriesList" :key="item">
-                        <NButton color="#9E8BA8" :dashed="recipesCategories!==item" size="tiny"
+                        <NButton color="var(--accent)" :dashed="recipesCategories!==item" size="tiny"
                                  @click="changeRecipesCategories(item)">{{ item }}
                         </NButton>
                       </div>
                     </div>
                   </div>
                 </n-popover>
-                <input type="text" v-model="searchText" @input="onInputRecipesSearch" placeholder="Search"/>
+                <input type="text" v-model="searchText" @input="onInputRecipesSearch" placeholder="输入名称…" aria-label="按名称搜索资料"/>
               </div>
             </header>
 
             <!-- 抽屉列表 -->
             <div class="drawer-body">
+              <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
               <n-virtual-list style="height: 100%;" :item-size="50" :items="items">
                 <template #default="{ item }">
                   <div
                       :key="item.recipesKey"
                       class="result-item"
                       :class="{ active: thisShowKey === item.recipesKey }"
-                      @click="showThisRecipesInfo(item.recipesKey)"
+                      role="button" tabindex="0" @keydown.enter="showThisRecipesInfo(item.recipesKey)" @click="showThisRecipesInfo(item.recipesKey)"
                   >
                     <img :key="item.recipesKey" decoding="async" class="result-item__avatar" :src="item.recipesIcon" alt=""/>
                     <div class="result-item__details">

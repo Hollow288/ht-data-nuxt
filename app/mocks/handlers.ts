@@ -1,7 +1,7 @@
 import { http, HttpResponse, delay } from 'msw'
 import type { OcrTask } from '~/types/ocr'
 
-const API_BASE = 'http://127.0.0.1:5777/api/v1'
+const API_BASE = '/hotta-api'
 
 const taskStore = new Map<string, { task: OcrTask; pollCount: number }>()
 

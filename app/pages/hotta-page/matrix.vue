@@ -13,7 +13,7 @@ const searchText = ref<string>('')
 const thisShowKey = ref<string | undefined>()
 const popoverVisible = ref(false)
 const popoverVisibleMobile = ref(false)
-const loading = ref(false)
+const loading = ref(true)
 const items = ref<MatrixListDto[]>([])
 const allItems = ref<MatrixListDto[]>([])
 const thisMatrixInfo = ref<Matrix>()
@@ -73,6 +73,10 @@ const showThisMatrixInfo = async (matrixKey: string) => {
 
 const initializePage = async () => {
   await queryMatrixList()
+  if (allItems.value.length === 0) {
+    loading.value = false
+    return
+  }
   if (allItems.value.length > 0) {
     thisShowKey.value = allItems.value[0]?.matrixKey
   }
@@ -119,6 +123,7 @@ onMounted(async () => {
   await initializePage();
 });
 
+onUnmounted(() => { document.body.style.overflow = '' })
 </script>
 
 <template>
@@ -127,6 +132,7 @@ onMounted(async () => {
     <!-- 1. 主要内容区域 -->
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
+      <div v-else-if="!allItems.length" class="empty-state"><i class="ri-compass-3-line" aria-hidden="true" /><p>这个分类暂时没有资料。</p></div>
       <div v-else class="gallery-container__content">
         <div class="gallery-container__left">
           <img width="150" :src="thisMatrixInfo?.matrixIcon" :alt="thisMatrixInfo?.matrixName" class="gallery-card__image" loading="lazy"/>
@@ -190,8 +196,8 @@ onMounted(async () => {
     <aside class="sidebar sidebar--right pc-sidebar">
       <div class="search-panel">
         <header class="search-panel__header">
-          <h4 class="search-panel__title">Search</h4>
-          <small class="search-panel__subtitle">Search by name and/or type</small>
+          <h4 class="search-panel__title">查找资料</h4>
+          <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
           <div class="search-panel__input-wrapper">
             <n-popover
                 trigger="click"
@@ -204,34 +210,35 @@ onMounted(async () => {
                 <i class="ri-filter-3-line" :class="{ 'active': popoverVisible }"></i>
               </template>
               <template #header>
-                <n-text style="color:var(--text-main)" strong depth="1">Type filter</n-text>
+                <n-text style="color:var(--text-main)" strong depth="1">类型筛选</n-text>
               </template>
               <div class="filter-group">
                 <p style="color:var(--text-main)">Rarity:</p>
                 <div class="button-group">
-                  <NButton color="#9E8BA8" :dashed="matrixQuality!=='SSR'" size="tiny"
+                  <NButton color="var(--accent)" :dashed="matrixQuality!=='SSR'" size="tiny"
                            @click="changeMatrixRarity('SSR')">SSR
                   </NButton>
-                  <NButton color="#9E8BA8" :dashed="matrixQuality!=='SR'" size="tiny"
+                  <NButton color="var(--accent)" :dashed="matrixQuality!=='SR'" size="tiny"
                            @click="changeMatrixRarity('SR')">SR
                   </NButton>
-                  <NButton color="#9E8BA8" :dashed="matrixQuality!=='R'" size="tiny"
+                  <NButton color="var(--accent)" :dashed="matrixQuality!=='R'" size="tiny"
                            @click="changeMatrixRarity('R')">R
                   </NButton>
-                  <NButton color="#9E8BA8" :dashed="matrixQuality!=='N'" size="tiny"
+                  <NButton color="var(--accent)" :dashed="matrixQuality!=='N'" size="tiny"
                            @click="changeMatrixRarity('N')">N
                   </NButton>
                 </div>
               </div>
             </n-popover>
-            <input type="text" v-model="searchText" @input="onInputMatrixSearch()" placeholder="Search"/>
+            <input type="text" v-model="searchText" @input="onInputMatrixSearch()" placeholder="输入名称…" aria-label="按名称搜索资料"/>
           </div>
         </header>
         <div class="search-panel__content">
+          <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
           <n-virtual-list style="height: 100%" :item-size="50" :items="items">
             <template #default="{ item }">
               <div :key="item.matrixKey" class="result-item" :class="{'active': thisShowKey === item.matrixKey}"
-                   @click="showThisMatrixInfo(item.matrixKey)">
+                   role="button" tabindex="0" @keydown.enter="showThisMatrixInfo(item.matrixKey)" @click="showThisMatrixInfo(item.matrixKey)">
                 <img :key="item.matrixKey" decoding="async" class="result-item__avatar" :src="item.matrixThumbnail" alt="">
                 <div class="result-item__details">
                   <span class="result-item__title">{{ item.matrixName }}</span>
@@ -263,14 +270,15 @@ onMounted(async () => {
 
       <!-- 抽屉面板 -->
       <Transition name="slide">
-        <div v-if="showDrawer" class="custom-drawer-panel">
+        <div v-if="showDrawer" class="custom-drawer-panel hotta-drawer" role="dialog" aria-modal="true" aria-label="搜索幻塔资料" @keydown.esc="showDrawer = false">
           <!-- 核心布局容器 -->
           <div class="drawer-layout">
+            <button class="drawer-close" aria-label="关闭资料搜索" @click="showDrawer = false"><i class="ri-close-line" /></button>
 
             <!-- 固定头部 -->
             <header class="search-panel__header drawer-header">
-              <h4 class="search-panel__title">Search</h4>
-              <small class="search-panel__subtitle">Search by name and/or type</small>
+              <h4 class="search-panel__title">查找资料</h4>
+              <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
               <div class="search-panel__input-wrapper">
                 <n-popover
                     trigger="click"
@@ -283,32 +291,33 @@ onMounted(async () => {
                     <i class="ri-filter-3-line" :class="{ active: popoverVisibleMobile }"></i>
                   </template>
                   <template #header>
-                    <n-text style="color:var(--text-main)" strong depth="1">Type filter</n-text>
+                    <n-text style="color:var(--text-main)" strong depth="1">类型筛选</n-text>
                   </template>
                   <div class="filter-group">
                     <p  style="color:var(--text-main)">Rarity:</p>
                     <div class="button-group">
-                      <NButton color="#9E8BA8" :dashed="matrixQuality!=='SSR'" size="tiny"
+                      <NButton color="var(--accent)" :dashed="matrixQuality!=='SSR'" size="tiny"
                                @click="changeMatrixRarity('SSR')">SSR
                       </NButton>
-                      <NButton color="#9E8BA8" :dashed="matrixQuality!=='SR'" size="tiny"
+                      <NButton color="var(--accent)" :dashed="matrixQuality!=='SR'" size="tiny"
                                @click="changeMatrixRarity('SR')">SR
                       </NButton>
-                      <NButton color="#9E8BA8" :dashed="matrixQuality!=='R'" size="tiny"
+                      <NButton color="var(--accent)" :dashed="matrixQuality!=='R'" size="tiny"
                                @click="changeMatrixRarity('R')">R
                       </NButton>
-                      <NButton color="#9E8BA8" :dashed="matrixQuality!=='N'" size="tiny"
+                      <NButton color="var(--accent)" :dashed="matrixQuality!=='N'" size="tiny"
                                @click="changeMatrixRarity('N')">N
                       </NButton>
                     </div>
                   </div>
                 </n-popover>
-                <input type="text" v-model="searchText" @input="onInputMatrixSearch" placeholder="Search"/>
+                <input type="text" v-model="searchText" @input="onInputMatrixSearch" placeholder="输入名称…" aria-label="按名称搜索资料"/>
               </div>
             </header>
 
             <!-- 滚动列表区域 (Flex: 1) -->
             <div class="drawer-body">
+              <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
               <n-virtual-list
                   style="height: 100%;"
                   :item-size="50"
@@ -319,7 +328,7 @@ onMounted(async () => {
                       :key="item.matrixKey"
                       class="result-item"
                       :class="{ active: thisShowKey === item.matrixKey }"
-                      @click="showThisMatrixInfo(item.matrixKey)"
+                      role="button" tabindex="0" @keydown.enter="showThisMatrixInfo(item.matrixKey)" @click="showThisMatrixInfo(item.matrixKey)"
                   >
                     <img :key="item.matrixKey" decoding="async" class="result-item__avatar" :src="item.matrixThumbnail" alt=""/>
                     <div class="result-item__details">

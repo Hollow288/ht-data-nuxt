@@ -9,7 +9,7 @@ import {replaceTagWithColor} from "~/utils/common";
 
 const searchText = ref<string>('')
 const thisShowKey = ref<string | undefined>()
-const loading = ref(false)
+const loading = ref(true)
 const items = ref<FoodListDto[]>([])
 const allItems = ref<FoodListDto[]>([])
 const thisFoodInfo = ref<Food>()
@@ -60,6 +60,10 @@ const showThisFoodInfo = async (foodKey: string) => {
 
 const initializePage = async () => {
   await queryFoodList()
+  if (allItems.value.length === 0) {
+    loading.value = false
+    return
+  }
   if (allItems.value.length > 0) {
     thisShowKey.value = allItems.value[0]?.foodKey
   }
@@ -78,6 +82,7 @@ onMounted(async () => {
   await initializePage();
 });
 
+onUnmounted(() => { document.body.style.overflow = '' })
 </script>
 
 <template>
@@ -86,6 +91,7 @@ onMounted(async () => {
     <!-- 1. 主要内容区域 -->
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
+      <div v-else-if="!allItems.length" class="empty-state"><i class="ri-compass-3-line" aria-hidden="true" /><p>这个分类暂时没有资料。</p></div>
       <div v-else class="gallery-container__content">
         <!-- 顶部展示区：图标 + 名称 + 描述 -->
         <div class="food-hero">
@@ -114,17 +120,18 @@ onMounted(async () => {
     <aside class="sidebar sidebar--right pc-sidebar">
       <div class="search-panel">
         <header class="search-panel__header">
-          <h4 class="search-panel__title">Search</h4>
-          <small class="search-panel__subtitle">Search by name and/or type</small>
+          <h4 class="search-panel__title">查找资料</h4>
+          <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
           <div class="search-panel__input-wrapper">
-            <input type="text" v-model="searchText" @input="onInputFoodSearch()" placeholder="Search"/>
+            <input type="text" v-model="searchText" @input="onInputFoodSearch()" placeholder="输入名称…" aria-label="按名称搜索资料"/>
           </div>
         </header>
         <div class="search-panel__content">
+          <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
           <n-virtual-list style="height: 100%" :item-size="50" :items="items">
             <template #default="{ item }">
               <div :key="item.foodKey" class="result-item" :class="{'active': thisShowKey === item.foodKey}"
-                   @click="showThisFoodInfo(item.foodKey)">
+                   role="button" tabindex="0" @keydown.enter="showThisFoodInfo(item.foodKey)" @click="showThisFoodInfo(item.foodKey)">
                 <img :key="item.foodKey" decoding="async" class="result-item__avatar" :src="item.foodIcon" alt="">
                 <div class="result-item__details">
                   <span class="result-item__title">{{ item.foodName }}</span>
@@ -151,26 +158,28 @@ onMounted(async () => {
 
       <!-- 抽屉面板 -->
       <Transition name="slide">
-        <div v-if="showDrawer" class="custom-drawer-panel">
+        <div v-if="showDrawer" class="custom-drawer-panel hotta-drawer" role="dialog" aria-modal="true" aria-label="搜索幻塔资料" @keydown.esc="showDrawer = false">
           <div class="drawer-layout">
+            <button class="drawer-close" aria-label="关闭资料搜索" @click="showDrawer = false"><i class="ri-close-line" /></button>
             <!-- 抽屉头部 -->
             <header class="search-panel__header drawer-header">
-              <h4 class="search-panel__title">Search</h4>
-              <small class="search-panel__subtitle">Search by name and/or type</small>
+              <h4 class="search-panel__title">查找资料</h4>
+              <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
               <div class="search-panel__input-wrapper">
-                <input type="text" v-model="searchText" @input="onInputFoodSearch" placeholder="Search"/>
+                <input type="text" v-model="searchText" @input="onInputFoodSearch" placeholder="输入名称…" aria-label="按名称搜索资料"/>
               </div>
             </header>
 
             <!-- 抽屉列表 -->
             <div class="drawer-body">
+              <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
               <n-virtual-list style="height: 100%;" :item-size="50" :items="items">
                 <template #default="{ item }">
                   <div
                       :key="item.foodKey"
                       class="result-item"
                       :class="{ active: thisShowKey === item.foodKey }"
-                      @click="showThisFoodInfo(item.foodKey)"
+                      role="button" tabindex="0" @keydown.enter="showThisFoodInfo(item.foodKey)" @click="showThisFoodInfo(item.foodKey)"
                   >
                     <img :key="item.foodKey" decoding="async" class="result-item__avatar" :src="item.foodIcon" alt=""/>
                     <div class="result-item__details">

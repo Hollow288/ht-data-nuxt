@@ -1,642 +1,118 @@
+<script setup lang="ts">
+import { BaseAPI } from '~/utils/api'
+import type { BlogDateListRes, BlogDateMenuItem, BlogDateMenuRes, BlogItem } from '~/types/blog'
+import type { BaseRes } from '~/types/api'
+useSeoMeta({ title: '文章 · Hollow’s Space', description: '开发记录、学习笔记与生活碎片。让思考有迹可循，让记录慢慢积累。' })
+const route = useRoute()
+const router = useRouter()
+const articles = ref<BlogItem[]>([])
+const dates = ref<BlogDateMenuItem[]>([])
+const tags = ref<string[]>([])
+const loading = ref(true)
+const failed = ref(false)
+const search = ref(typeof route.query.q === 'string' ? route.query.q : '')
+const loadedMonths = ref(0)
+let requestVersion = 0
+const selectedDate = computed(() => typeof route.query.date === 'string' ? route.query.date : '')
+const selectedTag = computed(() => typeof route.query.tag === 'string' ? route.query.tag : '')
+const searchQuery = computed(() => typeof route.query.q === 'string' ? route.query.q.trim() : '')
+const hasFilter = computed(() => !!(selectedDate.value || selectedTag.value || searchQuery.value))
+const totalArticles = computed(() => dates.value.reduce((sum, item) => sum + item.count, 0))
+const groups = computed(() => {
+  const grouped = new Map<string, BlogItem[]>()
+  for (const article of [...articles.value].sort((a, b) => b.createdAt.localeCompare(a.createdAt))) {
+    const year = article.createdAt.slice(0, 4)
+    if (!grouped.has(year)) grouped.set(year, [])
+    grouped.get(year)!.push(article)
+  }
+  return [...grouped].map(([year, posts]) => ({ year, posts }))
+})
+const resultLabel = computed(() => searchQuery.value ? '搜索：“' + searchQuery.value + '”' : selectedTag.value ? '# ' + selectedTag.value : selectedDate.value ? selectedDate.value.replace('-', ' 年 ') + ' 月' : '全部记录')
+
+async function loadArticles(append = false) {
+  const version = ++requestVersion
+  loading.value = true
+  failed.value = false
+  if (!append) { articles.value = []; loadedMonths.value = 0 }
+  try {
+    let url = ''
+    if (searchQuery.value) url = 'blog/search/' + encodeURIComponent(searchQuery.value)
+    else if (selectedTag.value) url = 'blog/blog-tag/' + encodeURIComponent(selectedTag.value)
+    else {
+      const date = selectedDate.value || dates.value[append ? loadedMonths.value : 0]?.yearMonth
+      if (!date) return
+      url = 'blog/blog-date-list/' + encodeURIComponent(date)
+    }
+    const response = await BaseAPI.apiGet<BlogDateListRes>(url)
+    if (version !== requestVersion) return
+    const rows = response.data ?? []
+    articles.value = append ? [...articles.value, ...rows.filter(row => !articles.value.some(existing => existing.blogId === row.blogId))] : rows
+    if (!hasFilter.value) loadedMonths.value += 1
+  } catch { if (version === requestVersion) failed.value = true }
+  finally { if (version === requestVersion) loading.value = false }
+}
+async function initialize() {
+  loading.value = true
+  failed.value = false
+  try {
+    const [menu, tagResponse] = await Promise.all([
+      BaseAPI.apiGet<BlogDateMenuRes>('blog/blog-date-menu'),
+      BaseAPI.apiGet<BaseRes<string[]>>('blog/blog-date-tags').catch(() => ({ data: [] as string[] }))
+    ])
+    dates.value = [...(menu.data ?? [])].sort((a, b) => b.yearMonth.localeCompare(a.yearMonth))
+    tags.value = (tagResponse.data ?? []).filter(Boolean)
+    await loadArticles()
+  } catch { failed.value = true; loading.value = false }
+}
+function filterBy(key?: 'date' | 'tag', value?: string) {
+  search.value = ''
+  router.push({ path: '/blog-page', query: key && value ? { [key]: value } : {} })
+}
+function submitSearch() { router.push({ path: '/blog-page', query: search.value.trim() ? { q: search.value.trim() } : {} }) }
+watch(() => route.query, () => { search.value = searchQuery.value; loadArticles() })
+onMounted(initialize)
+onUnmounted(() => { requestVersion++ })
+</script>
+
 <template>
-  <div class="page-layout">
-    <!-- 左侧栏 -->
-    <aside class="basic-aside">
-      <div style="display: flex;flex-direction: column;height: 100%">
-        <div class="left-sidebar-name">
-        <p class="title">Tags</p>
-        <div style="display: flex;margin-bottom: 5px;flex-wrap: wrap;">
-          <div v-for="item in tagList" style="margin: 3px">
-            <n-tag class="custom-tag" :class="{ active: activeTag === item }" round size="small" :bordered="false" @click="handleTagClick(item)">
-              # {{ item }}
-            </n-tag>
-          </div>
-        </div>
-
-        </div>
-        <div class="left-sidebar">
-          <ul class="menu-wrapper">
-            <li v-for="year in Object.keys(groupedDates).sort((a, b) => Number(b) - Number(a))" :key="year" class="year-group">
-              <div class="year-header" @click="toggleYear(year)">
-                <span>{{ year }}</span>
-                <span class="arrow" :class="{ expanded: expandedYears.includes(year) }"> <svg aria-hidden="true"
-                                                                                              focusable="false"
-                                                                                              data-prefix="fas"
-                                                                                              data-icon="chevron-left"
-                                                                                              role="img"
-                                                                                              xmlns="http://www.w3.org/2000/svg"
-                                                                                              viewBox="0 0 512 512"
-                                                                                              style="width: 8px; height: 8px;"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
-                    d="M169.4 297.4C156.9 309.9 156.9 330.2 169.4 342.7L361.4 534.7C373.9 547.2 394.2 547.2 406.7 534.7C419.2 522.2 419.2 501.9 406.7 489.4L237.3 320L406.6 150.6C419.1 138.1 419.1 117.8 406.6 105.3C394.1 92.8 373.8 92.8 361.3 105.3L169.3 297.3z"/></svg> </span>
-              </div>
-              <ul v-show="expandedYears.includes(year)" class="date-list">
-                <li v-for="item in groupedDates[year]" :key="item.yearMonth"
-                    :class="{ active: activeDate === item.yearMonth }"
-                    @click="selectDate(item.yearMonth)">
-                  {{ item.yearMonth.split('-')[1] }}月 <span class="count">{{ item.count }}</span>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-
-    </aside>
-
-    <!-- 文章区域 -->
-    <div class="card-container" v-if="loading || articles.length === 0">
-      <div v-if="loading" class="loading">
-<!--        {{ loading ? '加载中...' : '该日期没有文章' }}-->
-        <n-skeleton round :style="{ height: '20px', width: '30%', borderRadius : '10px', marginTop : '13px' }"/>
-        <n-skeleton round :style="{ height: '20px', width: '100%', borderRadius : '10px', marginTop : '13px' }"/>
-        <n-skeleton round :style="{ height: '20px', width: '100%', borderRadius : '10px', marginTop : '13px' }"/>
-        <n-skeleton round :style="{ height: '20px', width: '30%', borderRadius : '10px', marginTop : '13px' }"/>
-        <n-skeleton round :style="{ height: '20px', width: '100%', borderRadius : '10px', marginTop : '13px' }"/>
-        <n-skeleton round :style="{ height: '20px', width: '100%', borderRadius : '10px', marginTop : '13px' }"/>
-      </div>
-      <div v-else class="loading">
-        该日期没有文章
-      </div>
+  <div class="journal-page site-width">
+    <header class="page-heading"><span class="eyebrow"><i class="ri-quill-pen-line" aria-hidden="true" /> THE JOURNAL</span><h1 class="page-title">让思考，留下痕迹<span>。</span></h1><p class="page-description">一些开发记录，一些学习笔记，还有生活里值得留住的小事。</p></header>
+    <div class="journal-layout">
+      <aside class="journal-sidebar" aria-label="文章筛选">
+        <form class="journal-search" role="search" @submit.prevent="submitSearch"><input v-model="search" aria-label="搜索文章" placeholder="寻找一段文字…" /><button type="submit" aria-label="搜索文章"><i class="ri-search-line" aria-hidden="true" /></button></form>
+        <button class="all-posts" :class="{ selected: !hasFilter }" @click="filterBy()"><span><i class="ri-list-check-2" aria-hidden="true" /> 全部文章</span><span>{{ totalArticles || '—' }}</span></button>
+        <section v-if="tags.length" class="filter-section"><h2>按标签 <span>TOPICS</span></h2><div class="journal-tags"><button v-for="tag in tags" :key="tag" :class="{ selected: selectedTag === tag }" @click="filterBy('tag', tag)"># {{ tag }}</button></div></section>
+        <section v-if="dates.length" class="filter-section"><h2>时光归档 <span>ARCHIVE</span></h2><div class="archive-list"><button v-for="date in dates" :key="date.yearMonth" :class="{ selected: selectedDate === date.yearMonth }" @click="filterBy('date', date.yearMonth)"><span>{{ date.yearMonth.replace('-', ' / ') }}</span><span>{{ date.count }}</span></button></div></section>
+        <div class="sidebar-note"><i class="ri-seedling-line" aria-hidden="true" /><p>写下来，<br />就不算白白经过。</p></div>
+      </aside>
+      <section class="journal-content" aria-label="文章列表" :aria-busy="loading">
+        <div class="journal-toolbar"><span>{{ resultLabel }}</span><button v-if="hasFilter" class="quiet-button" @click="filterBy()">清除筛选 <i class="ri-close-line" aria-hidden="true" /></button><span v-else>从最近的一页开始 <i class="ri-arrow-down-line" aria-hidden="true" /></span></div>
+        <template v-if="groups.length"><div v-for="group in groups" :key="group.year" class="year-group"><h2 class="year-title">{{ group.year }}<span>年间的片段</span></h2><ArticleList :articles="group.posts" /></div></template>
+        <div v-if="loading" class="journal-loading" role="status" aria-label="正在加载文章"><div v-for="n in 3" :key="n"><span class="skeleton-line" /><span class="skeleton-line" /><span class="skeleton-line" /></div></div>
+        <div v-else-if="failed" class="empty-state" role="status"><i class="ri-cloud-line" aria-hidden="true" /><p>暂时没能取到这些文字。</p><small>请稍后再试，或先逛逛其他地方。</small><button class="secondary-button" @click="dates.length ? loadArticles(articles.length > 0) : initialize()"><i class="ri-refresh-line" aria-hidden="true" />重新加载</button></div>
+        <div v-else-if="!articles.length" class="empty-state"><i class="ri-quill-pen-line" aria-hidden="true" /><p>{{ hasFilter ? '这里还没有找到对应的文字。' : '第一篇记录，正在酝酿。' }}</p><button v-if="hasFilter" class="text-link quiet-button" @click="filterBy()">看看全部文章 <i class="ri-arrow-right-line" aria-hidden="true" /></button></div>
+        <div v-if="!loading && !failed && !hasFilter && loadedMonths < dates.length" class="load-more"><button class="secondary-button" @click="loadArticles(true)">再翻一页，看看更早的记录 <i class="ri-arrow-down-line" aria-hidden="true" /></button></div>
+        <div v-else-if="!loading && !failed && articles.length" class="journal-end"><span />{{ hasFilter ? '这次找到的文字，都在这里了' : '已经翻到最早的一页了' }}<span /></div>
+      </section>
     </div>
-    <div v-else class="cards-grid">
-      <div v-for="article in articles" :key="article.blogId" class="card-item">
-        <div style="display: flex; justify-content: space-between; align-items: stretch;">
-          <div style="flex: 1;">
-            <p class="title">{{ article.title }}</p>
-            <div class="date"><i class="ri-calendar-2-line" ></i>{{ formatDate(article.createdAt) }}</div>
-            <p class="summary">{{ article.summary }}</p>
-
-            <div style="display: flex;margin-bottom: 5px">
-            <div v-for="item in (article.tags == null || article.tags == '') ? []: article.tags.split(',')" style="margin-right: 10px">
-              <n-tag round :bordered="false" size="small" type="warning">
-                # {{ item }}
-              </n-tag>
-            </div>
-            </div>
-
-          </div>
-
-
-          <div style="width: 40px; margin: 5px;">
-            <button class="right-btn" @click="toMarkdownPage(article.blogId)">
-              <i class="ri-arrow-right-line"></i>
-            </button>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
   </div>
 </template>
 
-<script setup lang="ts">
-// ===================== 路由相关 =====================
-
-import type {BlogDateListRes, BlogDateMenuItem, BlogDateMenuRes, BlogItem} from "~/types/blog";
-import {BaseAPI} from "~/utils/api";
-import {NSkeleton} from "naive-ui";
-import type {BaseRes} from "~/types/api";
-
-const route = useRoute()
-const router = useRouter()
-const date = computed(() => route.query.date as string || '')
-
-// ===================== 数据状态 =====================
-const articles = ref<BlogItem[]>([])
-const dateList = ref<BlogDateMenuItem[]>([])
-const tagList = ref<string[]>([])
-const groupedDates = ref<Record<string, BlogDateMenuItem[]>>({})
-const loading = ref(false)
-
-const activeDate = ref('')
-const activeTag = ref('')
-const expandedYears = ref<string[]>([])
-
-// ===================== 工具函数 =====================
-const formatDate = (d: string) => {
-  const dt = new Date(d)
-  const yyyy = dt.getFullYear()
-  const mm = String(dt.getMonth() + 1).padStart(2, '0')
-  const dd = String(dt.getDate()).padStart(2, '0')
-  return `${yyyy}-${mm}-${dd}`
-}
-
-// ===================== 点击日期加载文章 =====================
-const selectDate = async (selectedDate: string) => {
-  activeDate.value = selectedDate
-  activeTag.value = ''
-  loading.value = true
-  try {
-    const res: BlogDateListRes = await BaseAPI.apiGet(`blog/blog-date-list/${selectedDate}`)
-    articles.value = res.data
-  } catch (error) {
-    console.error('获取文章列表失败', error)
-  } finally {
-    loading.value = false
-  }
-}
-
-// ===================== 点击标签加载文章 =====================
-const handleTagClick = async (tagName: string) => {
-  console.log('点击了标签:', tagName)
-  activeDate.value = ''
-  activeTag.value = tagName
-  // 这里可以写跳转逻辑，例如：
-  // router.push({ path: '/tags', query: { tag: tagName } })
-  const res: BlogDateListRes = await BaseAPI.apiGet(`blog/blog-tag/${tagName}`)
-  articles.value = res.data
-}
-
-// ===================== 数据请求 =====================
-const fetchArticles = async () => {
-  loading.value = true
-  try {
-    const resDate: BlogDateMenuRes = await BaseAPI.apiGet('blog/blog-date-menu')
-    const resTags: BaseRes<string[]> = await BaseAPI.apiGet('blog/blog-date-tags')
-
-    dateList.value = resDate.data
-    tagList.value = resTags.data
-
-    // 按年份分组
-    const grouped: Record<string, BlogDateMenuItem[]> = {}
-    dateList.value.forEach(item => {
-      const year = item.yearMonth.split('-')[0] ?? '其他'
-      if (!grouped[year]) grouped[year] = []
-      grouped[year].push(item)
-    })
-    groupedDates.value = grouped
-
-    // 自动选中第一个分组的第一个日期
-    const years =  Object.keys(grouped).sort((a, b) => Number(b) - Number(a))
-    if (years.length > 0) {
-      const firstYear = years[0] as string
-      const firstGroup = grouped[firstYear]
-      if (firstGroup && firstGroup.length > 0) {
-        const firstDate = firstGroup[0]!.yearMonth  // 非空断言
-        expandedYears.value.push(firstYear)
-        await selectDate(firstDate)
-      }
-    }
-
-  } catch (error) {
-    console.error('获取日期数据失败', error)
-  } finally {
-    loading.value = false
-  }
-}
-
-
-// ===================== 年份折叠 =====================
-const toggleYear = (year: string) => {
-  if (expandedYears.value.includes(year)) {
-    expandedYears.value = expandedYears.value.filter(y => y !== year)
-  } else {
-    expandedYears.value.push(year)
-  }
-}
-
-// ===================== 跳转文章 =====================
-const toMarkdownPage = (articleId: number) => {
-  router.push({path: '/markdown-page', query: {articleId}})
-}
-
-// ===================== 生命周期 =====================
-onMounted(fetchArticles)
-watch(date, fetchArticles)
-</script>
-
-<style scoped lang="scss">
-
-
-.page-layout {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 20px;
-  margin: 20px;
-  flex-direction: row;
-}
-
-
-.card-item {
-  margin-bottom: 20px;
-  background: var(--bg-card-glass-95);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  padding: 12px 15px;
-  transition: transform 0.2s, box-shadow 0.2s;
-  border-radius: 10px;
-
-  //&:hover {
-  //  transform: translateY(-2px);
-  //  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
-  //}
-
-  .title {
-    margin-top: 5px;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-main);
-    margin-bottom: 4px;
-    line-height: 1.4;
-
-    &::before {
-      content: "";
-      display: inline-block;
-      width: 5px;
-      height: 1.25em;
-      background: #6e4040;
-
-      margin-top: 0.15em;
-      flex-shrink: 0;
-      border-radius: 2px;
-    }
-  }
-
-  .summary {
-    font-size: 0.95rem;
-    color: #666;
-    margin: 5px 0 10px;
-  }
-
-  .date {
-    font-size: 0.85rem;
-    color: #999;
-    display: flex;
-    align-items: center;
-
-    i {
-      font-size: 1.3rem;
-      margin-right: 10px;
-    }
-
-  }
-}
-
-.basic-aside {
-  flex: 0 0 25vw;
-  min-width: 180px;
-  max-width: 300px;
-  box-sizing: border-box;
-  position: sticky;
-  top: 84px;
-  height: calc(100vh - 104px);
-  user-select: none;
-  cursor: default;
-}
-
-.left-sidebar-name {
-  min-height: 100px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  padding: 5px 15px 15px 15px;
-  box-sizing: border-box;
-  position: sticky;
-  top: 20px;
-  background: var(--bg-card-glass-95);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  overflow: auto;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 10px;
-  flex-wrap: wrap;
-
-  .title {
-    margin-top: 5px;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-main);
-    margin-bottom: 4px;
-    line-height: 1.4;
-
-    &::before {
-      content: "";
-      display: inline-block;
-      width: 5px;
-      height: 1.25em;
-      background: #6e4040;
-
-      margin-top: 0.15em;
-      flex-shrink: 0;
-      border-radius: 2px;
-    }
-  }
-
-  //.twelve h2 {
-  //  font-size: 26px;
-  //  font-weight: 700;
-  //  letter-spacing: 1px;
-  //  text-transform: uppercase;
-  //  width: 160px;
-  //  text-align: center;
-  //  margin: auto;
-  //  white-space: nowrap;
-  //  padding-bottom: 13px;
-  //  position: relative;
-  //}
-  //
-  //.twelve h2:before {
-  //  background-color: #9eb4ed;
-  //  content: '';
-  //  display: block;
-  //  height: 3px;
-  //  width: 75px;
-  //  margin-bottom: 5px;
-  //}
-  //
-  //.twelve h2:after {
-  //  background-color: var(--right-btn);
-  //  content: '';
-  //  display: block;
-  //  position: absolute;
-  //  right: 0;
-  //  bottom: 0;
-  //  height: 3px;
-  //  width: 75px;
-  //  margin-bottom: 0.25em;
-  //}
-
-  //&:hover {
-  //  transform: translateY(-4px);
-  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  //}
-}
-
-.custom-tag {
-  cursor: pointer;
-  background-color: var(--border-color);
-  color: var(--custom-tag);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 0 12px;
-  user-select: none;
-
-  &:hover {
-    background-color: #e19eba;
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(225, 158, 186, 0.4);
-  }
-
-  &.active {
-    transform: translateY(0);
-    background-color: var(--right-btn);
-    color: white;
-  }
-}
-
-
-.left-sidebar {
-  margin-top: 20px;
-  flex: 1;
-  max-height: calc(100vh - 174px);
-  padding: 15px;
-  box-sizing: border-box;
-  position: sticky;
-  background: var(--bg-card-glass-95);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  overflow: auto;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 10px;
-
-  //&:hover {
-  //  transform: translateY(-4px);
-  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  //}
-
-  .menu-wrapper {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-
-    &::-webkit-scrollbar {
-      width: 0;
-      height: 0;
-    }
-
-    .year-group {
-      margin-bottom: 12px;
-
-      .year-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 6px 10px;
-        font-weight: 600;
-        color: var(--text-main);
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background 0.25s;
-
-        &:hover {
-          background: var(--border-color);
-        }
-
-        .arrow {
-          font-size: 0.9em;
-          transition: transform 0.3s;
-
-          &.expanded {
-            transform: rotate(-90deg);
-          }
-        }
-      }
-
-      .date-list {
-        margin-top: 6px;
-        padding-left: 8px;
-
-        li {
-          display: flex;
-          justify-content: space-between;
-          padding: 6px 8px;
-          font-size: 0.9em;
-          border-radius: 4px;
-          cursor: pointer;
-          transition: all 0.2s;
-          color: #555;
-          word-wrap: break-word;
-          white-space: normal;
-
-          &:hover {
-            background: rgba(225, 158, 186, 0.05);
-            color: var(--right-btn-hover);
-          }
-
-          &.active {
-            background: rgba(225, 158, 186, 0.1);
-            font-weight: 600;
-            color: var(--menu-wrapper--li);
-            position: relative;
-
-            &::before {
-              content: "";
-              position: absolute;
-              left: -8px;
-              top: 4px;
-              bottom: 4px;
-              width: 3px;
-              background: var(--right-btn);
-              border-radius: 2px;
-            }
-          }
-
-          .count {
-            font-size: 10px;
-            color: #888;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
-        }
-      }
-    }
-  }
-}
-
-.cards-grid {
-  width: clamp(300px, 60%, 1000px);
-  margin-bottom: -20px;
-}
-
-.card-container {
-  min-height: calc(100vh - 140px);
-  overflow-y: auto;
-  // clamp(最小值, 理想值, 最大值)
-  width: clamp(300px, 60%, 1000px);
-
-  background: var(--bg-card-glass-95);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 10px;
-
-  //&:hover {
-  //  transform: translateY(-4px);
-  //  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-  //}
-
-
-  .loading, .empty {
-    text-align: center;
-    color: #999;
-    margin: 30px;
-    font-size: 1rem;
-  }
-
-}
-
-
-.right-btn {
-  width: 100%;
-  height: 100%;
-  background-color: var(--right-btn);
-  border: none;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.25s ease;
-
-  &:hover {
-    background-color: var(--right-btn-hover);
-    color: #fff;
-  }
-
-  i {
-    transition: color 0.25s ease;
-  }
-}
-
-
-@media screen and (max-width: 850px) {
-  /* 1. 整体布局改为纵向 */
-  .page-layout {
-    flex-direction: column-reverse; /* 上下排列 */
-    margin: 10px; /* 减小页面边距 */
-    gap: 15px; /* 减小模块间距 */
-  }
-
-  /* 2. 侧边栏 (标签 & 日期) 调整 */
-  .basic-aside {
-    flex: none; /* 取消 flex 比例限制 */
-    width: 100%; /* 宽度撑满 */
-    max-width: 100%;
-    min-width: 0;
-    height: auto; /* 高度自动 */
-    position: static; /* 取消固定定位，随页面滚动 */
-
-    /* 强制重置侧边栏内部那个 inline-style 的 height: 100% */
-    & > div {
-      height: auto !important;
-    }
-  }
-
-  /* 3. 标签区域调整 */
-  .left-sidebar-name {
-    min-height: auto; /* 取消最小高度限制 */
-    position: static; /* 取消 sticky */
-    margin-bottom: 20px;
-    padding: 10px; /* 减小内边距 */
-  }
-
-  /* 4. 日期归档区域调整 */
-  .left-sidebar {
-    margin-top: 0; /* 紧贴标签区域 */
-    max-height: 250px; /* 限制高度，防止日期列表太长占满屏幕，强制出现内部滚动条 */
-    position: static;
-    padding: 10px;
-  }
-
-  /* 5. 文章列表容器调整 */
-  .cards-grid,
-  .card-container {
-    width: 100%; /* 覆盖原来的 clamp() 宽度，撑满屏幕 */
-    /* clamp(300px, 60%, 1000px) 在手机上可能只有 60% 导致太窄，必须改为 100% */
-
-    /* 骨架屏容器高度适应 */
-    min-height: auto;
-  }
-
-  /* 6. 单个文章卡片微调 */
-  .card-item {
-    padding: 10px; /* 稍微减小内边距 */
-
-    .title {
-      font-size: 1.1rem; /* 标题字体稍小一点 */
-      word-break: break-all; /* 防止长标题撑开 */
-    }
-
-    .summary {
-      font-size: 0.9rem;
-      /* 限制摘要行数，可选 */
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    /* 调整右侧按钮大小，防止在小屏幕挤压内容 */
-    .right-btn {
-      width: 35px;
-      font-size: 1rem;
-    }
-  }
-}
-
+<style scoped>
+.page-title > span { color: var(--accent); }
+.journal-layout { display: grid; grid-template-columns: 205px 1fr; gap: 64px; padding-top: 14px; border-top: 1px solid var(--border-color); }
+.journal-sidebar { padding-top: 17px; min-width: 0; }
+.journal-search { display: flex; border-bottom: 1px solid var(--border-color); align-items: center; margin-bottom: 25px; }
+.journal-search input { min-width: 0; width: 100%; padding: 9px 0; background: none; border: none; color: var(--text-main); font-size: 12px; }.journal-search input:focus { outline-offset: 2px; }.journal-search input::placeholder { color: var(--text-muted); }.journal-search button { padding: 6px 3px; border: none; background: none; font-size: 17px; color: var(--text-muted); }
+.all-posts { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 9px 10px; border: 0; background: none; font-size: 12px; border-radius: 5px; }.all-posts i { margin-right: 7px; }.all-posts > span:last-child { color: var(--text-muted); font-size: 11px; }.all-posts.selected { background: var(--accent-soft); color: var(--accent); }
+.filter-section { margin-top: 30px; }.filter-section h2 { display: flex; align-items: baseline; gap: 10px; margin-bottom: 13px; color: var(--text-secondary); font-weight: 500; font-size: 12px; }.filter-section h2 span { font-size: 9px; color: var(--text-muted); letter-spacing: .08em; }
+.journal-tags { display: flex; flex-wrap: wrap; gap: 7px; }.journal-tags button { border: 1px solid var(--border-color); background: none; border-radius: 4px; padding: 3px 7px; font-size: 10px; color: var(--text-secondary); }.journal-tags button:hover, .journal-tags button.selected { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.archive-list { max-height: 310px; overflow-y: auto; }.archive-list button { display: flex; justify-content: space-between; padding: 6px 10px; width: 100%; border: 0; background: none; color: var(--text-secondary); font-size: 12px; border-radius: 4px; }.archive-list button > span:last-child { font-size: 10px; color: var(--text-muted); }.archive-list button:hover, .archive-list button.selected { color: var(--accent); background: var(--bg-soft); }
+.sidebar-note { padding-top: 35px; margin-top: 30px; border-top: 1px solid var(--border-color); color: var(--text-muted); }.sidebar-note > i { color: var(--accent); font-size: 24px; opacity: .65; }.sidebar-note p { font-size: 12px; margin-top: 9px; line-height: 2; }
+.journal-content { min-width: 0; min-height: 430px; }.journal-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 15px; min-height: 59px; border-bottom: 1px solid var(--border-color); color: var(--text-secondary); font-size: 12px; }.journal-toolbar > :last-child { color: var(--text-muted); font-size: 10px; }.journal-toolbar .quiet-button { color: var(--accent); }
+.year-title { display: flex; align-items: baseline; gap: 14px; padding-top: 28px; font-size: 30px; font-weight: 450; letter-spacing: -.06em; color: var(--text-secondary); }.year-title > span { font-size: 10px; letter-spacing: .05em; color: var(--text-muted); }.year-group :deep(.article-row:last-child) { border-bottom: 1px solid var(--border-color); }
+.journal-loading > div { padding: 25px 0; border-bottom: 1px solid var(--border-color); }.journal-loading .skeleton-line { display: block; margin-bottom: 16px; }.journal-loading .skeleton-line:first-child { width: 55%; height: 16px; }.journal-loading .skeleton-line:nth-child(2) { width: 90%; }.journal-loading .skeleton-line:last-child { width: 25%; margin: 0; }
+.load-more { padding: 30px 0; text-align: center; }.load-more button { font-size: 11px; }.journal-end { display: flex; align-items: center; justify-content: center; gap: 16px; padding-top: 38px; font-size: 10px; color: var(--text-muted); }.journal-end > span { width: 25px; height: 1px; background: var(--border-color); }
+@media (max-width: 900px) { .journal-layout { grid-template-columns: 175px 1fr; gap: 35px; } }
+@media (max-width: 700px) { .journal-layout { grid-template-columns: 1fr; gap: 20px; }.journal-sidebar { padding-top: 4px; }.journal-search { margin-bottom: 14px; }.filter-section { margin-top: 18px; }.filter-section h2 { margin-bottom: 10px; }.archive-list { display: flex; gap: 8px; overflow: auto; max-height: none; padding-bottom: 8px; }.archive-list button { width: auto; flex-shrink: 0; gap: 15px; padding: 4px 8px; font-size: 11px; }.sidebar-note { display: none; }.journal-tags { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; }.journal-tags button { flex-shrink: 0; }.all-posts { padding-inline: 8px; }.journal-toolbar { min-height: 48px; }.journal-content { min-height: 300px; }.year-title { padding-top: 23px; font-size: 27px; } }
 </style>

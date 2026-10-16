@@ -11,12 +11,12 @@ const store = useProgressStore()
 .progress-bar {
   height: 3px;
   position: fixed;
-  top: 64px;
+  top: 0;
   left: 0;
   z-index: 1;
   width: 0;
   border-radius: 2px;
-  background: linear-gradient(90deg, #a6c1ff, #4da6ff, #7db9ff);
+  background: var(--accent);
   transition: width 0.2s ease;
   background-size: 200% 100%;
   animation: gradientMove 2s linear infinite;
@@ -29,7 +29,7 @@ const store = useProgressStore()
 
 @media screen and (max-width: 850px) {
   .progress-bar {
-    top: 56px;
+    top: 0;
   }
 }
 </style>

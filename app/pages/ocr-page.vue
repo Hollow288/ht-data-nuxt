@@ -4,6 +4,8 @@ import { NButton, NRadio, NRadioGroup, NSlider, NSpin, NTag, NEmpty, NInput, NCh
 import { BaseAPI } from '~/utils/api'
 import type { OcrMode, OcrStatus, OcrSubmitRes, OcrResultRes, OcrTask } from '~/types/ocr'
 
+useSeoMeta({ title: 'OCR 文字识别 · Hollow’s Space', description: '从图片或 PDF 中提取文字，支持置信度筛选、识别位置查看与文本复制。' })
+
 const ACCEPT_EXT = ['jpg', 'jpeg', 'png', 'webp', 'bmp', 'heic', 'heif', 'pdf']
 const MAX_FILE_SIZE = 50 * 1024 * 1024
 const POLL_INTERVAL = 1500
@@ -206,8 +208,8 @@ function formatConfidence(c: number) {
 
 function formatBbox(bbox: number[][] | null | undefined) {
   if (!bbox || bbox.length < 4) return '-'
-  const xs = bbox.map(p => p[0])
-  const ys = bbox.map(p => p[1])
+  const xs = bbox.map(p => p[0]!)
+  const ys = bbox.map(p => p[1]!)
   const xMin = Math.min(...xs)
   const yMin = Math.min(...ys)
   const xMax = Math.max(...xs)
@@ -224,7 +226,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="ocr-page">
+  <div class="ocr-page site-width">
+    <header class="page-heading">
+      <NuxtLink to="/tools" class="ocr-back"><i class="ri-arrow-left-line" aria-hidden="true" /> 返回小工具</NuxtLink>
+      <h1 class="page-title">把图片，读成文字<span>。</span></h1>
+      <p class="page-description">上传一张图片或一份 PDF，让那些值得留下的文字，可以编辑、可以复制。</p>
+    </header>
     <div class="ocr-card">
       <header class="ocr-card__header">
         <div class="ocr-card__header-text">
@@ -249,8 +256,13 @@ onUnmounted(() => {
       <section class="ocr-section">
         <div
           class="dropzone"
+          role="button"
+          :tabindex="file ? -1 : 0"
+          aria-label="选择图片或 PDF 文件"
           :class="{ 'dropzone--active': isDragOver, 'dropzone--has-file': !!file }"
           @click="!file && pickFile()"
+          @keydown.enter.prevent="!file && pickFile()"
+          @keydown.space.prevent="!file && pickFile()"
           @dragover.prevent="isDragOver = true"
           @dragleave.prevent="isDragOver = false"
           @drop.prevent="onDrop"
@@ -291,9 +303,9 @@ onUnmounted(() => {
           <div class="option-row__label">返回模式</div>
           <div class="option-row__control">
             <n-radio-group v-model:value="mode" size="small">
-              <n-radio value="detail">Detail（含坐标 / 置信度）</n-radio>
-              <n-radio value="list">List（文本数组）</n-radio>
-              <n-radio value="text">Text（拼接为整段）</n-radio>
+              <n-radio value="detail">详细结果（位置与置信度）</n-radio>
+              <n-radio value="list">逐行文本</n-radio>
+              <n-radio value="text">完整段落</n-radio>
             </n-radio-group>
           </div>
         </div>
@@ -907,4 +919,17 @@ onUnmounted(() => {
     flex-basis: 100%;
   }
 }
+</style>
+
+<style scoped>
+.ocr-page { display: block; width: min(1080px, calc(100% - 96px)); padding: 0; }
+.ocr-back { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 11px; }
+.ocr-page .page-title { margin-top: 20px; }.page-title > span { color: var(--accent); }
+.ocr-card { max-width: none; border-radius: 0; padding: 28px 0 35px; background: transparent; box-shadow: none; border-block: 1px solid var(--border-color); }
+.ocr-card__header { align-items: center; margin-bottom: 30px; }.ocr-card__title { font-weight: 550; font-size: 18px; padding-left: 0; }.ocr-card__title::before { display: none; }.ocr-card__subtitle { font-size: 12px; color: var(--text-muted); }
+.dropzone { border: 1px dashed var(--border-color); border-radius: 8px; padding: 68px 20px; background: var(--bg-soft); }.dropzone:hover, .dropzone--active { border-color: var(--accent); background: var(--accent-soft); }.dropzone__icon { color: var(--accent); opacity: .7; font-size: 42px; }.dropzone__title { font-size: 15px; font-weight: 500; margin-top: 12px; }.dropzone__hint { color: var(--text-muted); font-size: 11px; margin-top: 8px; }
+.ocr-section { margin-bottom: 27px; }.option-row { padding-block: 8px; }.option-row__label { color: var(--text-secondary); font-size: 12px; }.confidence-value { color: var(--accent); font-size: 11px; }
+.file-card { border-radius: 6px; background: var(--bg-body); box-shadow: none; }.file-card__preview { border-radius: 4px; }
+.result-section { margin-top: 34px; padding-top: 26px; border-top: 1px solid var(--border-color); }.result-table th { color: var(--text-secondary); background: var(--bg-soft); font-weight: 500; }.result-table td { border-color: var(--border-color); }.copy-btn:hover:not(:disabled) { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+@media (max-width: 700px) { .ocr-page { width: calc(100% - 40px); padding: 0; }.ocr-card { padding: 23px 0 28px; }.ocr-card__header { flex-wrap: wrap; gap: 15px; }.ocr-card__header-text { flex-basis: 100%; }.ocr-card__action { margin: 0; }.dropzone { padding: 40px 15px; }.dropzone__hint { font-size: 10px; line-height: 1.9; }.option-row__control :deep(.n-radio-group) { display: flex; flex-wrap: wrap; gap: 8px; }.option-row__control :deep(.n-radio__label) { font-size: 12px; } }
 </style>

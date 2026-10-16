@@ -4,11 +4,19 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   modules: ['@pinia/nuxt', '@bg-dev/nuxt-naiveui', '@nuxtjs/color-mode'],
   runtimeConfig: {
     public: {
       enableMock: process.env.NUXT_PUBLIC_ENABLE_MOCK === 'true'
+    }
+  },
+  nitro: {
+    devProxy: {
+      '/hotta-api': {
+        target: process.env.NUXT_DEV_API_TARGET || 'http://127.0.0.1:5777/api/v1/',
+        changeOrigin: true
+      }
     }
   },
   vite: {
@@ -29,12 +37,12 @@ export default defineNuxtConfig({
         lang: 'zh-CN'
       },
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: 'favicon.ico' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {
           rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap'
+          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;550;600;650;700;750&display=swap'
         }
 
       ]
