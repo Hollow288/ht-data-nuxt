@@ -437,7 +437,6 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   padding: 30px 20px;
-  width: 100%;
 }
 
 .ocr-card {
@@ -491,7 +490,7 @@ onUnmounted(() => {
     display: block;
     margin-top: 6px;
     color: var(--summary-50);
-    font-size: 13px;
+    font-size: 15px;
   }
 }
 
@@ -544,14 +543,14 @@ onUnmounted(() => {
   }
 
   &__title {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 600;
     color: var(--text-main);
     margin-bottom: 6px;
   }
 
   &__hint {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--summary-50);
   }
 }
@@ -586,7 +585,7 @@ onUnmounted(() => {
   }
 
   &__name {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--text-main);
     white-space: nowrap;
@@ -596,7 +595,7 @@ onUnmounted(() => {
 
   &__meta {
     margin-top: 4px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--summary-50);
   }
 
@@ -630,7 +629,7 @@ onUnmounted(() => {
 
   &__label {
     flex: 0 0 90px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-main);
   }
@@ -654,7 +653,7 @@ onUnmounted(() => {
 .confidence-value {
   flex-shrink: 0;
   min-width: 56px;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--summary-50);
   font-variant-numeric: tabular-nums;
 }
@@ -671,7 +670,7 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 13px;
+  font-size: 15px;
   color: #d4564f;
 
   i {
@@ -694,7 +693,7 @@ onUnmounted(() => {
 }
 
 .result-meta {
-  font-size: 12px;
+  font-size: 14px;
   color: var(--summary-50);
   word-break: break-all;
 }
@@ -708,7 +707,7 @@ onUnmounted(() => {
 
 .result-toggle {
   flex-shrink: 0;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text-main);
   order: 10;
   margin-left: auto;
@@ -725,7 +724,7 @@ onUnmounted(() => {
   padding: 24px;
   background: var(--markdown-body-table-tr-2);
   border-radius: 10px;
-  font-size: 14px;
+  font-size: 16px;
   color: var(--text-main);
 }
 
@@ -737,7 +736,7 @@ onUnmounted(() => {
   background: rgba(212, 86, 79, 0.08);
   border-radius: 10px;
   color: #d4564f;
-  font-size: 13px;
+  font-size: 15px;
 
   i {
     font-size: 18px;
@@ -754,7 +753,7 @@ onUnmounted(() => {
 .result-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 15px;
   color: var(--text-main);
 
   th, td {
@@ -766,7 +765,7 @@ onUnmounted(() => {
   thead th {
     font-weight: 600;
     color: var(--summary-50);
-    font-size: 12px;
+    font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -797,7 +796,7 @@ onUnmounted(() => {
   .col-bbox {
     width: 180px;
     color: var(--summary-50);
-    font-size: 12px;
+    font-size: 14px;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
@@ -834,7 +833,7 @@ onUnmounted(() => {
     margin: 0;
     white-space: pre-wrap;
     word-break: break-word;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.7;
     color: var(--text-main);
     font-family: inherit;
@@ -846,7 +845,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 4px;
   padding: 4px 10px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text-main);
   background: var(--bg-card);
   border: 1px solid var(--border-color);
@@ -866,7 +865,7 @@ onUnmounted(() => {
   }
 
   i {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 
@@ -902,7 +901,7 @@ onUnmounted(() => {
   }
 
   .result-table {
-    font-size: 12px;
+    font-size: 14px;
 
     th, td {
       padding: 8px 10px;
@@ -922,14 +921,14 @@ onUnmounted(() => {
 </style>
 
 <style scoped>
-.ocr-page { display: block; width: min(1080px, calc(100% - 96px)); padding: 0; }
-.ocr-back { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 11px; }
+.ocr-page { display: block; padding: 0; }
+.ocr-back { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 14px; }
 .ocr-page .page-title { margin-top: 20px; }.page-title > span { color: var(--accent); }
 .ocr-card { max-width: none; border-radius: 0; padding: 28px 0 35px; background: transparent; box-shadow: none; border-block: 1px solid var(--border-color); }
-.ocr-card__header { align-items: center; margin-bottom: 30px; }.ocr-card__title { font-weight: 550; font-size: 18px; padding-left: 0; }.ocr-card__title::before { display: none; }.ocr-card__subtitle { font-size: 12px; color: var(--text-muted); }
-.dropzone { border: 1px dashed var(--border-color); border-radius: 8px; padding: 68px 20px; background: var(--bg-soft); }.dropzone:hover, .dropzone--active { border-color: var(--accent); background: var(--accent-soft); }.dropzone__icon { color: var(--accent); opacity: .7; font-size: 42px; }.dropzone__title { font-size: 15px; font-weight: 500; margin-top: 12px; }.dropzone__hint { color: var(--text-muted); font-size: 11px; margin-top: 8px; }
-.ocr-section { margin-bottom: 27px; }.option-row { padding-block: 8px; }.option-row__label { color: var(--text-secondary); font-size: 12px; }.confidence-value { color: var(--accent); font-size: 11px; }
+.ocr-card__header { align-items: center; margin-bottom: 30px; }.ocr-card__title { font-weight: 550; font-size: 18px; padding-left: 0; }.ocr-card__title::before { display: none; }.ocr-card__subtitle { font-size: 14px; color: var(--text-muted); }
+.dropzone { border: 1px dashed var(--border-color); border-radius: 8px; padding: 68px 20px; background: var(--bg-soft); }.dropzone:hover, .dropzone--active { border-color: var(--accent); background: var(--accent-soft); }.dropzone__icon { color: var(--accent); opacity: .7; font-size: 42px; }.dropzone__title { font-size: 17px; font-weight: 500; margin-top: 12px; }.dropzone__hint { color: var(--text-muted); font-size: 14px; margin-top: 8px; }
+.ocr-section { margin-bottom: 27px; }.option-row { padding-block: 8px; }.option-row__label { color: var(--text-secondary); font-size: 14px; }.confidence-value { color: var(--accent); font-size: 14px; }
 .file-card { border-radius: 6px; background: var(--bg-body); box-shadow: none; }.file-card__preview { border-radius: 4px; }
 .result-section { margin-top: 34px; padding-top: 26px; border-top: 1px solid var(--border-color); }.result-table th { color: var(--text-secondary); background: var(--bg-soft); font-weight: 500; }.result-table td { border-color: var(--border-color); }.copy-btn:hover:not(:disabled) { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
-@media (max-width: 700px) { .ocr-page { width: calc(100% - 40px); padding: 0; }.ocr-card { padding: 23px 0 28px; }.ocr-card__header { flex-wrap: wrap; gap: 15px; }.ocr-card__header-text { flex-basis: 100%; }.ocr-card__action { margin: 0; }.dropzone { padding: 40px 15px; }.dropzone__hint { font-size: 10px; line-height: 1.9; }.option-row__control :deep(.n-radio-group) { display: flex; flex-wrap: wrap; gap: 8px; }.option-row__control :deep(.n-radio__label) { font-size: 12px; } }
+@media (max-width: 700px) { .ocr-page { width: calc(100% - 40px); padding: 0; }.ocr-card { padding: 23px 0 28px; }.ocr-card__header { flex-wrap: wrap; gap: 15px; }.ocr-card__header-text { flex-basis: 100%; }.ocr-card__action { margin: 0; }.dropzone { padding: 40px 15px; }.dropzone__hint { font-size: 13px; line-height: 1.9; }.option-row__control :deep(.n-radio-group) { display: flex; flex-wrap: wrap; gap: 8px; }.option-row__control :deep(.n-radio__label) { font-size: 14px; } }
 </style>

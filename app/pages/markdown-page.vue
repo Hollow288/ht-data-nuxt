@@ -11,9 +11,13 @@ const loading = ref(true)
 const failed = ref(false)
 const notFound = ref(false)
 const activeHeading = ref('')
+const mobileTocDialog = ref<HTMLDialogElement | null>(null)
+const mobileTocOpen = ref(false)
 const md = new MarkdownIt()
 let version = 0
 let scrollFrame = 0
+let previousBodyOverflow: string | null = null
+let mobileTocViewport: MediaQueryList | undefined
 const content = computed(() => {
   const raw = post.value?.content ?? ''
   const lines = raw.split('\n')
@@ -33,7 +37,39 @@ const readingTime = computed(() => Math.max(1, Math.ceil((post.value?.content.le
 const postTags = computed(() => (post.value?.tags ?? '').split(',').map(tag => tag.trim()).filter(Boolean))
 useSeoMeta({ title: () => post.value ? post.value.title + ' · Hollow’s Space' : '阅读 · Hollow’s Space', description: () => post.value?.summary ?? 'Hollow 的文章与记录。' })
 
+function resetMobileToc() {
+  mobileTocOpen.value = false
+  if (previousBodyOverflow !== null) {
+    document.body.style.overflow = previousBodyOverflow
+    previousBodyOverflow = null
+  }
+}
+function closeMobileToc() {
+  mobileTocDialog.value?.close()
+  resetMobileToc()
+}
+async function openMobileToc() {
+  const dialog = mobileTocDialog.value
+  if (!dialog || dialog.open || !mobileTocViewport?.matches) return
+  dialog.showModal()
+  previousBodyOverflow = document.body.style.overflow
+  document.body.style.overflow = 'hidden'
+  mobileTocOpen.value = true
+  await nextTick()
+  dialog.querySelector('[aria-current="location"]')?.scrollIntoView({ block: 'nearest', behavior: 'instant' })
+}
+function onTocViewportChange(event: MediaQueryListEvent) {
+  if (!event.matches) closeMobileToc()
+}
+async function selectMobileHeading(id: string) {
+  closeMobileToc()
+  await navigateTo({ path: route.path, query: route.query, hash: '#' + id })
+  await nextTick()
+  // Numbered headings are not valid CSS selectors for Nuxt's default hash offset lookup.
+  requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ block: 'start', behavior: 'auto' }))
+}
 async function loadPost() {
+  closeMobileToc()
   const current = ++version
   loading.value = true
   failed.value = false
@@ -77,8 +113,19 @@ function updateHeading() {
   })
 }
 watch(articleId, loadPost)
-onMounted(() => { loadPost(); window.addEventListener('scroll', updateHeading, { passive: true }) })
-onUnmounted(() => { version++; window.removeEventListener('scroll', updateHeading); cancelAnimationFrame(scrollFrame) })
+onMounted(() => {
+  loadPost()
+  window.addEventListener('scroll', updateHeading, { passive: true })
+  mobileTocViewport = window.matchMedia('(max-width: 700px)')
+  mobileTocViewport.addEventListener('change', onTocViewportChange)
+})
+onUnmounted(() => {
+  version++
+  closeMobileToc()
+  window.removeEventListener('scroll', updateHeading)
+  mobileTocViewport?.removeEventListener('change', onTocViewportChange)
+  cancelAnimationFrame(scrollFrame)
+})
 </script>
 
 <template>
@@ -90,68 +137,97 @@ onUnmounted(() => { version++; window.removeEventListener('scroll', updateHeadin
       <div class="reader-layout">
         <div class="reading-content">
           <header class="reader-heading"><span class="eyebrow">A PAGE FROM MY JOURNAL</span><h1>{{ post.title }}</h1><div class="reader-meta"><span>Hollow</span><span>·</span><time :datetime="post.createdAt">{{ post.createdAt.slice(0, 10).replaceAll('-', '.') }}</time><span>·</span><span>约 {{ readingTime }} 分钟阅读</span></div><p v-if="post.summary">{{ post.summary }}</p><div v-if="postTags.length" class="reader-tags"><NuxtLink v-for="tag in postTags" :key="tag" :to="{ path: '/blog-page', query: { tag } }"># {{ tag }}</NuxtLink></div></header>
-          <details v-if="toc.length" class="mobile-toc"><summary><i class="ri-list-check" aria-hidden="true" /> 本文目录<span>{{ toc.length }}</span></summary><nav aria-label="本文目录"><a v-for="heading in toc" :key="heading.id" :href="'#' + encodeURIComponent(heading.id)" :style="{ paddingLeft: Math.max(0, heading.level - 2) * 12 + 'px' }">{{ heading.title }}</a></nav></details>
           <MarkdownContent :content="content" />
           <div class="reader-end"><i class="ri-sparkling-2-line" aria-hidden="true" /><p>谢谢你，读到这里。</p><NuxtLink to="/blog-page" class="text-link">再读一篇 <i class="ri-arrow-right-line" aria-hidden="true" /></NuxtLink></div>
         </div>
         <aside v-if="toc.length" class="reader-toc"><p>本文目录<span>ON THIS PAGE</span></p><nav aria-label="本文目录"><a v-for="heading in toc" :key="heading.id" :href="'#' + encodeURIComponent(heading.id)" :class="{ active: activeHeading === heading.id }" :aria-current="activeHeading === heading.id ? 'location' : undefined" :style="{ paddingLeft: 15 + Math.max(0, heading.level - 2) * 12 + 'px' }">{{ heading.title }}</a></nav><span class="toc-footnote">记录，让日常有迹可循。</span></aside>
       </div>
+      <template v-if="toc.length">
+        <button class="mobile-toc-trigger" type="button" aria-label="打开文章目录" title="本文目录" aria-haspopup="dialog" aria-controls="reader-mobile-toc" :aria-expanded="mobileTocOpen" @click="openMobileToc">
+          <i class="ri-list-check" aria-hidden="true" />
+        </button>
+        <dialog id="reader-mobile-toc" ref="mobileTocDialog" class="mobile-toc-dialog" aria-labelledby="mobile-toc-title" @close="resetMobileToc" @click="event => { if (event.target === event.currentTarget) closeMobileToc() }">
+          <div class="mobile-toc-panel">
+            <header class="mobile-toc-header">
+              <div><h2 id="mobile-toc-title">本文目录<span>ON THIS PAGE</span></h2><p>{{ toc.length }} 个章节 · 点击跳转阅读</p></div>
+              <button type="button" class="mobile-toc-close" aria-label="关闭文章目录" autofocus @click="closeMobileToc"><i class="ri-close-line" aria-hidden="true" /></button>
+            </header>
+            <nav class="mobile-toc-nav" aria-label="文章章节">
+              <div class="mobile-toc-links">
+                <a v-for="heading in toc" :key="heading.id" :href="'#' + encodeURIComponent(heading.id)" :class="{ active: activeHeading === heading.id }" :aria-current="activeHeading === heading.id ? 'location' : undefined" :style="{ paddingLeft: 16 + Math.max(0, heading.level - 2) * 12 + 'px' }" @click.prevent="selectMobileHeading(heading.id)">{{ heading.title }}</a>
+              </div>
+            </nav>
+          </div>
+        </dialog>
+      </template>
     </template>
   </div>
 </template>
 
 <style scoped>
-.reader-page { width: min(1000px, calc(100% - 96px)); padding-top: 34px; }
-.reader-back { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 12px; }
-.reader-layout { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 60px; }
+.reader-page { --site-max-width: 1240px; padding-top: 34px; }
+.reader-back { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 15px; }
+.reader-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 48px; }
 .reading-content { min-width: 0; }
 .reader-heading { padding: 32px 0 28px; margin-bottom: 32px; border-bottom: 1px solid var(--border-color); }
 .reader-heading > h1 { margin-top: 15px; font-size: clamp(27px, 3.2vw, 34px); font-weight: 600; line-height: 1.55; letter-spacing: -.035em; overflow-wrap: anywhere; }
-.reader-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; color: var(--text-muted); font-size: 11px; margin-top: 17px; }
+.reader-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; color: var(--text-muted); font-size: 14px; margin-top: 17px; }
 .reader-meta > span:first-child { color: var(--text-secondary); }
-.reader-heading > p { color: var(--text-secondary); margin-top: 22px; font-size: 14px; line-height: 1.95; }
-.reader-tags { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 18px; font-size: 11px; color: var(--accent); }
+.reader-heading > p { color: var(--text-secondary); margin-top: 22px; font-size: 17px; line-height: 1.95; }
+.reader-tags { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 18px; font-size: 14px; color: var(--accent); }
 .reader-tags a:hover { text-decoration: underline; }
-.reader-toc { position: sticky; top: 110px; align-self: start; max-height: calc(100vh - 150px); overflow-y: auto; padding: 38px 0 20px; }
-.reader-toc > p { display: flex; align-items: baseline; gap: 10px; font-size: 12px; font-weight: 600; color: var(--text-secondary); }
-.reader-toc > p > span { font-size: 8px; font-weight: 400; color: var(--text-muted); letter-spacing: .04em; }
-.reader-toc nav { margin-top: 18px; border-left: 1px solid var(--border-color); }
-.reader-toc nav a { display: block; padding-block: 6px; font-size: 12px; color: var(--text-muted); border-left: 2px solid transparent; margin-left: -1px; line-height: 1.65; overflow-wrap: anywhere; }
+.reader-toc { position: sticky; top: 110px; align-self: start; display: flex; flex-direction: column; max-height: calc(100dvh - 138px); min-height: 0; margin-top: 32px; }
+.reader-toc > p { display: flex; flex-shrink: 0; align-items: baseline; gap: 10px; padding-bottom: 18px; font-size: 15px; font-weight: 600; color: var(--text-secondary); }
+.reader-toc > p > span { font-size: 12px; font-weight: 400; color: var(--text-muted); letter-spacing: .04em; }
+.reader-toc nav { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; border-left: 1px solid #dedede; }
+.reader-toc nav a { display: block; padding-block: 6px; font-size: 15px; color: var(--text-muted); border-left: 2px solid transparent; margin-left: -1px; line-height: 1.65; overflow-wrap: anywhere; }
 .reader-toc nav a.active { color: var(--accent); border-color: var(--accent); }
 .reader-toc nav a:hover { color: var(--accent); }
-.toc-footnote { display: block; margin-top: 30px; font-size: 10px; color: var(--text-muted); }
-.mobile-toc { display: none; }
+.toc-footnote { display: block; flex-shrink: 0; margin-top: 22px; font-size: 13px; color: var(--text-muted); }
+.mobile-toc-trigger { display: none; position: fixed; right: 15px; bottom: calc(90px + env(safe-area-inset-bottom, 0px)); z-index: 90; width: 44px; height: 44px; padding: 0; place-items: center; border: 1px solid var(--border-color); border-radius: 50%; background: var(--bg-body); color: var(--accent); font-size: 23px; box-shadow: 0 4px 16px #0001; }
+.mobile-toc-trigger:hover { border-color: var(--accent); }
+.mobile-toc-dialog { position: fixed; inset: 0 0 0 auto; width: min(360px, 88vw); height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; overflow: hidden; border: 0; border-left: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-main); box-shadow: -10px 0 40px #0002; opacity: 0; transform: translateX(100%); transition: opacity .25s ease, transform .25s ease, display .25s allow-discrete, overlay .25s allow-discrete; }
+.mobile-toc-dialog[open] { opacity: 1; transform: translateX(0); }
+.mobile-toc-dialog::backdrop { background: #0006; backdrop-filter: blur(2px); }
+@starting-style { .mobile-toc-dialog[open] { opacity: 0; transform: translateX(100%); } }
+.mobile-toc-panel { display: flex; flex-direction: column; height: 100%; }
+.mobile-toc-header { display: flex; flex-shrink: 0; align-items: flex-start; justify-content: space-between; gap: 12px; padding: max(22px, env(safe-area-inset-top, 0px)) 20px 20px; border-bottom: 1px solid var(--border-color); }
+.mobile-toc-header h2 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 20px; font-weight: 600; }
+.mobile-toc-header h2 span { color: var(--text-muted); font-size: 12px; font-weight: 400; letter-spacing: .04em; }
+.mobile-toc-header p { margin-top: 7px; color: var(--text-muted); font-size: 14px; }
+.mobile-toc-close { display: grid; flex-shrink: 0; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--text-secondary); font-size: 24px; }
+.mobile-toc-close:hover { color: var(--accent); background: var(--bg-soft); }
+.mobile-toc-nav { flex: 1; min-height: 0; padding: 20px 20px max(24px, env(safe-area-inset-bottom, 0px)); overflow-y: auto; overscroll-behavior: contain; }
+.mobile-toc-links { border-left: 1px solid #dedede; }
+.mobile-toc-links a { display: block; margin-left: -1px; padding-block: 10px; padding-right: 8px; border-left: 2px solid transparent; color: var(--text-secondary); font-size: 15px; line-height: 1.7; overflow-wrap: anywhere; }
+.mobile-toc-links a:hover, .mobile-toc-links a.active { color: var(--accent); }
+.mobile-toc-links a.active { border-left-color: var(--accent); }
 .reader-end { text-align: center; border-top: 1px solid var(--border-color); padding: 36px 0 15px; margin-top: 48px; }
 .reader-end > i { font-size: 20px; color: var(--accent); }
-.reader-end > p { font-size: 12px; margin: 10px 0 18px; color: var(--text-muted); }
-.reader-end .text-link { font-size: 12px; }
+.reader-end > p { font-size: 15px; margin: 10px 0 18px; color: var(--text-muted); }
+.reader-end .text-link { font-size: 15px; }
 .reader-error { padding: 85px 0; }
 .reader-error h1 { font-size: 27px; font-weight: 550; margin-bottom: 18px; }
-.reader-error p { font-size: 13px; margin-bottom: 25px; }
+.reader-error p { font-size: 16px; margin-bottom: 25px; }
 .reader-loading { padding-top: 50px; min-height: 500px; }
 .reader-loading > div { margin-bottom: 23px; width: 70%; }
 .reader-loading > div:first-child { height: 30px; width: 50%; }
 .reader-loading > div:nth-child(2) { width: 25%; margin-bottom: 55px; }
+@media (max-width: 1100px) {
+  .reader-layout { grid-template-columns: minmax(0, 1fr) 260px; gap: 32px; }
+}
 @media (max-width: 900px) {
-  .reader-layout { grid-template-columns: minmax(0, 1fr) 170px; gap: 30px; }
-  .reader-toc > p > span { display: none; }
+  .reader-layout { grid-template-columns: minmax(0, 1fr) 230px; gap: 28px; }
 }
 @media (max-width: 700px) {
   .reader-page { width: calc(100% - 40px); padding-top: 25px; }
   .reader-heading { padding-top: 28px; margin-bottom: 26px; }
   .reader-heading h1 { font-size: 27px; }
-  .reader-heading > p { font-size: 13px; }
-  .reader-meta { gap: 9px; font-size: 10px; }
+  .reader-heading > p { font-size: 16px; }
+  .reader-meta { gap: 9px; font-size: 13px; }
   .reader-layout { grid-template-columns: minmax(0, 1fr); }
   .reader-toc { display: none; }
-  .mobile-toc { display: block; border-bottom: 1px solid var(--border-color); padding: 0 0 16px; margin-bottom: 25px; color: var(--text-secondary); }
-  .mobile-toc summary { display: flex; align-items: center; cursor: pointer; list-style: none; font-size: 12px; }
-  .mobile-toc summary::-webkit-details-marker { display: none; }
-  .mobile-toc summary > i { color: var(--accent); margin-right: 7px; }
-  .mobile-toc summary > span { margin-left: auto; color: var(--text-muted); font-size: 10px; }
-  .mobile-toc summary::after { content: '+'; margin-left: 12px; color: var(--accent); }
-  .mobile-toc[open] summary::after { content: '−'; }
-  .mobile-toc nav { display: grid; gap: 11px; padding-top: 18px; font-size: 12px; }
+  .mobile-toc-trigger { display: grid; }
   .reader-error h1 { font-size: 23px; }
 }
 </style>

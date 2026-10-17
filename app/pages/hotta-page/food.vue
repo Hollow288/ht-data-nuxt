@@ -120,7 +120,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
     <aside class="sidebar sidebar--right pc-sidebar">
       <div class="search-panel">
         <header class="search-panel__header">
-          <h4 class="search-panel__title">查找资料</h4>
           <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
           <div class="search-panel__input-wrapper">
             <input type="text" v-model="searchText" @input="onInputFoodSearch()" placeholder="输入名称…" aria-label="按名称搜索资料"/>
@@ -163,7 +162,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
             <button class="drawer-close" aria-label="关闭资料搜索" @click="showDrawer = false"><i class="ri-close-line" /></button>
             <!-- 抽屉头部 -->
             <header class="search-panel__header drawer-header">
-              <h4 class="search-panel__title">查找资料</h4>
               <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
               <div class="search-panel__input-wrapper">
                 <input type="text" v-model="searchText" @input="onInputFoodSearch" placeholder="输入名称…" aria-label="按名称搜索资料"/>
@@ -270,7 +268,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 
   &__desc {
     margin: 12px 0 0;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--summary-50);
     line-height: 1.6;
     max-width: 420px;
@@ -292,7 +290,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
   padding: 16px 20px;
 
   &__label {
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--custom-tag);
     text-transform: uppercase;
@@ -302,7 +300,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 
   &__content {
     color: var(--text-main);
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.7;
   }
 }
@@ -336,10 +334,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
     padding: 30px 20px;
   }
 
-  &__title {
-    margin: 0;
-  }
-
   &__subtitle {
     display: inline-block;
     margin: 5px 0 20px;
@@ -355,7 +349,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
       border: 0;
       border-radius: 50px;
       color: #fff;
-      font-size: 14px;
+      font-size: 16px;
       padding: 10px 15px;
       width: 100%;
 
@@ -437,12 +431,12 @@ onUnmounted(() => { document.body.style.overflow = '' })
 }
 
 .result-item__title {
-  font-size: 13px;
+  font-size: 15px;
   display: inline-block;
 }
 
 .result-item__meta {
-  font-size: 10px;
+  font-size: 13px;
   display: block;
   color: #888;
 }

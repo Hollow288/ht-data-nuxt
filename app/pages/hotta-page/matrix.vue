@@ -196,18 +196,16 @@ onUnmounted(() => { document.body.style.overflow = '' })
     <aside class="sidebar sidebar--right pc-sidebar">
       <div class="search-panel">
         <header class="search-panel__header">
-          <h4 class="search-panel__title">查找资料</h4>
           <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
           <div class="search-panel__input-wrapper">
             <n-popover
                 trigger="click"
-                placement="bottom"
+                placement="bottom-end"
                 v-model:show="popoverVisible"
-                :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
-                style="max-width: 200px; background-color: var(--white-black-50);box-sizing: border-box;padding:0;"
+                style="width: 260px; max-width: calc(100vw - 32px); max-height: min(360px, calc(100dvh - 160px)); overflow-y: auto;"
             >
               <template #trigger>
-                <i class="ri-filter-3-line" :class="{ 'active': popoverVisible }"></i>
+                <button type="button" class="query-filter-trigger" aria-label="筛选资料类型" :aria-expanded="popoverVisible" :class="{ active: popoverVisible || matrixQuality }"><i class="ri-filter-3-line" aria-hidden="true" /></button>
               </template>
               <template #header>
                 <n-text style="color:var(--text-main)" strong depth="1">类型筛选</n-text>
@@ -215,16 +213,16 @@ onUnmounted(() => { document.body.style.overflow = '' })
               <div class="filter-group">
                 <p style="color:var(--text-main)">Rarity:</p>
                 <div class="button-group">
-                  <NButton color="var(--accent)" :dashed="matrixQuality!=='SSR'" size="tiny"
+                  <NButton type="primary" :dashed="matrixQuality!=='SSR'" size="tiny"
                            @click="changeMatrixRarity('SSR')">SSR
                   </NButton>
-                  <NButton color="var(--accent)" :dashed="matrixQuality!=='SR'" size="tiny"
+                  <NButton type="primary" :dashed="matrixQuality!=='SR'" size="tiny"
                            @click="changeMatrixRarity('SR')">SR
                   </NButton>
-                  <NButton color="var(--accent)" :dashed="matrixQuality!=='R'" size="tiny"
+                  <NButton type="primary" :dashed="matrixQuality!=='R'" size="tiny"
                            @click="changeMatrixRarity('R')">R
                   </NButton>
-                  <NButton color="var(--accent)" :dashed="matrixQuality!=='N'" size="tiny"
+                  <NButton type="primary" :dashed="matrixQuality!=='N'" size="tiny"
                            @click="changeMatrixRarity('N')">N
                   </NButton>
                 </div>
@@ -277,18 +275,16 @@ onUnmounted(() => { document.body.style.overflow = '' })
 
             <!-- 固定头部 -->
             <header class="search-panel__header drawer-header">
-              <h4 class="search-panel__title">查找资料</h4>
               <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
               <div class="search-panel__input-wrapper">
                 <n-popover
                     trigger="click"
-                    placement="bottom"
+                    placement="bottom-end"
                     v-model:show="popoverVisibleMobile"
-                    :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
-                    style="max-width: 200px; background-color: var(--white-black-50); box-sizing: border-box; padding: 0; z-index: 1000;"
+                    style="width: 260px; max-width: calc(100vw - 32px); max-height: min(360px, calc(100dvh - 160px)); overflow-y: auto;"
                 >
                   <template #trigger>
-                    <i class="ri-filter-3-line" :class="{ active: popoverVisibleMobile }"></i>
+                    <button type="button" class="query-filter-trigger" aria-label="筛选资料类型" :aria-expanded="popoverVisibleMobile" :class="{ active: popoverVisibleMobile || matrixQuality }"><i class="ri-filter-3-line" aria-hidden="true" /></button>
                   </template>
                   <template #header>
                     <n-text style="color:var(--text-main)" strong depth="1">类型筛选</n-text>
@@ -296,16 +292,16 @@ onUnmounted(() => { document.body.style.overflow = '' })
                   <div class="filter-group">
                     <p  style="color:var(--text-main)">Rarity:</p>
                     <div class="button-group">
-                      <NButton color="var(--accent)" :dashed="matrixQuality!=='SSR'" size="tiny"
+                      <NButton type="primary" :dashed="matrixQuality!=='SSR'" size="tiny"
                                @click="changeMatrixRarity('SSR')">SSR
                       </NButton>
-                      <NButton color="var(--accent)" :dashed="matrixQuality!=='SR'" size="tiny"
+                      <NButton type="primary" :dashed="matrixQuality!=='SR'" size="tiny"
                                @click="changeMatrixRarity('SR')">SR
                       </NButton>
-                      <NButton color="var(--accent)" :dashed="matrixQuality!=='R'" size="tiny"
+                      <NButton type="primary" :dashed="matrixQuality!=='R'" size="tiny"
                                @click="changeMatrixRarity('R')">R
                       </NButton>
-                      <NButton color="var(--accent)" :dashed="matrixQuality!=='N'" size="tiny"
+                      <NButton type="primary" :dashed="matrixQuality!=='N'" size="tiny"
                                @click="changeMatrixRarity('N')">N
                       </NButton>
                     </div>
@@ -405,7 +401,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 
       .level {
         text-transform: uppercase;
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 700;
         margin-bottom: 3px;
         color: #EC9B3B;
@@ -444,7 +440,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
         }
 
         .stars {
-          font-size: 12px;
+          font-size: 14px;
           width: 80px;
           display: inline-block;
           line-height: 1.2;
@@ -516,10 +512,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
     padding: 30px 20px;
   }
 
-  &__title {
-    margin: 0;
-  }
-
   &__subtitle {
     display: inline-block;
     margin: 5px 0 20px;
@@ -535,7 +527,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
       border: 0;
       border-radius: 50px;
       color: #fff;
-      font-size: 14px;
+      font-size: 16px;
       padding: 10px 15px;
       width: 100%;
 
@@ -617,12 +609,12 @@ onUnmounted(() => { document.body.style.overflow = '' })
 }
 
 .result-item__title {
-  font-size: 13px;
+  font-size: 15px;
   display: inline-block;
 }
 
 .result-item__meta {
-  font-size: 10px;
+  font-size: 13px;
   display: block;
   color: #888;
 }

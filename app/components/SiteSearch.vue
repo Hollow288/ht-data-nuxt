@@ -75,21 +75,21 @@ defineExpose({ open })
 </template>
 
 <style scoped>
-.search-dialog { position: fixed; top: min(16vh, 140px); width: min(580px, calc(100% - 32px)); max-height: 75vh; margin: 0 auto; padding: 0; border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); background: var(--bg-body); box-shadow: 0 20px 80px #0002; }
-.search-dialog::backdrop { background: #18201566; backdrop-filter: blur(5px); }
+.search-dialog { position: fixed; top: min(16vh, 140px); width: min(800px, calc(100% - 32px)); max-width: none; max-height: 75vh; margin: 0 auto; padding: 0; border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); background: var(--bg-body); box-shadow: 0 20px 80px #0002; }
+.search-dialog::backdrop { background: #1d1e2166; backdrop-filter: blur(5px); }
 .search-form { display: flex; align-items: center; gap: 12px; padding: 18px 22px; border-bottom: 1px solid var(--border-color); }
 .search-form > i { font-size: 22px; color: var(--accent); }
-.search-form input { width: 100%; min-width: 0; border: none; outline: none; background: none; color: var(--text-main); font-size: 14px; }
+.search-form input { width: 100%; min-width: 0; border: none; outline: none; background: none; color: var(--text-main); font-size: 16px; }
 .search-form button { border: none; padding: 0; background: none; color: var(--text-muted); }
-kbd { font: 10px/1.5 monospace; border: 1px solid var(--border-color); border-radius: 3px; padding: 3px 5px; }
+kbd { font: 13px/1.5 monospace; border: 1px solid var(--border-color); border-radius: 3px; padding: 3px 5px; }
 .search-body { padding: 14px; max-height: 48vh; overflow: auto; }
-.search-caption { padding: 7px 9px 10px; color: var(--text-muted); font-size: 11px; }
+.search-caption { padding: 7px 9px 10px; color: var(--text-muted); font-size: 14px; }
 .search-result { display: flex; align-items: center; gap: 14px; padding: 10px; border-radius: 5px; }
 .search-result:hover { background: var(--bg-soft); }
 .search-result > i:first-child { color: var(--accent); font-size: 19px; }
-.search-result span { flex: 1; min-width: 0; font-size: 13px; }
-.search-result small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+.search-result span { flex: 1; min-width: 0; font-size: 16px; }
+.search-result small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); font-size: 14px; margin-top: 2px; }
 .search-result > i:last-child { color: var(--text-muted); font-size: 16px; }
-.search-status { padding: 12px 10px 20px; color: var(--text-secondary); font-size: 13px; }
-.search-footer { display: flex; justify-content: space-between; gap: 10px; padding: 12px 22px; border-top: 1px solid var(--border-color); font-size: 10px; color: var(--text-muted); }
+.search-status { padding: 12px 10px 20px; color: var(--text-secondary); font-size: 16px; }
+.search-footer { display: flex; justify-content: space-between; gap: 10px; padding: 12px 22px; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-muted); }
 </style>

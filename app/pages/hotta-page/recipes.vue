@@ -135,18 +135,16 @@ onUnmounted(() => { document.body.style.overflow = '' })
     <aside class="sidebar sidebar--right pc-sidebar">
       <div class="search-panel">
         <header class="search-panel__header">
-          <h4 class="search-panel__title">查找资料</h4>
           <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
           <div class="search-panel__input-wrapper">
             <n-popover
                 trigger="click"
-                placement="bottom"
+                placement="bottom-end"
                 v-model:show="popoverVisible"
-                :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }"
-                style="max-width: 400px; background-color: var(--white-black-50);box-sizing: border-box;padding:0"
+                style="width: 260px; max-width: calc(100vw - 32px); max-height: min(360px, calc(100dvh - 160px)); overflow-y: auto;"
             >
               <template #trigger>
-                <i class="ri-filter-3-line" :class="{ 'active': popoverVisible }"></i>
+                <button type="button" class="query-filter-trigger" aria-label="筛选资料类型" :aria-expanded="popoverVisible" :class="{ active: popoverVisible || recipesCategories }"><i class="ri-filter-3-line" aria-hidden="true" /></button>
               </template>
               <template #header>
                 <n-text style="color:var(--text-main)" strong depth="1">类型筛选</n-text>
@@ -155,7 +153,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
                 <p style="color:var(--text-main)">类别:</p>
                 <div class="button-group">
                   <div v-for="item in categoriesList" :key="item">
-                    <NButton color="var(--accent)" :dashed="recipesCategories!==item" size="tiny"
+                    <NButton type="primary" :dashed="recipesCategories!==item" size="tiny"
                              @click="changeRecipesCategories(item)">{{ item }}
                     </NButton>
                   </div>
@@ -204,18 +202,16 @@ onUnmounted(() => { document.body.style.overflow = '' })
             <button class="drawer-close" aria-label="关闭资料搜索" @click="showDrawer = false"><i class="ri-close-line" /></button>
             <!-- 抽屉头部 -->
             <header class="search-panel__header drawer-header">
-              <h4 class="search-panel__title">查找资料</h4>
               <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
               <div class="search-panel__input-wrapper">
                 <n-popover
                     trigger="click"
-                    placement="bottom"
+                    placement="bottom-end"
                     v-model:show="popoverVisibleMobile"
-                    :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
-                    style="max-width: 200px; background-color: var(--white-black-50); box-sizing: border-box; padding: 0; z-index: 1000;"
+                    style="width: 260px; max-width: calc(100vw - 32px); max-height: min(360px, calc(100dvh - 160px)); overflow-y: auto;"
                 >
                   <template #trigger>
-                    <i class="ri-filter-3-line" :class="{ active: popoverVisibleMobile }"></i>
+                    <button type="button" class="query-filter-trigger" aria-label="筛选资料类型" :aria-expanded="popoverVisibleMobile" :class="{ active: popoverVisibleMobile || recipesCategories }"><i class="ri-filter-3-line" aria-hidden="true" /></button>
                   </template>
                   <template #header>
                     <n-text style="color:var(--text-main)" strong depth="1">类型筛选</n-text>
@@ -224,7 +220,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
                     <p style="color:var(--text-main)">类别:</p>
                     <div class="button-group">
                       <div v-for="item in categoriesList" :key="item">
-                        <NButton color="var(--accent)" :dashed="recipesCategories!==item" size="tiny"
+                        <NButton type="primary" :dashed="recipesCategories!==item" size="tiny"
                                  @click="changeRecipesCategories(item)">{{ item }}
                         </NButton>
                       </div>
@@ -334,7 +330,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 
   &__tag {
     display: inline-block;
-    font-size: 12px;
+    font-size: 14px;
     color: #9E8BA8;
     background: rgba(158, 139, 168, 0.1);
     padding: 3px 12px;
@@ -345,7 +341,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 
   &__desc {
     margin: 12px 0 0;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--summary-50);
     line-height: 1.6;
     max-width: 420px;
@@ -367,7 +363,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
   padding: 16px 20px;
 
   &__label {
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--custom-tag);
     text-transform: uppercase;
@@ -377,7 +373,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 
   &__content {
     color: var(--text-main);
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.7;
   }
 }
@@ -418,7 +414,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
   right: -6px;
   background-color: rgba(220, 50, 50, 0.85);
   color: white;
-  font-size: 10px;
+  font-size: 13px;
   width: 16px;
   height: 16px;
   border-radius: 50%;
@@ -429,7 +425,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 }
 
 .ingredient-name {
-  font-size: 11px;
+  font-size: 14px;
   color: var(--summary-50);
   text-align: center;
   word-break: break-all;
@@ -466,10 +462,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
     padding: 30px 20px;
   }
 
-  &__title {
-    margin: 0;
-  }
-
   &__subtitle {
     display: inline-block;
     margin: 5px 0 20px;
@@ -485,7 +477,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
       border: 0;
       border-radius: 50px;
       color: #fff;
-      font-size: 14px;
+      font-size: 16px;
       padding: 10px 15px;
       width: 100%;
 
@@ -567,12 +559,12 @@ onUnmounted(() => { document.body.style.overflow = '' })
 }
 
 .result-item__title {
-  font-size: 13px;
+  font-size: 15px;
   display: inline-block;
 }
 
 .result-item__meta {
-  font-size: 10px;
+  font-size: 13px;
   display: block;
   color: #888;
 }

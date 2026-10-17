@@ -18,11 +18,25 @@ import type { GlobalThemeOverrides } from 'naive-ui'
 const colorMode = useColorMode()
 const themeOverrides = computed<GlobalThemeOverrides>(() => ({
   common: {
-    primaryColor: colorMode.value === 'dark' ? '#afc493' : '#667c51',
-    primaryColorHover: colorMode.value === 'dark' ? '#cedeb7' : '#455e35',
-    primaryColorPressed: colorMode.value === 'dark' ? '#afc493' : '#455e35',
-    primaryColorSuppl: '#667c51',
-    borderRadius: '5px',
+    primaryColor: colorMode.value === 'dark' ? '#a5bbd4' : '#526f91',
+    primaryColorHover: colorMode.value === 'dark' ? '#c3d2e3' : '#3f5c7d',
+    primaryColorPressed: colorMode.value === 'dark' ? '#a5bbd4' : '#3f5c7d',
+    primaryColorSuppl: colorMode.value === 'dark' ? '#a5bbd4' : '#526f91',
+    bodyColor: colorMode.value === 'dark' ? '#1d1e21' : '#ffffff',
+    cardColor: colorMode.value === 'dark' ? '#26282c' : '#ffffff',
+    popoverColor: colorMode.value === 'dark' ? '#26282c' : '#ffffff',
+    modalColor: colorMode.value === 'dark' ? '#26282c' : '#ffffff',
+    inputColor: colorMode.value === 'dark' ? '#26282c' : '#f7f7f8',
+    borderColor: colorMode.value === 'dark' ? '#393c42' : '#e4e5e7',
+    dividerColor: colorMode.value === 'dark' ? '#393c42' : '#e4e5e7',
+    borderRadius: '8px',
+    fontSize: '16px',
+    fontSizeSmall: '14px',
+    fontSizeMini: '13px',
+    textColorBase: colorMode.value === 'dark' ? '#e5e7eb' : '#303238',
+    textColor1: colorMode.value === 'dark' ? '#e5e7eb' : '#303238',
+    textColor2: colorMode.value === 'dark' ? '#aeb2b9' : '#5f6368',
+    textColor3: colorMode.value === 'dark' ? '#949aa3' : '#6b7078',
     fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif'
   }
 }))

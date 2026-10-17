@@ -14,11 +14,11 @@ const githubLink = computed(() => links.find(link => link.name === 'GitHub'))
   </footer>
 </template>
 <style scoped>
-.site-footer { margin-top: 80px; padding: 29px 0 22px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 11px; }
+.site-footer { margin-top: 80px; padding: 29px 0 22px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 14px; }
 .footer-top { display: flex; align-items: center; gap: 24px; }
-.footer-name { color: var(--text-secondary); font-size: 14px; letter-spacing: -.3px; }
+.footer-name { color: var(--text-secondary); font-size: 17px; letter-spacing: -.3px; }
 .footer-name span { color: var(--accent); }
-.footer-top p { font-size: 12px; }
+.footer-top p { font-size: 15px; }
 .footer-top > a:last-child { margin-left: auto; font-size: 19px; }
 .footer-top a:hover { color: var(--accent); }
 .footer-bottom { display: flex; justify-content: space-between; margin-top: 18px; }

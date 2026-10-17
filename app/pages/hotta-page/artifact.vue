@@ -125,18 +125,16 @@ onUnmounted(() => { document.body.style.overflow = '' })
     <aside class="sidebar sidebar--right pc-sidebar">
       <div class="search-panel">
         <header class="search-panel__header">
-          <h4 class="search-panel__title">查找资料</h4>
           <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
           <div class="search-panel__input-wrapper">
             <n-popover
                 trigger="click"
-                placement="bottom"
+                placement="bottom-end"
                 v-model:show="popoverVisible"
-                :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
-                style="max-width: 200px; background-color: var(--white-black-50);box-sizing: border-box;padding:0;"
+                style="width: 260px; max-width: calc(100vw - 32px); max-height: min(360px, calc(100dvh - 160px)); overflow-y: auto;"
             >
               <template #trigger>
-                <i class="ri-filter-3-line" :class="{ 'active': popoverVisible }"></i>
+                <button type="button" class="query-filter-trigger" aria-label="筛选资料类型" :aria-expanded="popoverVisible" :class="{ active: popoverVisible || artifactRarity }"><i class="ri-filter-3-line" aria-hidden="true" /></button>
               </template>
               <template #header>
                 <n-text style="color:var(--text-main)" strong depth="1">类型筛选</n-text>
@@ -144,10 +142,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
               <div class="filter-group">
                 <p style="color:var(--text-main)">Rarity:</p>
                 <div class="button-group">
-                  <NButton color="var(--accent)" :dashed="artifactRarity!=='SSR'" size="tiny"
+                  <NButton type="primary" :dashed="artifactRarity!=='SSR'" size="tiny"
                            @click="changeArtifactRarity('SSR')">SSR
                   </NButton>
-                  <NButton color="var(--accent)" :dashed="artifactRarity!=='SR'" size="tiny"
+                  <NButton type="primary" :dashed="artifactRarity!=='SR'" size="tiny"
                            @click="changeArtifactRarity('SR')">SR
                   </NButton>
                 </div>
@@ -200,18 +198,16 @@ onUnmounted(() => { document.body.style.overflow = '' })
 
             <!-- 固定头部 -->
             <header class="search-panel__header drawer-header">
-              <h4 class="search-panel__title">查找资料</h4>
               <small class="search-panel__subtitle">按名称搜索，按类型筛选</small>
               <div class="search-panel__input-wrapper">
                 <n-popover
                     trigger="click"
-                    placement="bottom"
+                    placement="bottom-end"
                     v-model:show="popoverVisibleMobile"
-                    :arrow-style="{ backgroundColor: 'rgba(255, 255, 255, 0.8)' }"
-                    style="max-width: 200px; background-color: var(--white-black-50); box-sizing: border-box; padding: 0; z-index: 1000;"
+                    style="width: 260px; max-width: calc(100vw - 32px); max-height: min(360px, calc(100dvh - 160px)); overflow-y: auto;"
                 >
                   <template #trigger>
-                    <i class="ri-filter-3-line" :class="{ active: popoverVisibleMobile }"></i>
+                    <button type="button" class="query-filter-trigger" aria-label="筛选资料类型" :aria-expanded="popoverVisibleMobile" :class="{ active: popoverVisibleMobile || artifactRarity }"><i class="ri-filter-3-line" aria-hidden="true" /></button>
                   </template>
                   <template #header>
                     <n-text style="color:var(--text-main)" strong depth="1">类型筛选</n-text>
@@ -219,8 +215,8 @@ onUnmounted(() => { document.body.style.overflow = '' })
                   <div class="filter-group">
                     <p style="color:var(--text-main)">Rarity:</p>
                     <div class="button-group">
-                      <NButton color="var(--accent)" :dashed="artifactRarity !== 'SSR'" size="tiny" @click="changeArtifactRarity('SSR')">SSR</NButton>
-                      <NButton color="var(--accent)" :dashed="artifactRarity !== 'SR'" size="tiny" @click="changeArtifactRarity('SR')">SR</NButton>
+                      <NButton type="primary" :dashed="artifactRarity !== 'SSR'" size="tiny" @click="changeArtifactRarity('SSR')">SSR</NButton>
+                      <NButton type="primary" :dashed="artifactRarity !== 'SR'" size="tiny" @click="changeArtifactRarity('SR')">SR</NButton>
                     </div>
                   </div>
                 </n-popover>
@@ -323,7 +319,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
     border-radius: 999px;
     background: rgba(236, 155, 59, 0.14);
     color: #EC9B3B;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.4px;
   }
@@ -352,7 +348,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
   &__label {
     margin-bottom: 10px;
     color: var(--custom-tag);
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -360,7 +356,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 
   &__content {
     color: var(--text-main);
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.7;
     word-break: break-word;
   }
@@ -384,7 +380,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
   &__stars {
     flex: 0 0 72px;
     color: #EC9B3B;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.5;
     user-select: none;
   }
@@ -392,7 +388,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
   &__desc {
     flex: 1;
     color: var(--text-main);
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.7;
     word-break: break-word;
   }
@@ -427,10 +423,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
     padding: 30px 20px;
   }
 
-  &__title {
-    margin: 0;
-  }
-
   &__subtitle {
     display: inline-block;
     margin: 5px 0 20px;
@@ -446,7 +438,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
       border: 0;
       border-radius: 50px;
       color: #fff;
-      font-size: 14px;
+      font-size: 16px;
       padding: 10px 15px;
       width: 100%;
 
@@ -528,12 +520,12 @@ onUnmounted(() => { document.body.style.overflow = '' })
 }
 
 .result-item__title {
-  font-size: 13px;
+  font-size: 15px;
   display: inline-block;
 }
 
 .result-item__meta {
-  font-size: 10px;
+  font-size: 13px;
   display: block;
   color: #888;
 }
