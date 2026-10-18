@@ -94,13 +94,14 @@ onUnmounted(() => {
 
 <style scoped>
 .site-header { position: sticky; top: 0; z-index: 100; background: var(--bg-overlay); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-color); }
-.header-inner { display: flex; align-items: center; min-height: 82px; gap: 38px; }
-.site-brand { display: flex; align-items: center; gap: 11px; white-space: nowrap; font-size: 21px; font-weight: 650; letter-spacing: -.65px; }
+.header-inner { display: flex; align-items: center; min-height: 72px; gap: 32px; }
+.site-brand { display: flex; align-items: center; gap: 10px; white-space: nowrap; font-size: 20px; font-weight: 700; letter-spacing: -.5px; }
 .brand-mark, .brand-dot { color: var(--accent); }
-.brand-light { font-weight: 400; }
+.brand-light { font-weight: 500; }
 .brand-dot { margin-left: 2px; }
 .site-nav { display: flex; align-items: stretch; gap: 28px; align-self: stretch; margin-left: auto; }
-.site-nav a { display: flex; align-items: center; position: relative; color: var(--text-secondary); font-size: 16px; white-space: nowrap; }
+.site-nav a { display: flex; align-items: center; position: relative; color: var(--text-secondary); font-size: 15px; font-weight: 500; white-space: nowrap; }
+.site-nav a.is-active { font-weight: 600; }
 .site-nav a:hover, .site-nav a.is-active { color: var(--accent); }
 .site-nav a.is-active::after { position: absolute; content: ''; bottom: 0; left: 0; right: 0; height: 2px; border-radius: 2px; background: var(--accent); }
 .header-actions { display: flex; align-items: center; gap: 14px; }

@@ -14,14 +14,14 @@ const githubLink = computed(() => links.find(link => link.name === 'GitHub'))
   </footer>
 </template>
 <style scoped>
-.site-footer { margin-top: 80px; padding: 29px 0 22px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 14px; }
+.site-footer { margin-top: 48px; padding: 24px 0 20px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 13px; }
 .footer-top { display: flex; align-items: center; gap: 24px; }
-.footer-name { color: var(--text-secondary); font-size: 17px; letter-spacing: -.3px; }
+.footer-name { color: var(--text-main); font-size: 16px; font-weight: 600; letter-spacing: -.3px; }
 .footer-name span { color: var(--accent); }
-.footer-top p { font-size: 15px; }
+.footer-top p { font-size: 14px; }
 .footer-top > a:last-child { margin-left: auto; font-size: 19px; }
 .footer-top a:hover { color: var(--accent); }
 .footer-bottom { display: flex; justify-content: space-between; margin-top: 18px; }
 .footer-bottom i { margin-left: 4px; color: var(--accent); }
-@media (max-width: 700px) { .site-footer { margin-top: 50px; } .footer-top { flex-wrap: wrap; gap: 8px 16px; } .footer-top p { width: 100%; order: 3; } }
+@media (max-width: 700px) { .site-footer { margin-top: 32px; } .footer-top { flex-wrap: wrap; gap: 8px 16px; } .footer-top p { width: 100%; order: 3; } }
 </style>

@@ -297,24 +297,26 @@ onUnmounted(() => { document.body.style.overflow = '' })
         </header>
         <div class="search-panel__content">
           <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-          <n-virtual-list style="height: 100%" :item-size="50" :items="items">
+          <n-virtual-list style="height: 100%" :item-size="58" :items="items">
             <template #default="{ item }">
-              <div :key="item.weaponKey" class="result-item" :class="{'active': thisShowKey === item.weaponKey}"
-                   role="button" tabindex="0" @keydown.enter="showThisWeaponsInfo(item.weaponKey)" @click="showThisWeaponsInfo(item.weaponKey)">
-                <img :key="item.weaponKey" decoding="async" class="result-item__avatar" :src="item.weaponIcon" alt="">
-                <div class="result-item__details">
-                  <span class="result-item__title">{{ item.weaponName }}</span>
-                  <span class="result-item__meta">
-                        <img :key="item.weaponElementType" :src="getImgUrl(returnTrueFilePathByName(item.weaponElementType))"  :alt="item.weaponElementType"/>
-                        <img :key="item.weaponCategory" :src="getImgUrl(returnTrueFilePathByName(item.weaponCategory))"  :alt="item.weaponCategory"/>
-                        <img :key="item.weaponRarity" :src="getImgUrl(returnTrueFilePathByName(item.weaponRarity))"
-                          :alt="item.weaponRarity"
-                          :style="{
-                            marginLeft: item.weaponRarity === 'R' ? '-7px' :
-                                        item.weaponRarity === 'SR' ? '-4px' : '0px'
-                          }"
-                    />
-                  </span>
+              <div :key="item.weaponKey" class="query-result-row">
+                <div class="result-item" :class="{'active': thisShowKey === item.weaponKey}"
+                     role="button" tabindex="0" :aria-pressed="thisShowKey === item.weaponKey" @keydown.enter="showThisWeaponsInfo(item.weaponKey)" @click="showThisWeaponsInfo(item.weaponKey)">
+                  <img :key="item.weaponKey" decoding="async" class="result-item__avatar" :src="item.weaponIcon" alt="">
+                  <div class="result-item__details">
+                    <span class="result-item__title" :title="item.weaponName">{{ item.weaponName }}</span>
+                    <span class="result-item__meta">
+                      <img :key="item.weaponElementType" :src="getImgUrl(returnTrueFilePathByName(item.weaponElementType))" :alt="item.weaponElementType"/>
+                      <img :key="item.weaponCategory" :src="getImgUrl(returnTrueFilePathByName(item.weaponCategory))" :alt="item.weaponCategory"/>
+                      <img :key="item.weaponRarity" :src="getImgUrl(returnTrueFilePathByName(item.weaponRarity))"
+                           :alt="item.weaponRarity"
+                           :style="{
+                             marginLeft: item.weaponRarity === 'R' ? '-7px' :
+                                         item.weaponRarity === 'SR' ? '-4px' : '0px'
+                           }"
+                      />
+                    </span>
+                  </div>
                 </div>
               </div>
             </template>
@@ -375,30 +377,31 @@ onUnmounted(() => { document.body.style.overflow = '' })
               <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
               <n-virtual-list
                   style="height: 100%;"
-                  :item-size="50"
+                  :item-size="58"
                   :items="items"
               >
                 <template #default="{ item }">
-                  <div
-                      :key="item.weaponKey"
-                      class="result-item"
-                      :class="{ active: thisShowKey === item.weaponKey }"
-                      role="button" tabindex="0" @keydown.enter="showThisWeaponsInfo(item.weaponKey)" @click="showThisWeaponsInfo(item.weaponKey)"
-                  >
-                    <img :key="item.weaponKey" decoding="async" class="result-item__avatar" :src="item.weaponIcon" alt=""/>
-                    <div class="result-item__details">
-                      <span class="result-item__title">{{ item.weaponName }}</span>
-                      <span class="result-item__meta">
-                        <img :key="item.weaponElementType" :src="getImgUrl(returnTrueFilePathByName(item.weaponElementType))"  :alt="item.weaponElementType"/>
-                        <img :key="item.weaponCategory" :src="getImgUrl(returnTrueFilePathByName(item.weaponCategory))"  :alt="item.weaponCategory"/>
-                        <img  :key="item.weaponRarity" :src="getImgUrl(returnTrueFilePathByName(item.weaponRarity))"
-                             :alt="item.weaponRarity"
-                             :style="{
-                                  marginLeft: item.weaponRarity === 'R' ? '-7px' :
-                                              item.weaponRarity === 'SR' ? '-4px' : '0px'
-                             }"
-                        />
-                      </span>
+                  <div :key="item.weaponKey" class="query-result-row">
+                    <div
+                        class="result-item"
+                        :class="{ active: thisShowKey === item.weaponKey }"
+                        role="button" tabindex="0" :aria-pressed="thisShowKey === item.weaponKey" @keydown.enter="showThisWeaponsInfo(item.weaponKey)" @click="showThisWeaponsInfo(item.weaponKey)"
+                    >
+                      <img :key="item.weaponKey" decoding="async" class="result-item__avatar" :src="item.weaponIcon" alt=""/>
+                      <div class="result-item__details">
+                        <span class="result-item__title" :title="item.weaponName">{{ item.weaponName }}</span>
+                        <span class="result-item__meta">
+                          <img :key="item.weaponElementType" :src="getImgUrl(returnTrueFilePathByName(item.weaponElementType))" :alt="item.weaponElementType"/>
+                          <img :key="item.weaponCategory" :src="getImgUrl(returnTrueFilePathByName(item.weaponCategory))" :alt="item.weaponCategory"/>
+                          <img :key="item.weaponRarity" :src="getImgUrl(returnTrueFilePathByName(item.weaponRarity))"
+                               :alt="item.weaponRarity"
+                               :style="{
+                                 marginLeft: item.weaponRarity === 'R' ? '-7px' :
+                                             item.weaponRarity === 'SR' ? '-4px' : '0px'
+                               }"
+                          />
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </template>
@@ -413,6 +416,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 </template>
 
 <style scoped lang="scss">
+@use "~/assets/css/hotta-query-directory";
 
 /* PC 端布局容器 */
 .page-container-wrapper {
@@ -612,34 +616,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
   }
 }
 
-.result-item {
-  display: flex;
-  align-items: center;
-  height: 50px;
-  box-sizing: border-box;
-
-  &:hover {
-    background-color: rgba(128, 128, 128, 0.1);
-    cursor: pointer;
-  }
-
-  &.active {
-    background-color: rgba(128, 128, 128, 0.1);
-  }
-
-  &__avatar {
-    margin-left: 10px;
-    width: 28px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-
-  &__details {
-    display: flex;
-    flex-direction: column;
-  }
-}
-
 .filter-group {
   display: flex;
   align-items: flex-start;
@@ -661,15 +637,13 @@ onUnmounted(() => { document.body.style.overflow = '' })
   flex: 1;
 }
 
-.result-item__title {
-  font-size: 14px;
-  display: inline-block;
-}
 
 .result-item__meta {
   display: flex;        /* 横向排列 */
   align-items: center;  /* 垂直居中 */
   gap: 7px;             /* 图片间距 */
+  height: 16px;
+  line-height: 16px;
 }
 
 .result-item__meta img {   /* 自行调整大小 */

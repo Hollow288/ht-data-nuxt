@@ -166,15 +166,17 @@ onUnmounted(() => { document.body.style.overflow = '' })
         </header>
         <div class="search-panel__content">
           <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-          <n-virtual-list style="height: 100%" :item-size="50" :items="items">
+          <n-virtual-list style="height: 100%" :item-size="58" :items="items">
             <template #default="{ item }">
-              <div :key="item.recipesKey" class="result-item" :class="{'active': thisShowKey === item.recipesKey}"
-                   role="button" tabindex="0" @keydown.enter="showThisRecipesInfo(item.recipesKey)" @click="showThisRecipesInfo(item.recipesKey)">
-                <img :key="item.recipesKey" decoding="async" class="result-item__avatar"
-                     :src="item.recipesIcon" alt="">
-                <div class="result-item__details">
-                  <span class="result-item__title">{{ item.recipesName }}</span>
-                  <span class="result-item__meta">{{ item.recipesKey }}</span>
+              <div :key="item.recipesKey" class="query-result-row">
+                <div class="result-item" :class="{'active': thisShowKey === item.recipesKey}"
+                     role="button" tabindex="0" :aria-pressed="thisShowKey === item.recipesKey" @keydown.enter="showThisRecipesInfo(item.recipesKey)" @click="showThisRecipesInfo(item.recipesKey)">
+                  <img :key="item.recipesKey" decoding="async" class="result-item__avatar"
+                       :src="item.recipesIcon" alt="">
+                  <div class="result-item__details">
+                    <span class="result-item__title" :title="item.recipesName">{{ item.recipesName }}</span>
+                    <span class="result-item__meta">{{ item.recipesKey }}</span>
+                  </div>
                 </div>
               </div>
             </template>
@@ -234,18 +236,19 @@ onUnmounted(() => { document.body.style.overflow = '' })
             <!-- 抽屉列表 -->
             <div class="drawer-body">
               <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-              <n-virtual-list style="height: 100%;" :item-size="50" :items="items">
+              <n-virtual-list style="height: 100%;" :item-size="58" :items="items">
                 <template #default="{ item }">
-                  <div
-                      :key="item.recipesKey"
-                      class="result-item"
-                      :class="{ active: thisShowKey === item.recipesKey }"
-                      role="button" tabindex="0" @keydown.enter="showThisRecipesInfo(item.recipesKey)" @click="showThisRecipesInfo(item.recipesKey)"
-                  >
-                    <img :key="item.recipesKey" decoding="async" class="result-item__avatar" :src="item.recipesIcon" alt=""/>
-                    <div class="result-item__details">
-                      <span class="result-item__title">{{ item.recipesName }}</span>
-                      <span class="result-item__meta">{{ item.recipesKey }}</span>
+                  <div :key="item.recipesKey" class="query-result-row">
+                    <div
+                        class="result-item"
+                        :class="{ active: thisShowKey === item.recipesKey }"
+                        role="button" tabindex="0" :aria-pressed="thisShowKey === item.recipesKey" @keydown.enter="showThisRecipesInfo(item.recipesKey)" @click="showThisRecipesInfo(item.recipesKey)"
+                    >
+                      <img :key="item.recipesKey" decoding="async" class="result-item__avatar" :src="item.recipesIcon" alt=""/>
+                      <div class="result-item__details">
+                        <span class="result-item__title" :title="item.recipesName">{{ item.recipesName }}</span>
+                        <span class="result-item__meta">{{ item.recipesKey }}</span>
+                      </div>
                     </div>
                   </div>
                 </template>
@@ -260,6 +263,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 </template>
 
 <style scoped lang="scss">
+@use "~/assets/css/hotta-query-directory";
 
 /* 全局布局容器 */
 .page-container-wrapper {
@@ -509,34 +513,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
   }
 }
 
-.result-item {
-  display: flex;
-  align-items: center;
-  height: 50px;
-  box-sizing: border-box;
-
-  &:hover {
-    background-color: rgba(128, 128, 128, 0.1);
-    cursor: pointer;
-  }
-
-  &.active {
-    background-color: rgba(128, 128, 128, 0.1);
-  }
-
-  &__avatar {
-    margin-left: 10px;
-    width: 28px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-
-  &__details {
-    display: flex;
-    flex-direction: column;
-  }
-}
-
 .filter-group {
   display: flex;
   align-items: flex-start;
@@ -558,16 +534,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
   flex: 1;
 }
 
-.result-item__title {
-  font-size: 15px;
-  display: inline-block;
-}
 
-.result-item__meta {
-  font-size: 13px;
-  display: block;
-  color: #888;
-}
 
 /* =========================================
    移动端抽屉与按钮 (Mobile Drawer & FAB)

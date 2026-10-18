@@ -133,7 +133,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
     <div class="gallery-container">
       <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
       <div v-else-if="!allItems.length" class="empty-state"><i class="ri-compass-3-line" aria-hidden="true" /><p>这个分类暂时没有资料。</p></div>
-      <div v-else class="gallery-container__content">
+      <div v-else class="gallery-container__content matrix-summary">
         <div class="gallery-container__left">
           <img width="150" :src="thisMatrixInfo?.matrixIcon" :alt="thisMatrixInfo?.matrixName" class="gallery-card__image" loading="lazy"/>
           <div class="level">{{ thisMatrixInfo?.matrixQuality }}</div>
@@ -233,14 +233,16 @@ onUnmounted(() => { document.body.style.overflow = '' })
         </header>
         <div class="search-panel__content">
           <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-          <n-virtual-list style="height: 100%" :item-size="50" :items="items">
+          <n-virtual-list style="height: 100%" :item-size="58" :items="items">
             <template #default="{ item }">
-              <div :key="item.matrixKey" class="result-item" :class="{'active': thisShowKey === item.matrixKey}"
-                   role="button" tabindex="0" @keydown.enter="showThisMatrixInfo(item.matrixKey)" @click="showThisMatrixInfo(item.matrixKey)">
-                <img :key="item.matrixKey" decoding="async" class="result-item__avatar" :src="item.matrixThumbnail" alt="">
-                <div class="result-item__details">
-                  <span class="result-item__title">{{ item.matrixName }}</span>
-                  <span class="result-item__meta">{{ item.matrixQuality }}</span>
+              <div :key="item.matrixKey" class="query-result-row">
+                <div class="result-item" :class="{'active': thisShowKey === item.matrixKey}"
+                     role="button" tabindex="0" :aria-pressed="thisShowKey === item.matrixKey" @keydown.enter="showThisMatrixInfo(item.matrixKey)" @click="showThisMatrixInfo(item.matrixKey)">
+                  <img :key="item.matrixKey" decoding="async" class="result-item__avatar" :src="item.matrixThumbnail" alt="">
+                  <div class="result-item__details">
+                    <span class="result-item__title" :title="item.matrixName">{{ item.matrixName }}</span>
+                    <span class="result-item__meta">{{ item.matrixQuality }}</span>
+                  </div>
                 </div>
               </div>
             </template>
@@ -316,20 +318,21 @@ onUnmounted(() => { document.body.style.overflow = '' })
               <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
               <n-virtual-list
                   style="height: 100%;"
-                  :item-size="50"
+                  :item-size="58"
                   :items="items"
               >
                 <template #default="{ item }">
-                  <div
-                      :key="item.matrixKey"
-                      class="result-item"
-                      :class="{ active: thisShowKey === item.matrixKey }"
-                      role="button" tabindex="0" @keydown.enter="showThisMatrixInfo(item.matrixKey)" @click="showThisMatrixInfo(item.matrixKey)"
-                  >
-                    <img :key="item.matrixKey" decoding="async" class="result-item__avatar" :src="item.matrixThumbnail" alt=""/>
-                    <div class="result-item__details">
-                      <span class="result-item__title">{{ item.matrixName }}</span>
-                      <span class="result-item__meta">{{ item.matrixQuality }}</span>
+                  <div :key="item.matrixKey" class="query-result-row">
+                    <div
+                        class="result-item"
+                        :class="{ active: thisShowKey === item.matrixKey }"
+                        role="button" tabindex="0" :aria-pressed="thisShowKey === item.matrixKey" @keydown.enter="showThisMatrixInfo(item.matrixKey)" @click="showThisMatrixInfo(item.matrixKey)"
+                    >
+                      <img :key="item.matrixKey" decoding="async" class="result-item__avatar" :src="item.matrixThumbnail" alt=""/>
+                      <div class="result-item__details">
+                        <span class="result-item__title" :title="item.matrixName">{{ item.matrixName }}</span>
+                        <span class="result-item__meta">{{ item.matrixQuality }}</span>
+                      </div>
                     </div>
                   </div>
                 </template>
@@ -344,6 +347,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 </template>
 
 <style scoped lang="scss">
+@use "~/assets/css/hotta-query-directory";
 
 /* PC 端布局容器 */
 .page-container-wrapper {
@@ -385,19 +389,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      height: 100%;
+      align-self: stretch;
       position: relative;
       padding-top: 20px;
-
-      ::after {
-        content: "";
-        position: absolute;
-        top: 10%;
-        bottom: 10%;
-        right: 0;
-        width: 1px;
-        background-image: linear-gradient(to bottom, transparent, #ccc, transparent);
-      }
+      border-right: 1px solid var(--border-color);
 
       .level {
         text-transform: uppercase;
@@ -559,34 +554,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
   }
 }
 
-.result-item {
-  display: flex;
-  align-items: center;
-  height: 50px;
-  box-sizing: border-box;
-
-  &:hover {
-    background-color: rgba(128, 128, 128, 0.1);
-    cursor: pointer;
-  }
-
-  &.active {
-    background-color: rgba(128, 128, 128, 0.1);
-  }
-
-  &__avatar {
-    margin-left: 10px;
-    width: 28px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-
-  &__details {
-    display: flex;
-    flex-direction: column;
-  }
-}
-
 .filter-group {
   display: flex;
   align-items: flex-start;
@@ -608,16 +575,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
   flex: 1;
 }
 
-.result-item__title {
-  font-size: 15px;
-  display: inline-block;
-}
 
-.result-item__meta {
-  font-size: 13px;
-  display: block;
-  color: #888;
-}
 
 
 .custom-drawer-mask {
@@ -735,6 +693,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
   }
   .gallery-container__left {
     width: 100%;
+    border-right: 0;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 20px;
   }

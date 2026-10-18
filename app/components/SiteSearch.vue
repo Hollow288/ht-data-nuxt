@@ -87,8 +87,8 @@ kbd { font: 13px/1.5 monospace; border: 1px solid var(--border-color); border-ra
 .search-result { display: flex; align-items: center; gap: 14px; padding: 10px; border-radius: 5px; }
 .search-result:hover { background: var(--bg-soft); }
 .search-result > i:first-child { color: var(--accent); font-size: 19px; }
-.search-result span { flex: 1; min-width: 0; font-size: 16px; }
-.search-result small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); font-size: 14px; margin-top: 2px; }
+.search-result span { flex: 1; min-width: 0; font-size: 16px; font-weight: 600; line-height: 1.5; }
+.search-result small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); font-size: 14px; font-weight: 400; margin-top: 3px; }
 .search-result > i:last-child { color: var(--text-muted); font-size: 16px; }
 .search-status { padding: 12px 10px 20px; color: var(--text-secondary); font-size: 16px; }
 .search-footer { display: flex; justify-content: space-between; gap: 10px; padding: 12px 22px; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-muted); }

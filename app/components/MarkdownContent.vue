@@ -89,19 +89,19 @@ onUnmounted(() => feedbackTimers.forEach(clearTimeout))
   --color-border-default: var(--border-color);
   --color-border-muted: var(--border-color);
   width: 100%; min-width: 0; background: transparent; color: var(--text-main);
-  font-family: inherit; font-size: 18px; line-height: 1.95; overflow-wrap: anywhere;
+  font-family: inherit; font-size: 18px; line-height: 1.75; overflow-wrap: anywhere;
 }
 .markdown-body h1, .markdown-body h2, .markdown-body h3,
 .markdown-body h4, .markdown-body h5, .markdown-body h6 {
-  color: var(--text-main); font-weight: 600; line-height: 1.65;
+  color: var(--text-main); font-weight: 700; line-height: 1.4;
   scroll-margin-top: 18px; border: 0; padding: 0; margin: 32px 0 16px;
 }
 .markdown-body h1 { font-size: 30px; }
-.markdown-body h2 { font-size: 26px; margin-top: 42px; }
-.markdown-body h3 { font-size: 21px; }
+.markdown-body h2 { font-size: 25px; margin-top: 32px; margin-bottom: 14px; }
+.markdown-body h3 { font-size: 21px; margin-top: 24px; margin-bottom: 12px; }
 .markdown-body h4 { font-size: 19px; }
 .markdown-body > :first-child { margin-top: 0; }
-.markdown-body p, .markdown-body ul, .markdown-body ol { margin: 0 0 20px; }
+.markdown-body p, .markdown-body ul, .markdown-body ol { margin: 0 0 16px; }
 .markdown-body li + li { margin-top: 6px; }
 .markdown-body li > p { margin-bottom: 8px; }
 .markdown-body a { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
@@ -113,7 +113,7 @@ onUnmounted(() => feedbackTimers.forEach(clearTimeout))
 .markdown-body :not(pre) > code { padding: .15em .35em; border-radius: 3px; background: var(--bg-soft); color: var(--accent); font-size: .87em; overflow-wrap: anywhere; }
 .markdown-body img { display: block; max-width: 100%; height: auto; margin: 24px auto; border-radius: 4px; background: transparent; }
 .markdown-body hr { height: 1px; margin: 36px 0; background: var(--border-color); border: 0; }
-.markdown-body .code-block { overflow: hidden; margin: 24px 0; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-soft); }
+.markdown-body .code-block { overflow: hidden; margin: 20px 0; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-soft); }
 .markdown-body .code-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 16px; border-bottom: 1px solid var(--border-color); font-size: 13px; line-height: 1.7; color: var(--text-secondary); }
 .markdown-body .code-toolbar > span { font-weight: 600; }
 .markdown-body .code-copy { display: inline-flex; align-items: center; gap: 5px; padding: 2px 0; border: 0; background: none; font-size: 13px; color: var(--text-secondary); }
@@ -124,14 +124,12 @@ onUnmounted(() => feedbackTimers.forEach(clearTimeout))
 .markdown-body pre { margin: 24px 0; padding: 16px; border: 0; border-radius: 5px; background: var(--bg-soft); color: var(--text-main); overflow: auto; font: 14px/1.8 Consolas, 'SFMono-Regular', 'Courier New', monospace; text-shadow: none; }
 .markdown-body .code-scroll pre { flex: 1; overflow: visible; margin: 0; padding: 0 18px; border-radius: 0; }
 .markdown-body pre code { display: block; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; line-height: inherit; white-space: pre; word-break: normal; overflow-wrap: normal; tab-size: 2; text-shadow: none; }
-.markdown-body .token:is(.comment,.prolog,.doctype,.cdata) { color: #7e8977; }
-.markdown-body .token:is(.punctuation,.operator) { color: #747d6e; }
+.markdown-body .token:is(.comment,.prolog,.doctype,.cdata) { color: var(--text-muted); }
+.markdown-body .token:is(.punctuation,.operator) { color: var(--text-secondary); }
 .markdown-body .token:is(.property,.tag,.constant,.symbol,.deleted,.number,.boolean) { color: #a56851; }
 .markdown-body .token:is(.selector,.attr-name,.string,.char,.builtin,.inserted) { color: #627c42; }
 .markdown-body .token:is(.keyword,.atrule,.attr-value) { color: #86729b; }
 .markdown-body .token:is(.function,.class-name) { color: #4d7e8a; }
-html.dark .markdown-body .token:is(.comment,.prolog,.doctype,.cdata) { color: #86947d; }
-html.dark .markdown-body .token:is(.punctuation,.operator) { color: #b5c0ac; }
 html.dark .markdown-body .token:is(.property,.tag,.constant,.symbol,.deleted,.number,.boolean) { color: #d4a184; }
 html.dark .markdown-body .token:is(.selector,.attr-name,.string,.char,.builtin,.inserted) { color: #b3c88e; }
 html.dark .markdown-body .token:is(.keyword,.atrule,.attr-value) { color: #bea7ce; }

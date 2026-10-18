@@ -156,14 +156,16 @@ onUnmounted(() => { document.body.style.overflow = '' })
         </header>
         <div class="search-panel__content">
           <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-          <n-virtual-list style="height: 100%" :item-size="50" :items="items">
+          <n-virtual-list style="height: 100%" :item-size="58" :items="items">
             <template #default="{ item }">
-              <div :key="item.artifactKey" class="result-item" :class="{'active': thisShowKey === item.artifactKey}"
-                   role="button" tabindex="0" @keydown.enter="showThisArtifactInfo(item.artifactKey)" @click="showThisArtifactInfo(item.artifactKey)">
-                <img :key="item.artifactKey" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt="">
-                <div class="result-item__details">
-                  <span class="result-item__title">{{ item.artifactName }}</span>
-                  <span class="result-item__meta">{{ item.artifactRarity }}</span>
+              <div :key="item.artifactKey" class="query-result-row">
+                <div class="result-item" :class="{'active': thisShowKey === item.artifactKey}"
+                     role="button" tabindex="0" :aria-pressed="thisShowKey === item.artifactKey" @keydown.enter="showThisArtifactInfo(item.artifactKey)" @click="showThisArtifactInfo(item.artifactKey)">
+                  <img :key="item.artifactKey" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt="">
+                  <div class="result-item__details">
+                    <span class="result-item__title" :title="item.artifactName">{{ item.artifactName }}</span>
+                    <span class="result-item__meta">{{ item.artifactRarity }}</span>
+                  </div>
                 </div>
               </div>
             </template>
@@ -229,20 +231,21 @@ onUnmounted(() => { document.body.style.overflow = '' })
               <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
               <n-virtual-list
                   style="height: 100%;"
-                  :item-size="50"
+                  :item-size="58"
                   :items="items"
               >
                 <template #default="{ item }">
-                  <div
-                      :key="item.artifactKey"
-                      class="result-item"
-                      :class="{ active: thisShowKey === item.artifactKey }"
-                      role="button" tabindex="0" @keydown.enter="showThisArtifactInfo(item.artifactKey)" @click="showThisArtifactInfo(item.artifactKey)"
-                  >
-                    <img :key="item.artifactKey" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt=""/>
-                    <div class="result-item__details">
-                      <span class="result-item__title">{{ item.artifactName }}</span>
-                      <span class="result-item__meta">{{ item.artifactRarity }}</span>
+                  <div :key="item.artifactKey" class="query-result-row">
+                    <div
+                        class="result-item"
+                        :class="{ active: thisShowKey === item.artifactKey }"
+                        role="button" tabindex="0" :aria-pressed="thisShowKey === item.artifactKey" @keydown.enter="showThisArtifactInfo(item.artifactKey)" @click="showThisArtifactInfo(item.artifactKey)"
+                    >
+                      <img :key="item.artifactKey" decoding="async" class="result-item__avatar" :src="item.artifactThumbnail" alt=""/>
+                      <div class="result-item__details">
+                        <span class="result-item__title" :title="item.artifactName">{{ item.artifactName }}</span>
+                        <span class="result-item__meta">{{ item.artifactRarity }}</span>
+                      </div>
                     </div>
                   </div>
                 </template>
@@ -257,6 +260,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
 </template>
 
 <style scoped lang="scss">
+@use "~/assets/css/hotta-query-directory";
 
 /* PC 端布局容器 */
 .page-container-wrapper {
@@ -470,34 +474,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
   }
 }
 
-.result-item {
-  display: flex;
-  align-items: center;
-  height: 50px;
-  box-sizing: border-box;
-
-  &:hover {
-    background-color: rgba(128, 128, 128, 0.1);
-    cursor: pointer;
-  }
-
-  &.active {
-    background-color: rgba(128, 128, 128, 0.1);
-  }
-
-  &__avatar {
-    margin-left: 10px;
-    width: 28px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-
-  &__details {
-    display: flex;
-    flex-direction: column;
-  }
-}
-
 .filter-group {
   display: flex;
   align-items: flex-start;
@@ -519,16 +495,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
   flex: 1;
 }
 
-.result-item__title {
-  font-size: 15px;
-  display: inline-block;
-}
 
-.result-item__meta {
-  font-size: 13px;
-  display: block;
-  color: #888;
-}
 
 
 .custom-drawer-mask {
