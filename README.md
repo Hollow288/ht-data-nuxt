@@ -55,6 +55,40 @@ NUXT_DEV_API_TARGET=http://127.0.0.1:5777/api/v1/
 开发代理仅在 `npm run dev` 中生效；生产环境仍需由反向代理将 `/hotta-api/`
 转发到后端的 `/api/v1/`。
 
+## 小工具
+
+`/tools` 是统一工具目录，包含 OCR 和从 `fish-tools` 移植的 8 个工具。
+目录定义位于 `app/data/tools.ts`，同时用于工具列表、分类和站内搜索。
+
+| 路由 | 工具 |
+| --- | --- |
+| `/tools/ocr` | OCR 图片与 PDF 文字识别（保留 `/ocr-page` 原地址） |
+| `/tools/twofa` | TOTP / HOTP 动态码，支持 SHA1 / SHA256 / SHA512 |
+| `/tools/one-line` | 多行文本压一行 |
+| `/tools/caesar` | 凯撒密码 25 种位移枚举 |
+| `/tools/base64-image` | Base64、图片与 UTF-8 文字互转 |
+| `/tools/encode` | URL 与 Unicode 编码解码 |
+| `/tools/color` | HEX / RGB / HSL 颜色转换 |
+| `/tools/sub-email` | 顺序或随机生成子邮箱，单次最多 1000 个 |
+| `/tools/js-runner` | JavaScript 编辑和沙箱运行 |
+
+2FA 支持 `/tools/twofa?input=...`，也兼容原项目的
+`/tools/twofa/<URL 编码后的密钥或 otpauth 链接>` 预填方式。
+除 OCR 使用现有后端外，其他工具均在浏览器中处理，无需启动 `fish-tools`。
+JS 运行器使用 CodeMirror 编辑器及沙箱内的 Web Worker，支持停止和 5 秒超时，
+请求强制省略凭据并遵守 CORS。
+
+运行 `npm run test:tools` 检查 OTP 标准向量及转换逻辑，
+运行 `npm run typecheck` 检查 Nuxt 应用类型。
+
+## Naive UI
+
+直接依赖官方 `naive-ui`，组件在使用的 Vue 文件中按需导入，不再使用社区 Nuxt 适配模块。
+`app/plugins/naive-ui.server.ts` 使用官方依赖 `@css-render/vue3-ssr` 收集首屏样式；
+`nuxt.config.ts` 的 `vite.ssr.noExternal` 处理服务端 ESM 依赖，
+`vite.optimizeDeps.include` 为浏览器预打包组件库，避免开发刷新时产生数千个模块请求。
+`app/app.vue` 统一管理明暗主题。
+
 ## Production
 
 Build the application for production:

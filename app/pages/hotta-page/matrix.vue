@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {NButton, NPopover, NTabPane, NTabs, NText, NVirtualList} from "naive-ui";
+import {NButton, NIconWrapper, NPopover, NSlider, NTabPane, NTabs, NText, NVirtualList} from "naive-ui";
 import {ref} from "vue";
 import type {Matrix, MatrixListDto, MatrixListDtoRes, MatrixRes} from "~/types/matrix";
 import {onMounted} from 'vue'

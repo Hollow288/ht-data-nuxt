@@ -4,6 +4,7 @@ import { NButton, NRadio, NRadioGroup, NSlider, NSpin, NTag, NEmpty, NInput, NCh
 import { BaseAPI } from '~/utils/api'
 import type { OcrMode, OcrStatus, OcrSubmitRes, OcrResultRes, OcrTask } from '~/types/ocr'
 
+definePageMeta({ alias: ['/tools/ocr'] })
 useSeoMeta({ title: 'OCR 文字识别 · Hollow’s Space', description: '从图片或 PDF 中提取文字，支持置信度筛选、识别位置查看与文本复制。' })
 
 const ACCEPT_EXT = ['jpg', 'jpeg', 'png', 'webp', 'bmp', 'heic', 'heif', 'pdf']
@@ -928,7 +929,9 @@ onUnmounted(() => {
 .ocr-card__header { align-items: center; margin-bottom: 24px; }.ocr-card__title { font-weight: 700; font-size: 20px; padding-left: 0; }.ocr-card__title::before { display: none; }.ocr-card__subtitle { font-size: 14px; color: var(--text-muted); }
 .dropzone { border: 1px dashed var(--border-color); border-radius: 8px; padding: 46px 20px; background: var(--bg-soft); }.dropzone:hover, .dropzone--active { border-color: var(--accent); background: var(--accent-soft); }.dropzone__icon { color: var(--accent); font-size: 38px; }.dropzone__title { font-size: 17px; font-weight: 600; margin-top: 12px; }.dropzone__hint { color: var(--text-muted); font-size: 14px; margin-top: 8px; }
 .ocr-section { margin-bottom: 27px; }.option-row { padding-block: 8px; }.option-row__label { color: var(--text-secondary); font-size: 14px; }.confidence-value { color: var(--accent); font-size: 14px; }
-.file-card { border-radius: 6px; background: var(--bg-body); box-shadow: none; }.file-card__preview { border-radius: 4px; }
+.dropzone--has-file { padding: 18px; }
+.file-card { border-radius: 6px; background: transparent; box-shadow: none; }.file-card__preview { border-radius: 4px; background: transparent; }
+.ocr-page :deep(:is(input, textarea, select):focus) { outline: none; box-shadow: none; }
 .result-section { margin-top: 34px; padding-top: 26px; border-top: 1px solid var(--border-color); }.result-table th { color: var(--text-secondary); background: var(--bg-soft); font-weight: 500; }.result-table td { border-color: var(--border-color); }.copy-btn:hover:not(:disabled) { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
-@media (max-width: 700px) { .ocr-page { width: calc(100% - 40px); padding: 0; }.ocr-card { padding: 20px; }.ocr-card__header { flex-wrap: wrap; gap: 15px; }.ocr-card__header-text { flex-basis: 100%; }.ocr-card__action { margin: 0; }.dropzone { padding: 32px 12px; }.dropzone__hint { font-size: 13px; line-height: 1.7; }.option-row__control :deep(.n-radio-group) { display: flex; flex-wrap: wrap; gap: 8px; }.option-row__control :deep(.n-radio__label) { font-size: 14px; } }
+@media (max-width: 700px) { .ocr-page { width: calc(100% - 40px); padding: 0; }.ocr-card { padding: 20px; }.ocr-card__header { flex-wrap: wrap; gap: 15px; }.ocr-card__header-text { flex-basis: 100%; }.ocr-card__action { margin: 0; }.dropzone { padding: 32px 12px; }.dropzone--has-file { padding: 14px; }.dropzone__hint { font-size: 13px; line-height: 1.7; }.option-row__control :deep(.n-radio-group) { display: flex; flex-wrap: wrap; gap: 8px; }.option-row__control :deep(.n-radio__label) { font-size: 14px; } }
 </style>

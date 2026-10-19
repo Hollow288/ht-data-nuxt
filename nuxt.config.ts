@@ -5,7 +5,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: false },
-  modules: ['@pinia/nuxt', '@bg-dev/nuxt-naiveui', '@nuxtjs/color-mode'],
+  modules: ['@pinia/nuxt', '@nuxtjs/color-mode'],
   runtimeConfig: {
     public: {
       enableMock: process.env.NUXT_PUBLIC_ENABLE_MOCK === 'true'
@@ -21,6 +21,13 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [tsconfigPaths()],
+    optimizeDeps: {
+      include: ['naive-ui']
+    },
+    ssr: {
+      // Handle ESM on the server without excluding browser dependency pre-bundling.
+      noExternal: ['naive-ui', 'vueuc', '@css-render/vue3-ssr']
+    }
   },
   css: ['~/assets/css/global.css',
     'remixicon/fonts/remixicon.css'],

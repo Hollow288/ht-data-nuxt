@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { siteNav, hottaCategories } from '~/data/site'
+import { tools } from '~/data/tools'
 import { BaseAPI } from '~/utils/api'
 import type { BlogDateListRes, BlogItem } from '~/types/blog'
 
@@ -11,12 +12,12 @@ const failed = ref(false)
 const route = useRoute()
 const destinations = [
   ...siteNav,
-  { label: 'OCR 文字识别', to: '/ocr-page', icon: 'ri-scan-2-line', description: '从图片与 PDF 中提取文字' },
+  ...tools.map(tool => ({ label: tool.name, to: `/tools/${tool.id}`, icon: tool.icon, description: tool.description, keywords: tool.keywords.join(' ') })),
   ...hottaCategories.map(item => ({ label: `幻塔 · ${item.name}`, to: `/hotta-page/${item.slug}`, icon: item.icon, description: item.description }))
 ]
 const matches = computed(() => {
   const keyword = query.value.trim().toLowerCase()
-  return destinations.filter(item => `${item.label} ${item.description}`.toLowerCase().includes(keyword))
+  return destinations.filter(item => `${item.label} ${item.description} ${'keywords' in item ? item.keywords : ''}`.toLowerCase().includes(keyword))
 })
 function open() { if (!dialog.value?.open) dialog.value?.showModal() }
 function close() { dialog.value?.close() }

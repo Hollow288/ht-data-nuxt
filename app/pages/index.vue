@@ -2,14 +2,14 @@
 import { BaseAPI } from '~/utils/api'
 import { links } from '~/data/links'
 import type { BlogDateMenuRes, BlogDateListRes, BlogItem } from '~/types/blog'
-useSeoMeta({ title: 'Hollow’s Space · 在这里，慢慢生长', description: '你好，我是 Hollow。这里记录开发与生活，分享实用小工具，也收藏幻塔世界里的探索。' })
+useSeoMeta({ title: 'Hollow’s Space', description: '你好，我是 Hollow。这里记录开发与生活，分享实用小工具，也收藏幻塔世界里的探索。' })
 const articles = ref<BlogItem[]>([])
 const loading = ref(true)
 const failed = ref(false)
-const socialLinks = computed(() => links.filter(link => ['GitHub', 'Bilibili', '邮箱'].includes(link.name) && !link.url.includes('example.com')))
+const socialLinks = computed(() => links.filter(link => ['GitHub', 'Bilibili', '邮箱', '探针'].includes(link.name) && !link.url.includes('example.com')))
 const sections = [
   { title: '文章与笔记', icon: 'ri-quill-pen-line', description: '开发实践、学习记录，还有生活里值得留下的片刻。', link: '浏览文章', to: '/blog-page' },
-  { title: '实用小工具', icon: 'ri-tools-line', description: '从图片和 PDF 中提取文字，让重复的事情简单一点。', link: '打开工具箱', to: '/tools' },
+  { title: '实用小工具', icon: 'ri-tools-line', description: '文字识别、编码转换和开发小帮手，让重复的事情简单一点。', link: '打开工具箱', to: '/tools' },
   { title: '幻塔资料库', icon: 'ri-planet-line', description: '查询武器、意志、源器与烹饪资料，为探索做好准备。', link: '查阅资料', to: '/hotta-page' }
 ]
 async function loadArticles() {

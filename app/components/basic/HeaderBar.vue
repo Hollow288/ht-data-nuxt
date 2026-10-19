@@ -13,7 +13,7 @@ const githubLink = computed(() => links.find(link => link.name === 'GitHub'))
 function isActive(to: string) {
   if (to === '/') return route.path === '/'
   if (to === '/blog-page') return ['/blog-page', '/markdown-page'].includes(route.path)
-  if (to === '/tools') return ['/tools', '/ocr-page'].includes(route.path)
+  if (to === '/tools') return route.path === '/tools' || route.path.startsWith('/tools/') || route.path === '/ocr-page'
   return route.path.startsWith(to)
 }
 function toggleTheme() { colorMode.preference = colorMode.value === 'dark' ? 'light' : 'dark' }
