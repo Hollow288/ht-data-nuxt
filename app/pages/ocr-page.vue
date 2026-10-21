@@ -683,6 +683,11 @@ onUnmounted(() => {
 .result-section {
   border-top: 1px solid var(--border-color);
   padding-top: 22px;
+
+  ::selection {
+    color: var(--bg-card);
+    background-color: var(--accent);
+  }
 }
 
 .result-header {
