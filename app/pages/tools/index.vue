@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { tools, matchesToolQuery } from '~/data/tools'
 
-useSeoMeta({ title: '小工具 · Hollow’s Space', description: '文字识别、编码转换、动态验证码与 JavaScript 运行。把日常重复的小事变简单。' })
+useSeoMeta({ title: '小工具 · Hollow’s Space', description: '文字识别、JSON 格式化、编码转换、动态验证码与 JavaScript 运行。把日常重复的小事变简单。' })
 const query = ref('')
 const category = ref('全部')
 const categories = ['全部', '文字与编码', '开发与安全', '日常效率']
