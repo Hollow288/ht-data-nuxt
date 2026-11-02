@@ -5,7 +5,7 @@ export const useProgressStore = defineStore('progress', () => {
     const width = ref(0)
     const active = ref(false)
     let timer: number | null = null
-    let requestCount = 0
+    const pendingRequests = ref(0)
 
     const start = () => {
         if (active.value) return
@@ -31,17 +31,16 @@ export const useProgressStore = defineStore('progress', () => {
 
     // 对外统一方法：增加/减少请求计数
     const requestStart = () => {
-        requestCount++
-        if (requestCount === 1) start()
+        pendingRequests.value++
+        if (pendingRequests.value === 1) start()
     }
 
     const requestEnd = () => {
-        requestCount--
-        if (requestCount <= 0) {
-            requestCount = 0
+        pendingRequests.value = Math.max(0, pendingRequests.value - 1)
+        if (pendingRequests.value === 0) {
             finish()
         }
     }
 
-    return { width, active, requestStart, requestEnd}
+    return { width, active, pendingRequests, requestStart, requestEnd}
 })

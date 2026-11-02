@@ -89,6 +89,15 @@ JSON 工具默认将 `context` 等字符串字段中的合法 JSON 对象或数�
 运行 `npm run test:tools` 检查 OTP 标准向量及转换逻辑，
 运行 `npm run typecheck` 检查 Nuxt 应用类型。
 
+## 首屏开屏
+
+首次打开任意页面时，以灰蓝色笔画依次写出手写体「Hollow’s Space」，不依赖外部字体。
+写完后停顿 900ms，页面仍在加载时从头重写；慢加载时，字样右下角提供带箭头的「先进去看看」文字链接。
+`app/composables/useInitialLoading.ts` 等待页面挂载、初始资源、异步页面及现有 API 请求完成，
+连续 120ms 没有待处理请求后退出；站内导航不会重复播放。
+等待 5 秒显示「先进去看看」，12 秒自动放行，不取消页面本身的数据加载。
+动画位于 `app/components/SiteSplash.vue`，支持明暗主题、移动端及减少动态效果设置。
+
 ## Naive UI
 
 直接依赖官方 `naive-ui`，组件在使用的 Vue 文件中按需导入，不再使用社区 Nuxt 适配模块。

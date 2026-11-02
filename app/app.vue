@@ -1,18 +1,27 @@
 <template>
-  <n-config-provider
-      :theme="naiveTheme"
-      :theme-overrides="themeOverrides"
-      inline-theme-disabled
-  >
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
-  </n-config-provider>
+  <SiteSplash :active="initialLoading" :slow="slowInitialLoad" @skip="finishInitialLoad" />
+  <div :inert="initialLoading && themeReady" :aria-busy="initialLoading && themeReady">
+    <n-config-provider
+        :theme="naiveTheme"
+        :theme-overrides="themeOverrides"
+        inline-theme-disabled
+    >
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </n-config-provider>
+  </div>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue'
 import { NConfigProvider, darkTheme } from 'naive-ui'
 import type { GlobalThemeOverrides } from 'naive-ui'
+import { useInitialLoading } from '~/composables/useInitialLoading'
+
+const { active: initialLoading, slow: slowInitialLoad, finish: finishInitialLoad } = useInitialLoading()
+useHead({
+  noscript: [{ innerHTML: '<style>.site-splash{display:none!important}html{overflow:auto!important}</style>' }]
+})
 
 // 获取 color-mode 实例
 const colorMode = useColorMode()
