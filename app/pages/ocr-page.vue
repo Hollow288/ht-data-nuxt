@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { NButton, NRadio, NRadioGroup, NSlider, NSpin, NTag, NEmpty, NInput, NCheckbox } from 'naive-ui'
 import { BaseAPI } from '~/utils/api'
 import type { OcrMode, OcrStatus, OcrSubmitRes, OcrResultRes, OcrTask } from '~/types/ocr'
@@ -8,6 +8,16 @@ definePageMeta({ alias: ['/tools/ocr'] })
 useSeoMeta({ title: 'OCR 文字识别 · Hollow’s Space', description: '从图片或 PDF 中提取文字，支持置信度筛选、识别位置查看与文本复制。' })
 
 const ACCEPT_EXT = ['jpg', 'jpeg', 'png', 'webp', 'bmp', 'heic', 'heif', 'pdf']
+const CLIPBOARD_EXT_BY_MIME: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/bmp': 'bmp',
+  'image/heic': 'heic',
+  'image/heif': 'heif',
+  'application/pdf': 'pdf'
+}
 const MAX_FILE_SIZE = 50 * 1024 * 1024
 const POLL_INTERVAL = 1500
 const MAX_POLLS = 240
@@ -89,6 +99,31 @@ function onDrop(e: DragEvent) {
   isDragOver.value = false
   const f = e.dataTransfer?.files?.[0]
   if (f) setFile(f)
+}
+
+function onPaste(e: ClipboardEvent) {
+  if (e.defaultPrevented || isWorking.value) return
+  const target = e.target
+  if (target instanceof HTMLElement && (
+    target.isContentEditable || target.closest('input, textarea, select, [role="textbox"]')
+  )) return
+
+  const data = e.clipboardData
+  const pastedFile = data?.files[0]
+    ?? Array.from(data?.items ?? []).find(item => item.kind === 'file')?.getAsFile()
+  if (!pastedFile) return
+
+  e.preventDefault()
+  // 截图或聊天软件提供的图片可能没有文件扩展名，按实际 MIME 补全。
+  const ext = pastedFile.name.split('.').pop()?.toLowerCase() ?? ''
+  const clipboardExt = CLIPBOARD_EXT_BY_MIME[pastedFile.type]
+  const normalizedFile = !ACCEPT_EXT.includes(ext) && clipboardExt
+    ? new File([pastedFile], `clipboard-${Date.now()}.${clipboardExt}`, {
+      type: pastedFile.type,
+      lastModified: pastedFile.lastModified
+    })
+    : pastedFile
+  setFile(normalizedFile)
 }
 
 function setFile(f: File) {
@@ -220,7 +255,12 @@ function formatBbox(bbox: number[][] | null | undefined) {
   return `${xMin.toFixed(0)}, ${yMin.toFixed(0)}, ${w.toFixed(0)} × ${h.toFixed(0)}`
 }
 
+onMounted(() => {
+  document.addEventListener('paste', onPaste)
+})
+
 onUnmounted(() => {
+  document.removeEventListener('paste', onPaste)
   stopPolling()
   if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
 })
@@ -259,7 +299,8 @@ onUnmounted(() => {
           class="dropzone"
           role="button"
           :tabindex="file ? -1 : 0"
-          aria-label="选择图片或 PDF 文件"
+          aria-label="选择图片或 PDF 文件，也可按 Ctrl+V 或 Command+V 粘贴图片"
+          aria-describedby="ocr-paste-hint"
           :class="{ 'dropzone--active': isDragOver, 'dropzone--has-file': !!file }"
           @click="!file && pickFile()"
           @keydown.enter.prevent="!file && pickFile()"
@@ -296,6 +337,7 @@ onUnmounted(() => {
             </div>
           </template>
         </div>
+        <p id="ocr-paste-hint" class="paste-hint">复制图片后，在此页面按 Ctrl+V（Mac：⌘V）即可添加或替换图片，再点击「开始识别」。</p>
       </section>
 
       <!-- 选项 -->
@@ -934,6 +976,7 @@ onUnmounted(() => {
 .ocr-card__header { align-items: center; margin-bottom: 24px; }.ocr-card__title { font-weight: 700; font-size: 20px; padding-left: 0; }.ocr-card__title::before { display: none; }.ocr-card__subtitle { font-size: 14px; color: var(--text-muted); }
 .dropzone { border: 1px dashed var(--border-color); border-radius: 8px; padding: 46px 20px; background: var(--bg-soft); }.dropzone:hover, .dropzone--active { border-color: var(--accent); background: var(--accent-soft); }.dropzone__icon { color: var(--accent); font-size: 38px; }.dropzone__title { font-size: 17px; font-weight: 600; margin-top: 12px; }.dropzone__hint { color: var(--text-muted); font-size: 14px; margin-top: 8px; }
 .ocr-section { margin-bottom: 27px; }.option-row { padding-block: 8px; }.option-row__label { color: var(--text-secondary); font-size: 14px; }.confidence-value { color: var(--accent); font-size: 14px; }
+.paste-hint { margin: 10px 0 0; color: var(--text-muted); font-size: 13px; line-height: 1.7; }
 .dropzone--has-file { padding: 18px; }
 .file-card { border-radius: 6px; background: transparent; box-shadow: none; }.file-card__preview { border-radius: 4px; background: transparent; }
 .ocr-page :deep(:is(input, textarea, select):focus) { outline: none; box-shadow: none; }
