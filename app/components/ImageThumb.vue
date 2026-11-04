@@ -12,6 +12,9 @@ const props = withDefaults(defineProps<{
   height?: number | string
   /** 缩略图填充模式（object-fit） */
   fit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down'
+  /** 确认预览方向时应用到源文件；未提供时仅预览。 */
+  applyRotation?: (degrees: number) => Promise<void>
+  rotationDisabled?: boolean
 }>(), {
   alt: '预览图片',
   width: '100%',
@@ -43,7 +46,13 @@ function openPreview() {
     <span class="image-thumb__zoom" aria-hidden="true">
       <i class="ri-zoom-in-line"></i>
     </span>
-    <ImagePreview v-model:show="show" :src="src" :alt="alt" />
+    <ImagePreview
+      v-model:show="show"
+      :src="src"
+      :alt="alt"
+      :apply-rotation="applyRotation"
+      :rotation-disabled="rotationDisabled"
+    />
   </div>
 </template>
 

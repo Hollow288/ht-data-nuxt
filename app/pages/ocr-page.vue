@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { NButton, NRadio, NRadioGroup, NSlider, NSpin, NTag, NEmpty, NInput, NCheckbox } from 'naive-ui'
 import { BaseAPI } from '~/utils/api'
+import { rotateOcrImage } from '~/utils/ocr-image'
 import type { OcrMode, OcrStatus, OcrSubmitRes, OcrResultRes, OcrTask } from '~/types/ocr'
 
 definePageMeta({ alias: ['/tools/ocr'] })
@@ -24,6 +25,9 @@ const MAX_POLLS = 240
 
 const file = ref<File | null>(null)
 const previewUrl = ref<string>('')
+const originalFile = ref<File | null>(null)
+const appliedRotation = ref(0)
+const rotating = ref(false)
 const mode = ref<OcrMode>('detail')
 const minConfidence = ref<number>(0)
 const isDragOver = ref(false)
@@ -39,6 +43,7 @@ const showBbox = ref<boolean>(true)
 
 let pollTimer: ReturnType<typeof setTimeout> | null = null
 let pollCount = 0
+let fileRevision = 0
 
 const isImageFile = computed(() => {
   if (!file.value) return false
@@ -102,7 +107,7 @@ function onDrop(e: DragEvent) {
 }
 
 function onPaste(e: ClipboardEvent) {
-  if (e.defaultPrevented || isWorking.value) return
+  if (e.defaultPrevented || isWorking.value || rotating.value) return
   const target = e.target
   if (target instanceof HTMLElement && (
     target.isContentEditable || target.closest('input, textarea, select, [role="textbox"]')
@@ -127,6 +132,7 @@ function onPaste(e: ClipboardEvent) {
 }
 
 function setFile(f: File) {
+  if (rotating.value) return
   errorMsg.value = ''
   const ext = f.name.split('.').pop()?.toLowerCase() ?? ''
   if (!ACCEPT_EXT.includes(ext)) {
@@ -137,13 +143,47 @@ function setFile(f: File) {
     errorMsg.value = '文件不能超过 50MB'
     return
   }
+  originalFile.value = f
+  appliedRotation.value = 0
+  fileRevision++
+  updateFile(f)
+}
+
+function updateFile(f: File) {
+  const nextPreviewUrl = f.type.startsWith('image/') ? URL.createObjectURL(f) : ''
+  const previousPreviewUrl = previewUrl.value
   file.value = f
-  if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
-  previewUrl.value = f.type.startsWith('image/') ? URL.createObjectURL(f) : ''
+  previewUrl.value = nextPreviewUrl
+  if (previousPreviewUrl) URL.revokeObjectURL(previousPreviewUrl)
   resetTask()
 }
 
+async function applyImageRotation(degrees: number) {
+  if (isWorking.value || rotating.value) throw new Error('当前任务处理中，请稍后再调整方向')
+  if (!originalFile.value || !isImageFile.value) throw new Error('请先选择一张图片')
+  if (degrees === 0) return
+
+  const source = originalFile.value
+  const revision = fileRevision
+  const nextRotation = (appliedRotation.value + degrees) % 360
+  rotating.value = true
+  try {
+    // 每次都从原图处理，避免多次确认造成重复编码。
+    const rotatedFile = await rotateOcrImage(source, nextRotation)
+    if (revision !== fileRevision) throw new Error('图片已变更，请重新打开预览')
+    if (rotatedFile.size > MAX_FILE_SIZE) throw new Error('调整后的图片超过 50MB，请先缩小图片后重试')
+    updateFile(rotatedFile)
+    appliedRotation.value = nextRotation
+  } finally {
+    rotating.value = false
+  }
+}
+
 function clearFile() {
+  if (rotating.value) return
+  originalFile.value = null
+  appliedRotation.value = 0
+  fileRevision++
   file.value = null
   if (previewUrl.value) {
     URL.revokeObjectURL(previewUrl.value)
@@ -170,7 +210,7 @@ function stopPolling() {
 }
 
 async function handleSubmit() {
-  if (!file.value || isWorking.value) return
+  if (!file.value || isWorking.value || rotating.value) return
   resetTask()
   submitting.value = true
   try {
@@ -260,6 +300,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  fileRevision++
   document.removeEventListener('paste', onPaste)
   stopPolling()
   if (previewUrl.value) URL.revokeObjectURL(previewUrl.value)
@@ -282,14 +323,14 @@ onUnmounted(() => {
         <n-button
           class="ocr-card__action"
           type="primary"
-          :loading="isWorking"
-          :disabled="!file || isWorking"
+          :loading="isWorking || rotating"
+          :disabled="!file || isWorking || rotating"
           @click="handleSubmit"
         >
           <template #icon>
             <i class="ri-scan-2-line"></i>
           </template>
-          {{ isWorking ? '识别中...' : '开始识别' }}
+          {{ rotating ? '调整中...' : isWorking ? '识别中...' : '开始识别' }}
         </n-button>
       </header>
 
@@ -303,8 +344,8 @@ onUnmounted(() => {
           aria-describedby="ocr-paste-hint"
           :class="{ 'dropzone--active': isDragOver, 'dropzone--has-file': !!file }"
           @click="!file && pickFile()"
-          @keydown.enter.prevent="!file && pickFile()"
-          @keydown.space.prevent="!file && pickFile()"
+          @keydown.enter.self.prevent="!file && pickFile()"
+          @keydown.space.self.prevent="!file && pickFile()"
           @dragover.prevent="isDragOver = true"
           @dragleave.prevent="isDragOver = false"
           @drop.prevent="onDrop"
@@ -324,20 +365,27 @@ onUnmounted(() => {
           <template v-else>
             <div class="file-card">
               <div class="file-card__preview">
-                <ImageThumb v-if="isImageFile && previewUrl" :src="previewUrl" />
+                <ImageThumb
+                  v-if="isImageFile && previewUrl"
+                  :src="previewUrl"
+                  fit="contain"
+                  :apply-rotation="applyImageRotation"
+                  :rotation-disabled="isWorking"
+                />
                 <i v-else class="ri-file-pdf-2-line"></i>
               </div>
               <div class="file-card__info">
                 <div class="file-card__name" :title="file.name">{{ file.name }}</div>
                 <div class="file-card__meta">{{ fileSizeText }}</div>
               </div>
-              <button class="file-card__close" @click.stop="clearFile" aria-label="移除文件">
+              <button class="file-card__close" :disabled="rotating" @click.stop="clearFile" aria-label="移除文件">
                 <i class="ri-close-line"></i>
               </button>
             </div>
           </template>
         </div>
         <p id="ocr-paste-hint" class="paste-hint">复制图片后，在此页面按 Ctrl+V（Mac：⌘V）即可添加或替换图片，再点击「开始识别」。</p>
+        <p v-if="isImageFile" class="paste-hint">方向不对？点击图片放大预览，旋转后点击工具栏中的「确认」。</p>
       </section>
 
       <!-- 选项 -->
