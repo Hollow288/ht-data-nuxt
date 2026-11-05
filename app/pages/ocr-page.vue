@@ -242,7 +242,8 @@ async function pollResult(taskId: string) {
   const tick = async () => {
     pollCount++
     try {
-      const res = await BaseAPI.apiGet<OcrResultRes>(`ocr/result/${taskId}`)
+      // 轮询由页面展示识别状态，不反复触发全局进度条。
+      const res = await BaseAPI.apiGet<OcrResultRes>(`ocr/result/${taskId}`, undefined, { showProgress: false })
       if (res.code !== 200) {
         errorMsg.value = res.msg || '查询任务失败'
         stopPolling()

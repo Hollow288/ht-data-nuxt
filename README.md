@@ -89,6 +89,20 @@ JSON 工具默认将 `context` 等字符串字段中的合法 JSON 对象或数�
 运行 `npm run test:tools` 检查 OTP 标准向量及转换逻辑，
 运行 `npm run typecheck` 检查 Nuxt 应用类型。
 
+## 请求进度提示
+
+`BaseAPI` 的请求默认参与顶部进度条，所有并发请求完成后统一结束。
+进度条延迟 150ms 显示，快速请求不会闪条。后台轮询或已有局部加载状态的请求
+可通过 `showProgress: false` 关闭全局进度提示，该选项不会发送给后端：
+
+```ts
+BaseAPI.apiGet('ocr/result/任务ID', undefined, { showProgress: false })
+```
+
+OCR 提交保留默认进度提示；后续结果轮询使用页面内的识别状态和加载提示。
+`apiFetch`、`apiPost`、`apiPut` 和 `apiDelete` 也支持此选项。
+运行 `npm run test:progress` 检查静默请求、并发计数及进度条定时器。
+
 ## 首屏开屏
 
 首次打开任意页面时，以灰蓝色笔画依次写出手写体「Hollow’s Space」，不依赖外部字体。

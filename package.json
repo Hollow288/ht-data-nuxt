@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "typecheck": "vue-tsc --noEmit -p .nuxt/tsconfig.app.json",
     "test:tools": "node --test tests/tools.test.mjs",
-    "test:json": "node --experimental-strip-types --test tests/json.test.mjs"
+    "test:json": "node --experimental-strip-types --test tests/json.test.mjs",
+    "test:progress": "node --experimental-strip-types --test tests/progress.test.mjs"
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
