@@ -3,12 +3,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "prebuild": "npm run build:token-offline",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "pregenerate": "npm run build:token-offline",
-    "build:token-offline": "node scripts/build-chatgpt-offline.mjs",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "typecheck": "vue-tsc --noEmit -p .nuxt/tsconfig.app.json",

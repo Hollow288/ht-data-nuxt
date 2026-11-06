@@ -73,13 +73,12 @@ function download() {
   <section class="tool-panel">
     <div class="panel-heading">
       <h2>转换选项</h2>
-      <a class="tool-button" href="/tools/chatgpt-tokens-offline.html" download="chatgpt-tokens-offline.html"><i class="ri-download-2-line" aria-hidden="true" /> 下载离线版</a>
     </div>
     <div class="mode-buttons">
       <NSelect v-model:value="mode" class="token-mode" :options="modes" aria-label="凭证输出格式" :theme-overrides="{ peers: { InternalSelection: { heightMedium: '36px', fontSizeMedium: '14px' } } }" />
       <label class="compatibility-option"><input v-model="compatibilityClaims" type="checkbox" /> 补全兼容 id_token</label>
     </div>
-    <p class="tool-note privacy-note"><i class="ri-shield-check-line" aria-hidden="true" /> 凭证仅在当前浏览器中转换，不上传或自动保存。离线版可保存为单个 HTML，断网后打开。</p>
+    <p class="tool-note privacy-note"><i class="ri-shield-check-line" aria-hidden="true" /> 凭证仅在当前浏览器中转换，不上传或自动保存。</p>
     <p v-if="compatibilityClaims" class="tool-note compatibility-note">补全会生成或改写 id_token 中的账号字段，无法保留有效签名。仅在目标工具明确需要兼容字段时开启。</p>
     <p v-else class="tool-note">默认保留原始 id_token。格式转换不验证登录状态，也不会刷新或延长 token 的有效期。</p>
   </section>
