@@ -9,6 +9,7 @@ import ColorTool from '~/components/tools/ColorTool.vue'
 import SubEmailTool from '~/components/tools/SubEmailTool.vue'
 import JsRunnerTool from '~/components/tools/JsRunnerTool.vue'
 import JsonTool from '~/components/tools/JsonTool.vue'
+import ChatgptTokensTool from '~/components/tools/ChatgptTokensTool.vue'
 
 definePageMeta({
   validate: route => {
@@ -19,7 +20,7 @@ definePageMeta({
 const route = useRoute()
 const parts = computed(() => (Array.isArray(route.params.path) ? route.params.path : [route.params.path]).filter(Boolean))
 const currentTool = computed(() => tools.find(tool => tool.id === parts.value[0])!)
-const components = { twofa: TwoFaTool, 'one-line': OneLineTool, json: JsonTool, caesar: CaesarTool, 'base64-image': Base64ImageTool, encode: EncodeTool, color: ColorTool, 'sub-email': SubEmailTool, 'js-runner': JsRunnerTool }
+const components = { twofa: TwoFaTool, 'one-line': OneLineTool, json: JsonTool, 'chatgpt-tokens': ChatgptTokensTool, caesar: CaesarTool, 'base64-image': Base64ImageTool, encode: EncodeTool, color: ColorTool, 'sub-email': SubEmailTool, 'js-runner': JsRunnerTool }
 const activeComponent = computed(() => components[currentTool.value.id as keyof typeof components])
 const initialInput = computed(() => typeof route.query.input === 'string' ? route.query.input : parts.value[1])
 useSeoMeta({ title: () => `${currentTool.value.name} · Hollow’s Space`, description: () => currentTool.value.description })

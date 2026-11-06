@@ -12,6 +12,7 @@ export const tools: ToolDefinition[] = [
   { id: 'twofa', name: '2FA 动态码', description: '输入 otpauth 链接或密钥，生成 TOTP / HOTP 验证码。', icon: 'ri-shield-keyhole-line', category: '开发与安全', keywords: ['otp', 'totp', 'hotp', '验证码', '密钥'] },
   { id: 'one-line', name: '文本压一行', description: '将多行文本合并为一行，自动折叠换行、制表符和多余空格。', icon: 'ri-text-wrap', category: '文字与编码', keywords: ['text', 'line', '压缩', '空白', '换行'] },
   { id: 'json', name: 'JSON 格式化', description: '格式化与压缩 JSON，支持递归展开嵌套、多层转义的 JSON 字符串。', icon: 'ri-braces-line', category: '开发与安全', keywords: ['json', 'format', '格式化', '压缩', '转义', '嵌套', '解析', 'context'] },
+  { id: 'chatgpt-tokens', name: 'ChatGPT 凭证转换', description: '本地转换 ChatGPT / Codex 凭证，导出 CPA、sub2api 或 JSONL，支持下载离线版。', icon: 'ri-key-2-line', category: '开发与安全', keywords: ['chatgpt', 'codex', 'cpa', 'cliproxyapi', 'sub2api', 'token', 'session', 'oauth', 'siwc', '凭证', '转换', '离线'] },
   { id: 'caesar', name: '凯撒密码破解', description: '枚举全部 25 种字母位移，过滤并复制可能的明文。', icon: 'ri-lock-unlock-line', category: '开发与安全', keywords: ['caesar', 'rot', '位移', '加密', '解密'] },
   { id: 'base64-image', name: 'Base64 / 图片 / 文字互转', description: '预览与下载 Base64 图片，也能转换图片和 UTF-8 文本。', icon: 'ri-image-2-line', category: '文字与编码', keywords: ['base64', 'image', 'utf-8', 'png', 'jpg', '编码', '解码'] },
   { id: 'encode', name: '编码 / 解码', description: 'URL 编码解码与 Unicode 转义互转，实时查看转换结果。', icon: 'ri-code-s-slash-line', category: '文字与编码', keywords: ['url', 'unicode', 'encode', 'decode', '转义', 'percent'] },
