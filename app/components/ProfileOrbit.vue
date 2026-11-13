@@ -3,7 +3,7 @@ const avatarFailed = ref(false)
 </script>
 
 <template>
-  <div class="profile-orbit" aria-label="Hollow 的头像与小小星球">
+  <div class="profile-orbit" aria-label="Hollow 的头像">
     <div class="orbit-dots" aria-hidden="true" />
     <div class="orbit-ring orbit-ring-outer" aria-hidden="true" />
     <div class="orbit-ring orbit-ring-inner" aria-hidden="true" />
@@ -15,7 +15,7 @@ const avatarFailed = ref(false)
       <span v-else class="portrait-fallback">H.</span>
     </div>
     <span class="orbit-note">a little space, a little me.</span>
-    <span class="orbit-status"><span /> 永远对世界保持好奇</span>
+<!--    <span class="orbit-status"><span /> 永远对世界保持好奇</span>-->
   </div>
 </template>
 
@@ -34,11 +34,10 @@ const avatarFailed = ref(false)
 .star-two { bottom: 19%; left: 7.2%; font-size: 25px; color: #b3a37b; }
 .orbit-dot { position: absolute; top: 22.6%; left: 9.7%; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); opacity: .55; }
 .orbit-note { position: absolute; bottom: 7.7%; right: 1%; font: italic 14px Georgia, serif; color: var(--text-muted); transform: rotate(-8deg); }
-.orbit-status { position: absolute; left: 50%; bottom: 17%; transform: translateX(-50%); z-index: 1; display: flex; align-items: center; gap: 8px; padding: 7px 14px; font-size: 14px; white-space: nowrap; background: var(--bg-body); border: 1px solid var(--border-color); border-radius: 24px; color: var(--text-secondary); }
 .orbit-status > span { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
 @media (max-width: 700px) {
   .profile-orbit { width: 80px; }.portrait { width: 78%; outline-width: 3px; }.portrait-fallback { font-size: 32px; }
   .orbit-ring-outer { width: 100%; height: 100%; }.orbit-ring-inner { width: 90%; height: 90%; }
-  .orbit-dots, .orbit-star, .orbit-dot, .orbit-note, .orbit-status { display: none; }
+  .orbit-dots, .orbit-star, .orbit-dot, .orbit-note  { display: none; }
 }
 </style>

@@ -14,6 +14,7 @@ const thisShowKey = ref<string | undefined>()
 const popoverVisible = ref(false)
 const popoverVisibleMobile = ref(false)
 const loading = ref(true)
+const listLoading = ref(true)
 const items = ref<MatrixListDto[]>([])
 const allItems = ref<MatrixListDto[]>([])
 const thisMatrixInfo = ref<Matrix>()
@@ -44,15 +45,20 @@ const onInputMatrixSearch = () => {
 }
 
 const queryMatrixList = async () => {
-  const matrixList: MatrixListDtoRes = await BaseAPI.apiGet("matrix/search",{'matrixQuality':encodeURIComponent(matrixQuality.value)})
-  allItems.value = matrixList.data
-  onInputMatrixSearch()
+  listLoading.value = true
+  try {
+    const matrixList: MatrixListDtoRes = await BaseAPI.apiGet("matrix/search",{'matrixQuality':encodeURIComponent(matrixQuality.value)}, { showProgress: false })
+    allItems.value = matrixList.data ?? []
+    onInputMatrixSearch()
+  } finally {
+    listLoading.value = false
+  }
 }
 
 const findMatrixInfoByKey = async () => {
   try {
     loading.value = true
-    const matrixRes: MatrixRes = await BaseAPI.apiGet(`matrix/${thisShowKey.value}`)
+    const matrixRes: MatrixRes = await BaseAPI.apiGet(`matrix/${thisShowKey.value}`, undefined, { showProgress: false })
     thisMatrixInfo.value = matrixRes.data
 
     matrixStart.value = thisMatrixInfo.value.matrixSuitList[0]?.matrixMaxStarLevel || 0
@@ -66,21 +72,20 @@ const findMatrixInfoByKey = async () => {
 
 const showThisMatrixInfo = async (matrixKey: string) => {
   thisShowKey.value = matrixKey
-  await findMatrixInfoByKey()
-  // 核心：在移动端点击后，自动关闭抽屉
   showDrawer.value = false
+  await findMatrixInfoByKey()
 }
 
 const initializePage = async () => {
-  await queryMatrixList()
-  if (allItems.value.length === 0) {
-    loading.value = false
-    return
-  }
-  if (allItems.value.length > 0) {
+  loading.value = true
+  try {
+    await queryMatrixList()
+    if (!allItems.value.length) return
     thisShowKey.value = allItems.value[0]?.matrixKey
+    await findMatrixInfoByKey()
+  } finally {
+    loading.value = false
   }
-  await findMatrixInfoByKey()
 };
 
 const currentAttributeSum = (slotIndex: string) => {
@@ -130,10 +135,11 @@ onUnmounted(() => { document.body.style.overflow = '' })
   <div class="page-container-wrapper">
 
     <!-- 1. 主要内容区域 -->
-    <div class="gallery-container">
-      <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
+    <div class="gallery-container" :aria-busy="loading">
+      <HottaDetailSkeleton v-if="loading" variant="matrix" />
       <div v-else-if="!allItems.length" class="empty-state"><i class="ri-compass-3-line" aria-hidden="true" /><p>这个分类暂时没有资料。</p></div>
-      <div v-else class="gallery-container__content matrix-summary">
+      <template v-else>
+      <div class="gallery-container__content matrix-summary">
         <div class="gallery-container__left">
           <img width="150" :src="thisMatrixInfo?.matrixIcon" :alt="thisMatrixInfo?.matrixName" class="gallery-card__image" loading="lazy"/>
           <div class="level">{{ thisMatrixInfo?.matrixQuality }}</div>
@@ -190,6 +196,7 @@ onUnmounted(() => { document.body.style.overflow = '' })
           </div>
         </div>
       </div>
+      </template>
     </div>
 
     <!-- 2. PC端侧边栏 (移动端隐藏) -->
@@ -231,9 +238,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
             <input type="text" v-model="searchText" @input="onInputMatrixSearch()" placeholder="输入名称…" aria-label="按名称搜索资料"/>
           </div>
         </header>
-        <div class="search-panel__content">
-          <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-          <n-virtual-list style="height: 100%" :item-size="58" :items="items">
+        <div class="search-panel__content" :aria-busy="listLoading">
+          <HottaListSkeleton v-if="listLoading" />
+          <p v-else-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
+          <n-virtual-list v-else style="height: 100%" :item-size="58" :items="items">
             <template #default="{ item }">
               <div :key="item.matrixKey" class="query-result-row">
                 <div class="result-item" :class="{'active': thisShowKey === item.matrixKey}"
@@ -314,9 +322,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
             </header>
 
             <!-- 滚动列表区域 (Flex: 1) -->
-            <div class="drawer-body">
-              <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-              <n-virtual-list
+            <div class="drawer-body" :aria-busy="listLoading">
+              <HottaListSkeleton v-if="listLoading" />
+              <p v-else-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
+              <n-virtual-list v-else
                   style="height: 100%;"
                   :item-size="58"
                   :items="items"
@@ -370,14 +379,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
   flex: 1;
   width: 0;
 
-  &__status {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #999;
-    font-size: 1rem;
-    min-height: 100%;
-  }
 
   &__content {
     display: flex;

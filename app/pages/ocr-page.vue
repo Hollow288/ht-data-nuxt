@@ -312,8 +312,8 @@ onUnmounted(() => {
   <div class="ocr-page site-width">
     <header class="page-heading">
       <NuxtLink to="/tools" class="ocr-back"><i class="ri-arrow-left-line" aria-hidden="true" /> 返回小工具</NuxtLink>
-      <h1 class="page-title">把图片，读成文字<span>。</span></h1>
-      <p class="page-description">上传一张图片或一份 PDF，让那些值得留下的文字，可以编辑、可以复制。</p>
+      <h1 class="page-title">OCR 文字识别</h1>
+      <p class="page-description">从图片或 PDF 中提取文字。</p>
     </header>
     <div class="ocr-card">
       <header class="ocr-card__header">

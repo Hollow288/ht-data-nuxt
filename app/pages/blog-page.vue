@@ -2,7 +2,7 @@
 import { BaseAPI } from '~/utils/api'
 import type { BlogDateListRes, BlogDateMenuItem, BlogDateMenuRes, BlogItem } from '~/types/blog'
 import type { BaseRes } from '~/types/api'
-useSeoMeta({ title: '文章 · Hollow’s Space', description: '开发记录、学习笔记与生活碎片。让思考有迹可循，让记录慢慢积累。' })
+useSeoMeta({ title: '文章 · Hollow’s Space', description: 'Hollow 的开发记录与学习笔记。' })
 const route = useRoute()
 const router = useRouter()
 const articles = ref<BlogItem[]>([])
@@ -77,12 +77,12 @@ onUnmounted(() => { requestVersion++ })
       </aside>
       <section class="journal-content" aria-label="文章列表" :aria-busy="loading">
         <div class="journal-toolbar"><span>{{ resultLabel }}</span><button v-if="hasFilter" class="quiet-button" @click="filterBy()">清除筛选 <i class="ri-close-line" aria-hidden="true" /></button><span v-else>按发布时间排序 <i class="ri-sort-desc" aria-hidden="true" /></span></div>
-        <template v-if="groups.length"><div v-for="group in groups" :key="group.year" class="year-group"><h2 class="year-title">{{ group.year }}<span>年间的片段</span></h2><ArticleList :articles="group.posts" /></div></template>
+        <template v-if="groups.length"><div v-for="group in groups" :key="group.year" class="year-group"><h2 class="year-title">{{ group.year }}<span>年</span></h2><ArticleList :articles="group.posts" /></div></template>
         <div v-if="loading" class="journal-loading" role="status" aria-label="正在加载文章"><div v-for="n in 3" :key="n"><span class="skeleton-line" /><span class="skeleton-line" /><span class="skeleton-line" /></div></div>
-        <div v-else-if="failed" class="empty-state" role="status"><i class="ri-cloud-line" aria-hidden="true" /><p>暂时没能取到这些文字。</p><small>请稍后再试，或先逛逛其他地方。</small><button class="secondary-button" @click="dates.length ? loadArticles(articles.length > 0) : initialize()"><i class="ri-refresh-line" aria-hidden="true" />重新加载</button></div>
-        <div v-else-if="!articles.length" class="empty-state"><i class="ri-quill-pen-line" aria-hidden="true" /><p>{{ hasFilter ? '这里还没有找到对应的文字。' : '第一篇记录，正在酝酿。' }}</p><button v-if="hasFilter" class="text-link quiet-button" @click="filterBy()">看看全部文章 <i class="ri-arrow-right-line" aria-hidden="true" /></button></div>
-        <div v-if="!loading && !failed && !hasFilter && loadedMonths < dates.length" class="load-more"><button class="secondary-button" @click="loadArticles(true)">再翻一页，看看更早的记录 <i class="ri-arrow-down-line" aria-hidden="true" /></button></div>
-        <div v-else-if="!loading && !failed && articles.length" class="journal-end"><span />{{ hasFilter ? '这次找到的文字，都在这里了' : '已经翻到最早的一页了' }}<span /></div>
+        <div v-else-if="failed" class="empty-state" role="status"><i class="ri-cloud-line" aria-hidden="true" /><p>文章加载失败，请稍后重试。</p><button class="secondary-button" @click="dates.length ? loadArticles(articles.length > 0) : initialize()"><i class="ri-refresh-line" aria-hidden="true" />重新加载</button></div>
+        <div v-else-if="!articles.length" class="empty-state"><i class="ri-quill-pen-line" aria-hidden="true" /><p>{{ hasFilter ? '没有符合筛选条件的文章。' : '暂无文章。' }}</p><button v-if="hasFilter" class="text-link quiet-button" @click="filterBy()">查看全部文章 <i class="ri-arrow-right-line" aria-hidden="true" /></button></div>
+        <div v-if="!loading && !failed && !hasFilter && loadedMonths < dates.length" class="load-more"><button class="secondary-button" @click="loadArticles(true)">加载更多 <i class="ri-arrow-down-line" aria-hidden="true" /></button></div>
+        <div v-else-if="!loading && !failed && articles.length" class="journal-end"><span />已显示全部文章<span /></div>
       </section>
     </div>
   </div>

@@ -13,6 +13,7 @@ const thisShowKey = ref<string | undefined>()
 const popoverVisible = ref(false)
 const popoverVisibleMobile = ref(false)
 const loading = ref(true)
+const listLoading = ref(true)
 const items = ref<WeaponsListDto[]>([])
 const allItems = ref<WeaponsListDto[]>([])
 const thisWeaponsInfo = ref<Weapons>()
@@ -44,15 +45,20 @@ const onInputWeaponsSearch = () => {
 }
 
 const queryWeaponsList = async () => {
-  const weaponsList: WeaponsListDtoRes = await BaseAPI.apiGet("weapons/search",{'weaponRarity':encodeURIComponent(weaponRarity.value)})
-  allItems.value = weaponsList.data
-  onInputWeaponsSearch()
+  listLoading.value = true
+  try {
+    const weaponsList: WeaponsListDtoRes = await BaseAPI.apiGet("weapons/search",{'weaponRarity':encodeURIComponent(weaponRarity.value)}, { showProgress: false })
+    allItems.value = weaponsList.data ?? []
+    onInputWeaponsSearch()
+  } finally {
+    listLoading.value = false
+  }
 }
 
 const findWeaponsInfoByKey = async () => {
   try {
     loading.value = true
-    const weaponsRes: WeaponsRes = await BaseAPI.apiGet(`weapons/${thisShowKey.value}`)
+    const weaponsRes: WeaponsRes = await BaseAPI.apiGet(`weapons/${thisShowKey.value}`, undefined, { showProgress: false })
     thisWeaponsInfo.value = weaponsRes.data
     if(thisWeaponsInfo.value.weaponAttributeCoefficientList.length === 0){
       weaponsStart.value = 0
@@ -106,21 +112,20 @@ const isStartDisabled = computed(() => {
 
 const showThisWeaponsInfo = async (weaponKey: string) => {
   thisShowKey.value = weaponKey
-  await findWeaponsInfoByKey()
-  // 核心：在移动端点击后，自动关闭抽屉
   showDrawer.value = false
+  await findWeaponsInfoByKey()
 }
 
 const initializePage = async () => {
-  await queryWeaponsList()
-  if (allItems.value.length === 0) {
-    loading.value = false
-    return
-  }
-  if (allItems.value.length > 0) {
+  loading.value = true
+  try {
+    await queryWeaponsList()
+    if (!allItems.value.length) return
     thisShowKey.value = allItems.value[0]?.weaponKey
+    await findWeaponsInfoByKey()
+  } finally {
+    loading.value = false
   }
-  await findWeaponsInfoByKey()
 };
 
 watch(showDrawer, (val) => {
@@ -148,8 +153,8 @@ onUnmounted(() => { document.body.style.overflow = '' })
   <div class="page-container-wrapper">
 
     <!-- 1. 主要内容区域 -->
-    <div class="gallery-container">
-      <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
+    <div class="gallery-container" :aria-busy="loading">
+      <HottaDetailSkeleton v-if="loading" variant="weapons" />
       <div v-else-if="!allItems.length" class="empty-state"><i class="ri-compass-3-line" aria-hidden="true" /><p>这个分类暂时没有资料。</p></div>
       <div v-else class="gallery-container__content">
         <div class="gallery-container__row">
@@ -295,9 +300,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
             <input type="text" v-model="searchText" @input="onInputWeaponsSearch()" placeholder="输入名称…" aria-label="按名称搜索资料"/>
           </div>
         </header>
-        <div class="search-panel__content">
-          <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-          <n-virtual-list style="height: 100%" :item-size="58" :items="items">
+        <div class="search-panel__content" :aria-busy="listLoading">
+          <HottaListSkeleton v-if="listLoading" />
+          <p v-else-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
+          <n-virtual-list v-else style="height: 100%" :item-size="58" :items="items">
             <template #default="{ item }">
               <div :key="item.weaponKey" class="query-result-row">
                 <div class="result-item" :class="{'active': thisShowKey === item.weaponKey}"
@@ -373,9 +379,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
             </header>
 
             <!-- 滚动列表区域 (Flex: 1) -->
-            <div class="drawer-body">
-              <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-              <n-virtual-list
+            <div class="drawer-body" :aria-busy="listLoading">
+              <HottaListSkeleton v-if="listLoading" />
+              <p v-else-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
+              <n-virtual-list v-else
                   style="height: 100%;"
                   :item-size="58"
                   :items="items"
@@ -443,14 +450,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
   flex: 1;
   width: 0;
 
-  &__status {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #999;
-    font-size: 1rem;
-    min-height: 100%;
-  }
 
   &__content {
     display: flex;

@@ -2,15 +2,15 @@
 import { BaseAPI } from '~/utils/api'
 import { links } from '~/data/links'
 import type { BlogDateMenuRes, BlogDateListRes, BlogItem } from '~/types/blog'
-useSeoMeta({ title: 'Hollow’s Space', description: '你好，我是 Hollow。这里记录开发与生活，分享实用小工具，也收藏幻塔世界里的探索。' })
+useSeoMeta({ title: 'Hollow’s Space', description: 'Hollow 的个人主页：开发笔记、实用工具与幻塔资料查询。' })
 const articles = ref<BlogItem[]>([])
 const loading = ref(true)
 const failed = ref(false)
 const socialLinks = computed(() => links.filter(link => ['GitHub', 'Bilibili', '邮箱', '探针'].includes(link.name) && !link.url.includes('example.com')))
 const sections = [
-  { title: '文章与笔记', icon: 'ri-quill-pen-line', description: '开发实践、学习记录，还有生活里值得留下的片刻。', link: '浏览文章', to: '/blog-page' },
-  { title: '实用小工具', icon: 'ri-tools-line', description: '文字识别、编码转换和开发小帮手，让重复的事情简单一点。', link: '打开工具箱', to: '/tools' },
-  { title: '幻塔资料库', icon: 'ri-planet-line', description: '查询武器、意志、源器与烹饪资料，为探索做好准备。', link: '查阅资料', to: '/hotta-page' }
+  { title: '文章与笔记', icon: 'ri-quill-pen-line', description: '开发实践与学习笔记。', link: '浏览文章', to: '/blog-page' },
+  { title: '实用小工具', icon: 'ri-tools-line', description: '文字识别、编码转换与开发工具。', link: '打开工具箱', to: '/tools' },
+  { title: '幻塔资料库', icon: 'ri-planet-line', description: '武器、意志、源器、食物与食谱查询。', link: '查阅资料', to: '/hotta-page' }
 ]
 async function loadArticles() {
   loading.value = true
@@ -41,7 +41,7 @@ onMounted(loadArticles)
     </section>
 
     <section id="explore" class="explore-section" aria-labelledby="explore-title">
-      <div class="section-heading"><h2 id="explore-title">从这里开始</h2><span class="section-side-note">记录 · 工具 · 探索</span></div>
+      <div class="section-heading"><h2 id="explore-title">从这里开始</h2></div>
       <div class="explore-grid">
         <NuxtLink v-for="section in sections" :key="section.to" :to="section.to" class="explore-item">
           <i :class="section.icon" class="explore-icon" aria-hidden="true" />
@@ -54,14 +54,13 @@ onMounted(loadArticles)
       <section class="recent-section" aria-labelledby="recent-title">
         <div class="section-heading"><h2 id="recent-title">最近更新</h2><NuxtLink to="/blog-page" class="text-link">更多文章<i class="ri-arrow-right-line" aria-hidden="true" /></NuxtLink></div>
         <div v-if="loading" class="recent-loading" role="status" aria-label="正在加载文章"><div v-for="n in 3" :key="n" class="loading-row"><span class="skeleton-line" /><span class="skeleton-line" /></div></div>
-        <div v-else-if="failed" class="recent-empty"><i class="ri-quill-pen-line" aria-hidden="true" /><div><p>文字正在路上，稍后再来看看。</p><button class="quiet-button" @click="loadArticles">重新加载 <i class="ri-refresh-line" aria-hidden="true" /></button></div></div>
-        <div v-else-if="!articles.length" class="recent-empty"><i class="ri-quill-pen-line" aria-hidden="true" /><p>空白也有无限可能。第一篇记录，敬请期待。</p></div>
+        <div v-else-if="failed" class="recent-empty"><i class="ri-quill-pen-line" aria-hidden="true" /><div><p>文章加载失败，请稍后重试。</p><button class="quiet-button" @click="loadArticles">重新加载 <i class="ri-refresh-line" aria-hidden="true" /></button></div></div>
+        <div v-else-if="!articles.length" class="recent-empty"><i class="ri-quill-pen-line" aria-hidden="true" /><p>暂无文章。</p></div>
         <ArticleList v-else :articles="articles" compact />
       </section>
       <aside class="now-section" aria-labelledby="now-title">
         <div class="section-heading"><h2 id="now-title">关于这里</h2><i class="ri-cup-line" aria-hidden="true" /></div>
-        <p>一个开发者的个人空间。把解决过的问题、学到的知识和喜欢的事情，整理成可以再次翻阅的记录。</p><div class="now-tags"><span><i class="ri-code-s-slash-line" aria-hidden="true" /> 开发与学习</span><span><i class="ri-gamepad-line" aria-hidden="true" /> 幻塔与日常</span></div>
-        <p class="little-quote">保持好奇，慢慢积累。</p>
+        <p>Hollow 的个人网站，收录开发笔记、在线工具与幻塔资料。</p><div class="now-tags"><span><i class="ri-code-s-slash-line" aria-hidden="true" /> 开发与学习</span><span><i class="ri-gamepad-line" aria-hidden="true" /> 幻塔与日常</span></div>
       </aside>
     </div>
   </div>
@@ -84,7 +83,6 @@ onMounted(loadArticles)
 .hero-socials a:hover { color: var(--accent); }
 .social-arrow { color: var(--text-muted); font-size: 13px; }
 .explore-section { padding-top: 28px; scroll-margin-top: var(--sticky-top); }
-.section-side-note { color: var(--text-muted); font-size: 13px; }
 .explore-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .explore-item { display: flex; align-items: start; gap: 16px; min-width: 0; padding: 24px; }
 .explore-icon { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; color: var(--accent); font-size: 23px; }
@@ -109,7 +107,6 @@ onMounted(loadArticles)
 .now-section > p { margin-top: 16px; color: var(--text-secondary); font-size: 16px; line-height: 1.7; }
 .now-tags { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 16px; font-size: 13px; color: var(--text-secondary); }
 .now-tags i { color: var(--accent); }
-.now-section > .little-quote { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 14px; }
 @media (max-width: 1100px) { .hero { column-gap: 32px; grid-template-columns: minmax(0, 1fr) 280px; padding-inline: 0; }.explore-item { gap: 12px; padding: 20px; }.explore-icon { width: 36px; height: 36px; font-size: 21px; }.explore-copy h3 { font-size: 18px; }.home-bottom { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 20px; } }
 @media (max-width: 850px) { .explore-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }.explore-copy .text-link { margin-top: 10px; }.explore-item { gap: 16px; }.home-bottom { grid-template-columns: minmax(0, 1fr); }.hero h1 { font-size: 36px; } }
 @media (max-width: 700px) {
@@ -120,7 +117,7 @@ onMounted(loadArticles)
   .hero-subtitle { font-size: 17px; line-height: 1.6; margin-top: 10px; }
   .hero-description, .hero-socials { grid-column: 1 / -1; }
   .hero-description { font-size: 16px; }.hero-socials { gap: 10px 18px; margin: 0; }
-  .explore-section { padding-top: 24px; }.section-side-note { display: none; }.explore-item { padding: 20px; }
+  .explore-section { padding-top: 24px; }.explore-item { padding: 20px; }
   .home-bottom { margin-top: 24px; gap: 20px; }.recent-section, .now-section { padding: 20px; }.home-bottom .section-heading { gap: 10px; }.recent-section .text-link { font-size: 13px; }
 }
 </style>

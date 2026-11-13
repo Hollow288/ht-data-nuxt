@@ -71,7 +71,7 @@ defineExpose({ open })
         </NuxtLink>
       </template>
     </div>
-    <div class="search-footer"><span>在这个小小的空间里，找点感兴趣的东西。</span><span>Ctrl / ⌘ K</span></div>
+    <div class="search-footer"><span>Ctrl / ⌘ K</span></div>
   </dialog>
 </template>
 
@@ -92,5 +92,5 @@ kbd { font: 13px/1.5 monospace; border: 1px solid var(--border-color); border-ra
 .search-result small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); font-size: 14px; font-weight: 400; margin-top: 3px; }
 .search-result > i:last-child { color: var(--text-muted); font-size: 16px; }
 .search-status { padding: 12px 10px 20px; color: var(--text-secondary); font-size: 16px; }
-.search-footer { display: flex; justify-content: space-between; gap: 10px; padding: 12px 22px; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-muted); }
+.search-footer { display: flex; justify-content: flex-end; padding: 12px 22px; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-muted); }
 </style>

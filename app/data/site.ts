@@ -10,5 +10,5 @@ export const hottaCategories = [
   { name: '意志', slug: 'matrix', icon: 'ri-cpu-line', english: 'Matrices', description: '寻找意志套装，了解搭配与套装效果。' },
   { name: '源器', slug: 'artifact', icon: 'ri-box-3-line', english: 'Relics', description: '探索源器用途与各星级的进阶效果。' },
   { name: '食物', slug: 'food', icon: 'ri-leaf-line', english: 'Ingredients', description: '查找食物、食材的来源与使用效果。' },
-  { name: '食谱', slug: 'recipes', icon: 'ri-restaurant-line', english: 'Recipes', description: '收集烹饪配方，准备下一次冒险。' }
+  { name: '食谱', slug: 'recipes', icon: 'ri-restaurant-line', english: 'Recipes', description: '查询烹饪配方、所需食材与食用效果。' }
 ]

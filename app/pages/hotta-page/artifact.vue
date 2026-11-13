@@ -13,6 +13,7 @@ const thisShowKey = ref<string | undefined>()
 const popoverVisible = ref(false)
 const popoverVisibleMobile = ref(false)
 const loading = ref(true)
+const listLoading = ref(true)
 const items = ref<ArtifactListDto[]>([])
 const allItems = ref<ArtifactListDto[]>([])
 const thisArtifactInfo = ref<Artifact>()
@@ -38,15 +39,20 @@ const onInputArtifactSearch = () => {
 }
 
 const queryArtifactList = async () => {
-  const artifactList: ArtifactListDtoRes = await BaseAPI.apiGet("artifact/search",{'artifactRarity':encodeURIComponent(artifactRarity.value)})
-  allItems.value = artifactList.data
-  onInputArtifactSearch()
+  listLoading.value = true
+  try {
+    const artifactList: ArtifactListDtoRes = await BaseAPI.apiGet("artifact/search",{'artifactRarity':encodeURIComponent(artifactRarity.value)}, { showProgress: false })
+    allItems.value = artifactList.data ?? []
+    onInputArtifactSearch()
+  } finally {
+    listLoading.value = false
+  }
 }
 
 const findArtifactInfoByKey = async () => {
   try {
     loading.value = true
-    const artifactRes: ArtifactRes = await BaseAPI.apiGet(`artifact/${thisShowKey.value}`)
+    const artifactRes: ArtifactRes = await BaseAPI.apiGet(`artifact/${thisShowKey.value}`, undefined, { showProgress: false })
     thisArtifactInfo.value = artifactRes.data
   } finally {
     loading.value = false
@@ -55,21 +61,20 @@ const findArtifactInfoByKey = async () => {
 
 const showThisArtifactInfo = async (artifactKey: string) => {
   thisShowKey.value = artifactKey
-  await findArtifactInfoByKey()
-  // 核心：在移动端点击后，自动关闭抽屉
   showDrawer.value = false
+  await findArtifactInfoByKey()
 }
 
 const initializePage = async () => {
-  await queryArtifactList()
-  if (allItems.value.length === 0) {
-    loading.value = false
-    return
-  }
-  if (allItems.value.length > 0) {
+  loading.value = true
+  try {
+    await queryArtifactList()
+    if (!allItems.value.length) return
     thisShowKey.value = allItems.value[0]?.artifactKey
+    await findArtifactInfoByKey()
+  } finally {
+    loading.value = false
   }
-  await findArtifactInfoByKey()
 };
 
 watch(showDrawer, (val) => {
@@ -91,8 +96,8 @@ onUnmounted(() => { document.body.style.overflow = '' })
   <div class="page-container-wrapper">
 
     <!-- 1. 主要内容区域 -->
-    <div class="gallery-container">
-      <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
+    <div class="gallery-container" :aria-busy="loading">
+      <HottaDetailSkeleton v-if="loading" variant="artifact" />
       <div v-else-if="!allItems.length" class="empty-state"><i class="ri-compass-3-line" aria-hidden="true" /><p>这个分类暂时没有资料。</p></div>
       <div v-else class="gallery-container__content">
         <div class="artifact-hero">
@@ -154,9 +159,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
             <input type="text" v-model="searchText" @input="onInputArtifactSearch()" placeholder="输入名称…" aria-label="按名称搜索资料"/>
           </div>
         </header>
-        <div class="search-panel__content">
-          <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-          <n-virtual-list style="height: 100%" :item-size="58" :items="items">
+        <div class="search-panel__content" :aria-busy="listLoading">
+          <HottaListSkeleton v-if="listLoading" />
+          <p v-else-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
+          <n-virtual-list v-else style="height: 100%" :item-size="58" :items="items">
             <template #default="{ item }">
               <div :key="item.artifactKey" class="query-result-row">
                 <div class="result-item" :class="{'active': thisShowKey === item.artifactKey}"
@@ -227,9 +233,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
             </header>
 
             <!-- 滚动列表区域 (Flex: 1) -->
-            <div class="drawer-body">
-              <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-              <n-virtual-list
+            <div class="drawer-body" :aria-busy="listLoading">
+              <HottaListSkeleton v-if="listLoading" />
+              <p v-else-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
+              <n-virtual-list v-else
                   style="height: 100%;"
                   :item-size="58"
                   :items="items"
@@ -283,14 +290,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
   flex: 1;
   width: 0;
 
-  &__status {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #999;
-    font-size: 1rem;
-    min-height: 100%;
-  }
 
   &__content {
     display: flex;

@@ -10,6 +10,7 @@ import {replaceTagWithColor} from "~/utils/common";
 const searchText = ref<string>('')
 const thisShowKey = ref<string | undefined>()
 const loading = ref(true)
+const listLoading = ref(true)
 const items = ref<FoodListDto[]>([])
 const allItems = ref<FoodListDto[]>([])
 const thisFoodInfo = ref<Food>()
@@ -36,15 +37,20 @@ const onInputFoodSearch = () => {
 }
 
 const queryFoodList = async () => {
-  const foodList: FoodListDtoRes = await BaseAPI.apiGet("food/search")
-  allItems.value = foodList.data
-  onInputFoodSearch()
+  listLoading.value = true
+  try {
+    const foodList: FoodListDtoRes = await BaseAPI.apiGet("food/search", undefined, { showProgress: false })
+    allItems.value = foodList.data ?? []
+    onInputFoodSearch()
+  } finally {
+    listLoading.value = false
+  }
 }
 
 const findFoodInfoByKey = async () => {
   try {
     loading.value = true
-    const foodRes: FoodRes = await BaseAPI.apiGet(`food/${thisShowKey.value}`)
+    const foodRes: FoodRes = await BaseAPI.apiGet(`food/${thisShowKey.value}`, undefined, { showProgress: false })
     thisFoodInfo.value = foodRes.data
   } finally {
     loading.value = false
@@ -53,21 +59,20 @@ const findFoodInfoByKey = async () => {
 
 const showThisFoodInfo = async (foodKey: string) => {
   thisShowKey.value = foodKey
-  await findFoodInfoByKey()
-  // 新增：移动端点击后关闭抽屉
   showDrawer.value = false
+  await findFoodInfoByKey()
 }
 
 const initializePage = async () => {
-  await queryFoodList()
-  if (allItems.value.length === 0) {
-    loading.value = false
-    return
-  }
-  if (allItems.value.length > 0) {
+  loading.value = true
+  try {
+    await queryFoodList()
+    if (!allItems.value.length) return
     thisShowKey.value = allItems.value[0]?.foodKey
+    await findFoodInfoByKey()
+  } finally {
+    loading.value = false
   }
-  await findFoodInfoByKey()
 };
 
 watch(showDrawer, (val) => {
@@ -89,8 +94,8 @@ onUnmounted(() => { document.body.style.overflow = '' })
   <div class="page-container-wrapper">
 
     <!-- 1. 主要内容区域 -->
-    <div class="gallery-container">
-      <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
+    <div class="gallery-container" :aria-busy="loading">
+      <HottaDetailSkeleton v-if="loading" variant="food" />
       <div v-else-if="!allItems.length" class="empty-state"><i class="ri-compass-3-line" aria-hidden="true" /><p>这个分类暂时没有资料。</p></div>
       <div v-else class="gallery-container__content">
         <!-- 顶部展示区：图标 + 名称 + 描述 -->
@@ -125,9 +130,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
             <input type="text" v-model="searchText" @input="onInputFoodSearch()" placeholder="输入名称…" aria-label="按名称搜索资料"/>
           </div>
         </header>
-        <div class="search-panel__content">
-          <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-          <n-virtual-list style="height: 100%" :item-size="58" :items="items">
+        <div class="search-panel__content" :aria-busy="listLoading">
+          <HottaListSkeleton v-if="listLoading" />
+          <p v-else-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
+          <n-virtual-list v-else style="height: 100%" :item-size="58" :items="items">
             <template #default="{ item }">
               <div :key="item.foodKey" class="query-result-row">
                 <div class="result-item" :class="{'active': thisShowKey === item.foodKey}"
@@ -171,9 +177,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
             </header>
 
             <!-- 抽屉列表 -->
-            <div class="drawer-body">
-              <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-              <n-virtual-list style="height: 100%;" :item-size="58" :items="items">
+            <div class="drawer-body" :aria-busy="listLoading">
+              <HottaListSkeleton v-if="listLoading" />
+              <p v-else-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
+              <n-virtual-list v-else style="height: 100%;" :item-size="58" :items="items">
                 <template #default="{ item }">
                   <div :key="item.foodKey" class="query-result-row">
                     <div
@@ -225,14 +232,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   //padding: 40px 20px;
 
-  &__status {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #999;
-    font-size: 1rem;
-    min-height: 100%;
-  }
 
   &__content {
     display: flex;

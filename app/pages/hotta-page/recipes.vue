@@ -12,6 +12,7 @@ const thisShowKey = ref<string | undefined>()
 const popoverVisible = ref(false)
 const popoverVisibleMobile = ref(false) // 新增：移动端筛选弹窗状态
 const loading = ref(true)
+const listLoading = ref(true)
 const items = ref<RecipesListDto[]>([])
 const allItems = ref<RecipesListDto[]>([])
 const thisRecipesInfo = ref<Recipes>()
@@ -40,15 +41,20 @@ const onInputRecipesSearch = () => {
 }
 
 const queryRecipesList = async () => {
-  const recipesList: RecipesListDtoRes = await BaseAPI.apiGet("recipes/search", {'categories': recipesCategories.value})
-  allItems.value = recipesList.data
-  onInputRecipesSearch()
+  listLoading.value = true
+  try {
+    const recipesList: RecipesListDtoRes = await BaseAPI.apiGet("recipes/search", {'categories': recipesCategories.value}, { showProgress: false })
+    allItems.value = recipesList.data ?? []
+    onInputRecipesSearch()
+  } finally {
+    listLoading.value = false
+  }
 }
 
 const findRecipesInfoByKey = async () => {
   try {
     loading.value = true
-    const recipesRes: RecipesRes = await BaseAPI.apiGet(`recipes/how-make/${thisShowKey.value}`)
+    const recipesRes: RecipesRes = await BaseAPI.apiGet(`recipes/how-make/${thisShowKey.value}`, undefined, { showProgress: false })
     thisRecipesInfo.value = recipesRes.data
   } finally {
     loading.value = false
@@ -57,21 +63,20 @@ const findRecipesInfoByKey = async () => {
 
 const showThisRecipesInfo = async (recipesKey: string) => {
   thisShowKey.value = recipesKey
-  await findRecipesInfoByKey()
-  // 新增：移动端点击后关闭抽屉
   showDrawer.value = false
+  await findRecipesInfoByKey()
 }
 
 const initializePage = async () => {
-  await queryRecipesList()
-  if (allItems.value.length === 0) {
-    loading.value = false
-    return
-  }
-  if (allItems.value.length > 0) {
+  loading.value = true
+  try {
+    await queryRecipesList()
+    if (!allItems.value.length) return
     thisShowKey.value = allItems.value[0]?.recipesKey
+    await findRecipesInfoByKey()
+  } finally {
+    loading.value = false
   }
-  await findRecipesInfoByKey()
 };
 
 watch(showDrawer, (val) => {
@@ -93,8 +98,8 @@ onUnmounted(() => { document.body.style.overflow = '' })
   <div class="page-container-wrapper">
 
     <!-- 1. 主要内容区域 -->
-    <div class="gallery-container">
-      <div v-if="loading" class="gallery-container__status">{{ '加载中...' }}</div>
+    <div class="gallery-container" :aria-busy="loading">
+      <HottaDetailSkeleton v-if="loading" variant="recipes" />
       <div v-else-if="!allItems.length" class="empty-state"><i class="ri-compass-3-line" aria-hidden="true" /><p>这个分类暂时没有资料。</p></div>
       <div v-else class="gallery-container__content">
         <!-- 顶部展示区：图标 + 名称 + 类别 + 描述 -->
@@ -164,9 +169,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
                    placeholder="输入名称…" aria-label="按名称搜索资料"/>
           </div>
         </header>
-        <div class="search-panel__content">
-          <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-          <n-virtual-list style="height: 100%" :item-size="58" :items="items">
+        <div class="search-panel__content" :aria-busy="listLoading">
+          <HottaListSkeleton v-if="listLoading" />
+          <p v-else-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
+          <n-virtual-list v-else style="height: 100%" :item-size="58" :items="items">
             <template #default="{ item }">
               <div :key="item.recipesKey" class="query-result-row">
                 <div class="result-item" :class="{'active': thisShowKey === item.recipesKey}"
@@ -234,9 +240,10 @@ onUnmounted(() => { document.body.style.overflow = '' })
             </header>
 
             <!-- 抽屉列表 -->
-            <div class="drawer-body">
-              <p v-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
-              <n-virtual-list style="height: 100%;" :item-size="58" :items="items">
+            <div class="drawer-body" :aria-busy="listLoading">
+              <HottaListSkeleton v-if="listLoading" />
+              <p v-else-if="!items.length" class="query-no-results">没有找到匹配的资料</p>
+              <n-virtual-list v-else style="height: 100%;" :item-size="58" :items="items">
                 <template #default="{ item }">
                   <div :key="item.recipesKey" class="query-result-row">
                     <div
@@ -287,14 +294,6 @@ onUnmounted(() => { document.body.style.overflow = '' })
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
-  &__status {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #999;
-    font-size: 1rem;
-    min-height: 100%;
-  }
 
   &__content {
     display: flex;

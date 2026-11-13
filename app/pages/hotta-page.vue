@@ -25,13 +25,9 @@ useSeoMeta({ title: () => (activeCategory.value ? activeCategory.value.name + '�
         <a href="https://github.com/Hollow288/hotta-data-builder" class="hotta-data-project" target="_blank" rel="noopener noreferrer"><i class="ri-github-line" aria-hidden="true" /><span>数据项目</span><i class="ri-arrow-right-up-line" aria-hidden="true" /></a>
       </aside>
       <div class="hotta-content">
-        <section v-if="!activeCategory" class="hotta-overview" aria-label="选择查询分类">
-          <div class="overview-intro"><h2>资料分类</h2><p>选择一个分类，查阅武器、意志、源器与烹饪资料。</p></div>
-          <div class="category-list"><NuxtLink v-for="(item, index) in hottaCategories" :key="item.slug" :to="'/hotta-page/' + item.slug" class="category-row"><span class="category-number">0{{ index + 1 }}</span><i :class="item.icon" class="category-icon" aria-hidden="true" /><div><h3>{{ item.name }}<span>{{ item.english }}</span></h3><p>{{ item.description }}</p></div><i class="ri-arrow-right-line category-arrow" aria-hidden="true" /></NuxtLink></div>
-        </section>
-        <section v-else class="hotta-detail" :aria-label="activeCategory.name + '查询'">
-          <div class="detail-caption">{{ activeCategory.name }}档案</div>
-          <NuxtErrorBoundary :key="activeCategory.slug"><NuxtPage /><template #error="{ clearError }"><div class="empty-state" role="status"><i class="ri-planet-line" aria-hidden="true" /><p>这份探索资料暂时无法读取。</p><small>请稍后重试，或换个分类继续看看。</small><button class="secondary-button" @click="clearError"><i class="ri-refresh-line" aria-hidden="true" />重新加载</button></div></template></NuxtErrorBoundary>
+        <section class="hotta-detail" :aria-label="(activeCategory?.name ?? '武器') + '查询'">
+          <div v-if="activeCategory" class="detail-caption">{{ activeCategory.name }}档案</div>
+          <NuxtErrorBoundary :key="activeCategory?.slug"><NuxtPage /><template #error="{ clearError }"><div class="empty-state" role="status"><i class="ri-planet-line" aria-hidden="true" /><p>资料加载失败，请稍后重试。</p><button class="secondary-button" @click="clearError"><i class="ri-refresh-line" aria-hidden="true" />重新加载</button></div></template></NuxtErrorBoundary>
         </section>
         <div class="hotta-note"><i class="ri-information-line" aria-hidden="true" />资料仅供探索与参考，游戏内容请以实际版本为准。</div>
       </div>
@@ -57,14 +53,6 @@ useSeoMeta({ title: () => (activeCategory.value ? activeCategory.value.name + '�
 .hotta-data-project > i:last-child { margin-left: auto; font-size: 14px; }
 .hotta-data-project:hover { color: var(--accent-hover); }
 .hotta-content { min-width: 0; }
-.hotta-overview { padding-top: 8px; }
-.overview-intro { padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
-.overview-intro h2 { font-size: 26px; font-weight: 700; letter-spacing: -.025em; }
-.overview-intro p { font-size: 16px; color: var(--text-secondary); line-height: 1.65; margin-top: 10px; }
-.category-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
-.category-number { align-self: flex-start; padding-top: 6px; }
-.category-row:last-child { grid-column: 1 / -1; }
-.category-row { display: flex; align-items: center; gap: 15px; padding: 26px 0; border-bottom: 1px solid var(--border-color); }.category-number { font-size: 13px; color: var(--text-muted); }.category-icon { font-size: 27px; color: var(--accent); }.category-row > div { flex: 1; min-width: 0; }.category-row h3 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 10px; font-size: 20px; font-weight: 700; }.category-row h3 span { font-size: 13px; font-weight: 400; color: var(--text-muted); }.category-row p { font-size: 15px; color: var(--text-secondary); margin-top: 6px; line-height: 1.65; }.category-arrow { color: var(--text-muted); font-size: 21px; transition: transform .2s; }.category-row:hover h3, .category-row:hover .category-arrow { color: var(--accent); }.category-row:hover .category-arrow { transform: translateX(4px); }
 .detail-caption { padding: 4px 0 14px; color: var(--text-main); font-size: 16px; font-weight: 700; }
 .hotta-detail { display: grid; grid-template-columns: minmax(0, 1fr) clamp(280px, 25vw, 360px); grid-template-rows: auto 1fr; column-gap: 35px; align-items: start; }
 .detail-caption { grid-column: 1; grid-row: 1; }
@@ -110,7 +98,6 @@ useSeoMeta({ title: () => (activeCategory.value ? activeCategory.value.name + '�
   .hotta-detail :deep(.pc-sidebar) { display: none; }
   .hotta-detail :deep(.toc-toggle-btn) { display: grid; place-items: center; }
 }
-@media (max-width: 1000px) { .category-list { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 850px) { .hotta-detail :deep(.page-container-wrapper) { width: 100%; }.hotta-detail :deep(.gallery-container) { width: 100%; min-height: 300px; } }
 @media (max-width: 700px) {
   .hotta-page { padding-top: 20px; }
@@ -123,11 +110,6 @@ useSeoMeta({ title: () => (activeCategory.value ? activeCategory.value.name + '�
   .hotta-category-nav.is-open { display: grid; }
   .hotta-category-nav > a { padding-block: 9px; }
   .hotta-data-project { margin-top: 0; padding: 12px 0; border-top: 0; }
-  .hotta-overview { padding-top: 0; }
-  .overview-intro { padding-bottom: 20px; }
-  .overview-intro h2 { font-size: 23px; }
-  .overview-intro p { font-size: 15px; }
-  .category-row { gap: 14px; padding: 24px 0; }.category-row h3 { font-size: 18px; }.category-row p { font-size: 14px; }
   .detail-caption { padding-top: 0; font-size: 16px; }
   .hotta-detail :deep(.gallery-container__row), .hotta-detail :deep(.artifact-section), .hotta-detail :deep(.food-section), .hotta-detail :deep(.recipes-section) { padding: 16px 0; }
   .hotta-detail :deep(.gallery-container__content) { max-width: 100%; }
