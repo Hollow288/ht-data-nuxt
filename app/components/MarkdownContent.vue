@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, onUpdated, ref } from 'vue'
-import MarkdownIt from 'markdown-it'
+import { computed, onMounted, onUnmounted, onUpdated, ref, useId, watch } from 'vue'
 import Prism from 'prismjs'
+import { createArticleMarkdown } from '~/utils/articleMarkdown'
 import { markdownHeadingId, markdownHeadingText } from '~/utils/markdown'
 import 'github-markdown-css/github-markdown.css'
+import 'katex/dist/katex.min.css'
 import 'prismjs/components/prism-javascript'
 import 'prismjs/components/prism-typescript'
 import 'prismjs/components/prism-json'
@@ -19,7 +20,10 @@ import 'prismjs/components/prism-powershell'
 
 const props = defineProps<{ content: string }>()
 const markdownRoot = ref<HTMLDivElement | null>(null)
-const md = new MarkdownIt({ html: true, linkify: true })
+const md = createArticleMarkdown()
+const diagramId = useId().replace(/[^\w-]/g, '')
+let diagramVersion = 0
+let mounted = false
 const languageNames: Record<string, string> = {
   js: 'JavaScript', javascript: 'JavaScript', ts: 'TypeScript', typescript: 'TypeScript',
   json: 'JSON', html: 'HTML', xml: 'XML', markup: 'HTML', css: 'CSS',
@@ -28,9 +32,11 @@ const languageNames: Record<string, string> = {
 }
 const languageAliases: Record<string, string> = { js: 'javascript', ts: 'typescript', py: 'python', sh: 'bash', html: 'markup', xml: 'markup' }
 
-md.renderer.rules.fence = (tokens, index) => {
+const renderFence = md.renderer.rules.fence!
+md.renderer.rules.fence = (tokens, index, options, env, self) => {
   const token = tokens[index]!
   const requested = (token.info.trim().split(/\s+/)[0] ?? '').toLowerCase()
+  if (requested === 'mermaid') return renderFence(tokens, index, options, env, self)
   const language = /^[\w+-]+$/.test(requested) ? requested : 'text'
   const grammar = Prism.languages[languageAliases[language] ?? language]
   const code = token.content.replace(/\n$/, '')
@@ -54,6 +60,44 @@ md.renderer.rules.table_close = () => '</table></div>'
 
 const rendered = computed(() => md.render(props.content, { headingCounts: new Map<string, number>() }))
 let themeObserver: MutationObserver | undefined
+
+async function renderDiagrams() {
+  const version = ++diagramVersion
+  const blocks = [...(markdownRoot.value?.querySelectorAll<HTMLElement>('.mermaid-block') ?? [])]
+  if (!mounted || !blocks.length) return
+  try {
+    const { default: mermaid } = await import('mermaid')
+    if (!mounted || version !== diagramVersion) return
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      suppressErrorRendering: true,
+      theme: document.documentElement.classList.contains('dark') ? 'dark' : 'neutral',
+      fontFamily: 'Inter, "Microsoft YaHei", sans-serif',
+      flowchart: { htmlLabels: false, useMaxWidth: false }
+    })
+    for (const [index, block] of blocks.entries()) {
+      if (!mounted || version !== diagramVersion) return
+      const source = block.querySelector<HTMLElement>('.mermaid-source')!
+      const output = block.querySelector<HTMLElement>('.mermaid-output')!
+      try {
+        const { svg } = await mermaid.render(`article-diagram-${diagramId}-${version}-${index}`, source.textContent ?? '')
+        if (!mounted || version !== diagramVersion || !block.isConnected) return
+        output.innerHTML = svg
+        output.hidden = false
+        source.hidden = true
+      } catch {
+        if (!mounted || version !== diagramVersion) return
+        output.hidden = true
+        source.hidden = false
+      }
+    }
+  } catch {
+    // Keep the readable source if loading the optional renderer fails.
+  }
+}
+
+watch(rendered, renderDiagrams, { flush: 'post' })
 
 function blogEmbedOrigin(frame: HTMLIFrameElement) {
   try {
@@ -88,10 +132,15 @@ function resizeEmbed(event: MessageEvent) {
   frame.style.height = Math.ceil(Math.min(3000, Math.max(120, data.height))) + 'px'
 }
 onMounted(() => {
+  mounted = true
   window.addEventListener('message', resizeEmbed)
-  themeObserver = new MutationObserver(measureEmbeds)
+  themeObserver = new MutationObserver(() => {
+    measureEmbeds()
+    renderDiagrams()
+  })
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
   measureEmbeds()
+  renderDiagrams()
 })
 onUpdated(measureEmbeds)
 
@@ -117,6 +166,8 @@ async function copyCode(event: MouseEvent) {
   feedbackTimers.add(timer)
 }
 onUnmounted(() => {
+  mounted = false
+  diagramVersion++
   feedbackTimers.forEach(clearTimeout)
   window.removeEventListener('message', resizeEmbed)
   themeObserver?.disconnect()
@@ -160,6 +211,13 @@ onUnmounted(() => {
 .markdown-body :not(pre) > code { padding: .15em .35em; border-radius: 3px; background: var(--bg-soft); color: var(--accent); font-size: .87em; overflow-wrap: anywhere; }
 .markdown-body img { display: block; max-width: 100%; height: auto; margin: 24px auto; border-radius: 4px; background: transparent; }
 .markdown-body hr { height: 1px; margin: 36px 0; background: var(--border-color); border: 0; }
+.markdown-body .mermaid-block { min-width: 0; max-width: 100%; margin: 24px 0; }
+.markdown-body .mermaid-output { max-width: 100%; overflow-x: auto; padding: 8px 0; }
+.markdown-body .mermaid-output svg { display: block; max-width: none; margin-inline: auto; }
+.markdown-body .mermaid-source[hidden], .markdown-body .mermaid-output[hidden] { display: none; }
+.markdown-body .katex { font-size: 1.1em; overflow-wrap: normal; }
+.markdown-body .katex-block { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding-block: 4px; }
+.markdown-body .katex-display { width: max-content; min-width: 100%; margin: .5em 0; }
 .markdown-body .code-block { overflow: hidden; margin: 20px 0; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-soft); }
 .markdown-body .code-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 16px; border-bottom: 1px solid var(--border-color); font-size: 13px; line-height: 1.7; color: var(--text-secondary); }
 .markdown-body .code-toolbar > span { font-weight: 600; }

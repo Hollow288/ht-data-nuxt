@@ -13,7 +13,7 @@ export function markdownHeadingText(token?: { content: string; children: { type:
   if (!token) return ''
   if (!token.children) return token.content
   return token.children.map(child => {
-    if (['text', 'code_inline', 'image'].includes(child.type)) return child.content
+    if (['text', 'code_inline', 'image', 'math_inline'].includes(child.type)) return child.content
     if (['softbreak', 'hardbreak'].includes(child.type)) return ' '
     return ''
   }).join('')

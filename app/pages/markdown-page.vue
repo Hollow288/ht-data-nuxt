@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MarkdownIt from 'markdown-it'
+import { createArticleMarkdown } from '~/utils/articleMarkdown'
 import { BaseAPI } from '~/utils/api'
 import { markdownHeadingId, markdownHeadingText } from '~/utils/markdown'
 import type { BlogPost, BlogPostRes } from '~/types/blog'
@@ -14,7 +14,7 @@ const activeHeading = ref('')
 const desktopTocNav = ref<HTMLElement | null>(null)
 const mobileTocDialog = ref<HTMLDialogElement | null>(null)
 const mobileTocOpen = ref(false)
-const md = new MarkdownIt()
+const md = createArticleMarkdown()
 let version = 0
 let scrollFrame = 0
 let tocFollowTimer: ReturnType<typeof setTimeout> | undefined
