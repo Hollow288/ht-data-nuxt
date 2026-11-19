@@ -32,10 +32,10 @@ const strokes = [
 function replay() {
   clearTimeout(replayTimer)
   if (!props.active) return
-  // Hold the completed signature briefly, then start a fresh set of strokes.
+  // Hold the completed signature for 1.5 seconds before writing it again.
   replayTimer = setTimeout(() => {
     if (props.active) writingCycle.value++
-  }, 900)
+  }, 1500)
 }
 
 watch(() => props.active, active => {

@@ -22,10 +22,13 @@ test('renders inline and display math, including blockquotes and lists', () => {
   assert.ok(!html.includes('katex-error'))
 })
 
-test('Mermaid source stays escaped until the client renders the diagram', () => {
+test('Mermaid starts with an accessible skeleton and hidden escaped source', () => {
   const html = createArticleMarkdown().render('```mermaid\nflowchart LR\n A["<script>alert(1)</script>"]-->B\n```')
+  assert.match(html, /class="mermaid-block" aria-busy="true"/)
+  assert.match(html, /class="mermaid-loading" role="status" aria-label="正在加载流程图"/)
   assert.match(html, /class="mermaid-output"[^>]* hidden/)
-  assert.match(html, /class="mermaid-source"/)
+  assert.match(html, /class="mermaid-error"[^>]* hidden/)
+  assert.match(html, /class="mermaid-source" hidden/)
   assert.match(html, /&lt;script&gt;alert\(1\)&lt;\/script&gt;/)
   assert.ok(!html.includes('<script>'))
 })

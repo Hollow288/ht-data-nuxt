@@ -16,8 +16,8 @@ export function createArticleMarkdown() {
     if (token.info.trim().split(/\s+/)[0]?.toLowerCase() !== 'mermaid') {
       return defaultFence(tokens, index, options, env, self)
     }
-    // Keep escaped source as a usable fallback if the diagram cannot be rendered.
-    return `<div class="mermaid-block"><div class="mermaid-output" role="img" aria-label="文章流程图" tabindex="0" hidden></div><pre class="mermaid-source"><code>${md.utils.escapeHtml(token.content)}</code></pre></div>\n`
+    // Hide source from the first paint while the client loads the diagram renderer.
+    return `<div class="mermaid-block" aria-busy="true"><div class="mermaid-loading" role="status" aria-label="正在加载流程图"><span class="skeleton-line" aria-hidden="true"></span><span class="skeleton-line" aria-hidden="true"></span><span class="skeleton-line" aria-hidden="true"></span></div><div class="mermaid-output" role="img" aria-label="文章流程图" tabindex="0" hidden></div><div class="mermaid-error" role="status" hidden>流程图加载失败，请刷新页面重试。</div><pre class="mermaid-source" hidden><code>${md.utils.escapeHtml(token.content)}</code></pre></div>\n`
   }
   return md
 }
