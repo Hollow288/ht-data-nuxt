@@ -32,7 +32,7 @@ onMounted(loadArticles)
     <section class="hero" aria-labelledby="hello-heading">
       <div class="hero-heading">
         <p class="hero-eyebrow">HOLLOW’S SPACE <span>个人主页</span></p>
-        <h1 id="hello-heading">你好，我是 <span>Hollow<span class="title-period">。</span></span></h1>
+        <h1 id="hello-heading">你好，这里是 <span>Hollow<span class="title-period">。</span></span></h1>
         <p class="hero-subtitle">我本微末凡尘，但也心向天空。</p>
       </div>
       <ProfileOrbit />

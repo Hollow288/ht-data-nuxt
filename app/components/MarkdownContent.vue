@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, onUpdated, ref } from 'vue'
 import MarkdownIt from 'markdown-it'
 import Prism from 'prismjs'
 import { markdownHeadingId, markdownHeadingText } from '~/utils/markdown'
@@ -18,6 +18,7 @@ import 'prismjs/components/prism-matlab'
 import 'prismjs/components/prism-powershell'
 
 const props = defineProps<{ content: string }>()
+const markdownRoot = ref<HTMLDivElement | null>(null)
 const md = new MarkdownIt({ html: true, linkify: true })
 const languageNames: Record<string, string> = {
   js: 'JavaScript', javascript: 'JavaScript', ts: 'TypeScript', typescript: 'TypeScript',
@@ -52,6 +53,48 @@ md.renderer.rules.table_open = () => '<div class="table-container" role="region"
 md.renderer.rules.table_close = () => '</table></div>'
 
 const rendered = computed(() => md.render(props.content, { headingCounts: new Map<string, number>() }))
+let themeObserver: MutationObserver | undefined
+
+function blogEmbedOrigin(frame: HTMLIFrameElement) {
+  try {
+    const url = new URL(frame.src)
+    return url.origin === 'https://media.ovovk.com' && url.pathname.startsWith('/blog/') && url.pathname.endsWith('.html')
+      ? url.origin : null
+  } catch { return null }
+}
+function measureEmbed(frame: HTMLIFrameElement) {
+  if (!blogEmbedOrigin(frame)) return
+  frame.contentWindow?.postMessage({
+    type: 'blog-embed:measure',
+    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+  }, '*')
+}
+function measureEmbeds() {
+  markdownRoot.value?.querySelectorAll<HTMLIFrameElement>('iframe').forEach(measureEmbed)
+}
+function onEmbedLoad(event: Event) {
+  if (event.target instanceof HTMLIFrameElement) measureEmbed(event.target)
+}
+function resizeEmbed(event: MessageEvent) {
+  const data = event.data
+  if (!data || data.type !== 'blog-embed:resize' || typeof data.height !== 'number' || !Number.isFinite(data.height) || data.height <= 0) return
+  const frame = [...(markdownRoot.value?.querySelectorAll<HTMLIFrameElement>('iframe') ?? [])]
+    .find(frame => frame.contentWindow === event.source)
+  if (!frame) return
+  const origin = blogEmbedOrigin(frame)
+  // Script-only sandboxed documents have an opaque origin; verify their exact window as well as the configured URL.
+  const opaqueOrigin = event.origin === 'null' && frame.hasAttribute('sandbox') && !frame.sandbox.contains('allow-same-origin')
+  if (!origin || (event.origin !== origin && !opaqueOrigin)) return
+  frame.style.height = Math.ceil(Math.min(3000, Math.max(120, data.height))) + 'px'
+}
+onMounted(() => {
+  window.addEventListener('message', resizeEmbed)
+  themeObserver = new MutationObserver(measureEmbeds)
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+  measureEmbeds()
+})
+onUpdated(measureEmbeds)
+
 const feedbackTimers = new Set<ReturnType<typeof setTimeout>>()
 async function copyCode(event: MouseEvent) {
   const target = event.target as HTMLElement | null
@@ -73,11 +116,15 @@ async function copyCode(event: MouseEvent) {
   }, 1800)
   feedbackTimers.add(timer)
 }
-onUnmounted(() => feedbackTimers.forEach(clearTimeout))
+onUnmounted(() => {
+  feedbackTimers.forEach(clearTimeout)
+  window.removeEventListener('message', resizeEmbed)
+  themeObserver?.disconnect()
+})
 </script>
 
 <template>
-  <div class="markdown-body" @click="copyCode" v-html="rendered" />
+  <div ref="markdownRoot" class="markdown-body" @click="copyCode" @load.capture="onEmbedLoad" v-html="rendered" />
 </template>
 
 <style>
