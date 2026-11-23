@@ -119,6 +119,21 @@ watch(rendered, () => {
   renderDiagrams()
 }, { flush: 'post' })
 
+let embedAssets: Promise<{ css: string; js: string }> | undefined
+async function readEmbedAsset(path: string) {
+  const response = await fetch(path)
+  if (!response.ok) throw new Error(`Failed to load blog embed asset: ${path}`)
+  return response.text()
+}
+function loadEmbedAssets() {
+  return embedAssets ??= Promise.all([
+    readEmbedAsset('/blog-embed/embed.css'),
+    readEmbedAsset('/blog-embed/embed.js')
+  ]).then(([css, js]) => ({ css, js })).catch(error => {
+    embedAssets = undefined
+    throw error
+  })
+}
 function blogEmbedOrigin(frame: HTMLIFrameElement) {
   try {
     const url = new URL(frame.src)
@@ -128,10 +143,25 @@ function blogEmbedOrigin(frame: HTMLIFrameElement) {
 }
 function measureEmbed(frame: HTMLIFrameElement) {
   if (!blogEmbedOrigin(frame)) return
-  frame.contentWindow?.postMessage({
+  const measure = () => frame.contentWindow?.postMessage({
     type: 'blog-embed:measure',
     theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
   }, '*')
+  measure()
+  void loadEmbedAssets().then(assets => {
+    if (!mounted || !frame.isConnected || !blogEmbedOrigin(frame)) return
+    frame.contentWindow?.postMessage({
+      type: 'blog-embed:assets',
+      theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+      assets
+    }, '*')
+    // The remote loader installs the adapter while handling the preceding message.
+    measure()
+  }).catch(() => {
+    if (mounted && frame.isConnected && blogEmbedOrigin(frame)) {
+      frame.contentWindow?.postMessage({ type: 'blog-embed:assets-error' }, '*')
+    }
+  })
 }
 function measureEmbeds() {
   markdownRoot.value?.querySelectorAll<HTMLIFrameElement>('iframe').forEach(measureEmbed)

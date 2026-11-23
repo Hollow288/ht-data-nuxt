@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>交互图标题</title>
+  <script data-blog-embed-loader>
+    // The article page provides the shared assets; no blog domain is hard-coded here.
+    (() => {
+      if (window.parent === window) return;
+      const root = document.documentElement;
+      root.dataset.embedded = '';
+      root.style.visibility = 'hidden';
+      let installed = false;
+      window.addEventListener('message', event => {
+        if (event.source !== window.parent) return;
+        const data = event.data;
+        if (!installed && (data?.type === 'blog-embed:measure' || data?.type === 'blog-embed:assets')) {
+          if (data.theme === 'light' || data.theme === 'dark') root.dataset.theme = data.theme;
+        }
+        if (data?.type === 'blog-embed:assets-error') {
+          root.style.removeProperty('visibility');
+          return;
+        }
+        if (installed || data?.type !== 'blog-embed:assets') return;
+        if (typeof data.assets?.css !== 'string' || typeof data.assets?.js !== 'string') return;
+        installed = true;
+        const style = document.createElement('style');
+        style.dataset.blogEmbed = '';
+        style.textContent = data.assets.css;
+        document.head.appendChild(style);
+        const script = document.createElement('script');
+        script.dataset.blogEmbed = '';
+        script.textContent = data.assets.js;
+        document.head.appendChild(script);
+        root.style.removeProperty('visibility');
+      });
+    })();
+  </script>
+  <style>
+    /* 默认值用于单独预览；嵌入文章时由项目公共 CSS 覆盖。 */
+    body { margin: 0; padding: 28px 16px; background: var(--embed-bg, #f8fafc); color: var(--embed-text, #0f172a); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif; }
+    .blog-widget { max-width: 820px; margin: auto; padding: 20px 22px; border: 1px solid var(--embed-border, #e2e8f0); border-radius: 12px; background: var(--embed-surface, #ffffff); }
+    /* 本图专属样式。保留 var() 的默认值供单独预览使用。 */
+    .demo-heading { margin: 0 0 8px; font-size: 18px; }
+    .demo-description { margin: 0 0 16px; color: var(--embed-muted, #64748b); }
+    .demo-button {
+      padding: 7px 12px;
+      border: 1px solid var(--embed-border, #e2e8f0);
+      border-radius: 6px;
+      background: var(--embed-surface-subtle, #f1f5f9);
+      color: var(--embed-text, #0f172a);
+      cursor: pointer;
+    }
+    .demo-result {
+      margin: 14px 0 0;
+      padding: 12px;
+      border: 1px solid var(--embed-border, #e2e8f0);
+      border-radius: 8px;
+      background: var(--embed-surface, #ffffff);
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+<body>
+  <main class="blog-widget">
+    <!-- 替换此区域：标题、图解、操作按钮和讲解。保留外层 .blog-widget。 -->
+    <h1 class="demo-heading">交互图标题</h1>
+    <p class="demo-description">用一句话说明读者可以观察什么。</p>
+    <button id="demo-action" class="demo-button" type="button">展开演示说明</button>
+    <p id="demo-result" class="demo-result" aria-live="polite">点击按钮体验交互。</p>
+  </main>
+
+  <script>
+    // 替换此区域：本图专属交互。主题同步和高度上报由 embed.js 处理。
+    (() => {
+      const button = document.getElementById('demo-action');
+      const result = document.getElementById('demo-result');
+      let expanded = false;
+      button.addEventListener('click', () => {
+        expanded = !expanded;
+        button.textContent = expanded ? '收起演示说明' : '展开演示说明';
+        result.textContent = expanded
+          ? '内容变化后，公共适配器会自动重新测量高度。嵌入博客时跟随文章主题，单独打开时显示基础浅色预览。生成新图时，将这里替换成对应的图解与讲解。'
+          : '点击按钮体验交互。';
+      });
+    })();
+  </script>
+</body>
+</html>
