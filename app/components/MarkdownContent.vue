@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, onUpdated, ref, useId, watch } from 'vue'
 import Prism from 'prismjs'
 import { createArticleMarkdown } from '~/utils/articleMarkdown'
+import { createDiagramZoom } from '~/utils/diagramZoom'
 import { markdownHeadingId, markdownHeadingText } from '~/utils/markdown'
 import 'github-markdown-css/github-markdown.css'
 import 'katex/dist/katex.min.css'
@@ -60,11 +61,13 @@ md.renderer.rules.table_close = () => '</table></div>'
 
 const rendered = computed(() => md.render(props.content, { headingCounts: new Map<string, number>() }))
 let themeObserver: MutationObserver | undefined
+let diagramZoom: ReturnType<typeof createDiagramZoom> | undefined
 
 function setDiagramState(block: HTMLElement, state: 'loading' | 'ready' | 'error') {
   block.setAttribute('aria-busy', String(state === 'loading'))
   block.querySelector<HTMLElement>('.mermaid-loading')!.hidden = state !== 'loading'
   block.querySelector<HTMLElement>('.mermaid-output')!.hidden = state !== 'ready'
+  block.querySelector<HTMLElement>('.mermaid-toolbar')!.hidden = state !== 'ready'
   block.querySelector<HTMLElement>('.mermaid-error')!.hidden = state !== 'error'
 }
 
@@ -97,6 +100,7 @@ async function renderDiagrams() {
         if (!mounted || version !== diagramVersion || !block.isConnected) return
         output.innerHTML = svg
         setDiagramState(block, 'ready')
+        diagramZoom?.register(block, output.querySelector<SVGSVGElement>('svg')!)
       } catch {
         if (!mounted || version !== diagramVersion || !block.isConnected) return
         setDiagramState(block, 'error')
@@ -110,7 +114,10 @@ async function renderDiagrams() {
   }
 }
 
-watch(rendered, renderDiagrams, { flush: 'post' })
+watch(rendered, () => {
+  diagramZoom?.clear()
+  renderDiagrams()
+}, { flush: 'post' })
 
 function blogEmbedOrigin(frame: HTMLIFrameElement) {
   try {
@@ -146,6 +153,7 @@ function resizeEmbed(event: MessageEvent) {
 }
 onMounted(() => {
   mounted = true
+  if (markdownRoot.value) diagramZoom = createDiagramZoom(markdownRoot.value)
   window.addEventListener('message', resizeEmbed)
   themeObserver = new MutationObserver(() => {
     measureEmbeds()
@@ -184,6 +192,7 @@ onUnmounted(() => {
   feedbackTimers.forEach(clearTimeout)
   window.removeEventListener('message', resizeEmbed)
   themeObserver?.disconnect()
+  diagramZoom?.destroy()
 })
 </script>
 
@@ -238,14 +247,21 @@ html.dark .markdown-body .article-alert-caution { --alert-color: #ff8e94; }
 .markdown-body :not(pre) > code { padding: .15em .35em; border-radius: 3px; background: var(--bg-soft); color: var(--accent); font-size: .87em; overflow-wrap: anywhere; }
 .markdown-body img { display: block; max-width: 100%; height: auto; margin: 24px auto; border-radius: 4px; background: transparent; }
 .markdown-body hr { height: 1px; margin: 36px 0; background: var(--border-color); border: 0; }
-.markdown-body .mermaid-block { min-width: 0; max-width: 100%; margin: 24px 0; }
+.markdown-body .mermaid-block { min-width: 0; max-width: 100%; margin: 24px 0; overflow: hidden; border: 1px solid var(--border-color); border-radius: 8px; }
+.markdown-body .mermaid-toolbar { display: flex; align-items: center; gap: 4px; min-height: 45px; padding: 5px 10px; border-bottom: 1px solid var(--border-color); background: var(--bg-soft); color: var(--text-secondary); }
+.markdown-body .mermaid-label { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; }
+.markdown-body .mermaid-toolbar button { display: grid; flex-shrink: 0; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 4px; background: transparent; color: inherit; font-size: 19px; }
+.markdown-body .mermaid-toolbar button:hover:not(:disabled), .markdown-body .mermaid-toolbar button[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); }
+.markdown-body .mermaid-toolbar button:disabled { opacity: .35; cursor: default; }
+.markdown-body .mermaid-toolbar button:focus-visible, .markdown-body .mermaid-output:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.markdown-body .mermaid-zoom { flex-shrink: 0; width: 52px; text-align: center; font-size: 13px; font-variant-numeric: tabular-nums; }
 .markdown-body .mermaid-loading { display: flex; align-items: center; justify-content: center; gap: clamp(12px, 3vw, 36px); min-height: 160px; padding: 28px 20px; border-radius: 8px; background: var(--bg-soft); }
 .markdown-body .mermaid-loading .skeleton-line { width: 22%; max-width: 140px; height: 44px; background: var(--border-color); }
 .markdown-body .mermaid-loading .skeleton-line:nth-child(2) { height: 60px; }
 .markdown-body .mermaid-error { padding: 28px 20px; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); text-align: center; font-size: 14px; }
-.markdown-body .mermaid-output { max-width: 100%; overflow-x: auto; padding: 8px 0; }
-.markdown-body .mermaid-output svg { display: block; max-width: none; margin-inline: auto; }
-.markdown-body :is(.mermaid-source, .mermaid-loading, .mermaid-output, .mermaid-error)[hidden] { display: none; }
+.markdown-body .mermaid-output { display: flex; flex-direction: column; justify-content: safe center; max-width: 100%; height: min(var(--diagram-view-height, 320px), 560px, 65dvh); overflow: auto; padding: 16px 0; }
+.markdown-body .mermaid-output svg { display: block; flex-shrink: 0; max-width: none; margin-inline: auto; }
+.markdown-body :is(.mermaid-source, .mermaid-loading, .mermaid-output, .mermaid-error, .mermaid-toolbar)[hidden] { display: none; }
 .markdown-body .katex { font-size: 1.1em; overflow-wrap: normal; }
 .markdown-body .katex-block { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding-block: 4px; }
 .markdown-body .katex-display { width: max-content; min-width: 100%; margin: .5em 0; }
