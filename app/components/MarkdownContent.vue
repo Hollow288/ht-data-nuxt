@@ -255,11 +255,25 @@ html.dark .markdown-body .article-alert-caution { --alert-color: #ff8e94; }
 .markdown-body .mermaid-toolbar button:disabled { opacity: .35; cursor: default; }
 .markdown-body .mermaid-toolbar button:focus-visible, .markdown-body .mermaid-output:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .markdown-body .mermaid-zoom { flex-shrink: 0; width: 52px; text-align: center; font-size: 13px; font-variant-numeric: tabular-nums; }
-.markdown-body .mermaid-loading { display: flex; align-items: center; justify-content: center; gap: clamp(12px, 3vw, 36px); min-height: 160px; padding: 28px 20px; border-radius: 8px; background: var(--bg-soft); }
-.markdown-body .mermaid-loading .skeleton-line { width: 22%; max-width: 140px; height: 44px; background: var(--border-color); }
-.markdown-body .mermaid-loading .skeleton-line:nth-child(2) { height: 60px; }
+.markdown-body .mermaid-loading-toolbar { display: flex; align-items: center; justify-content: space-between; min-height: 45px; padding: 8px 16px; border-bottom: 1px solid var(--border-color); background: var(--bg-soft); color: var(--text-muted); font-size: 13px; font-weight: 600; }
+.markdown-body .mermaid-loading-toolbar > i { font-size: 17px; font-weight: 400; line-height: 1; animation: diagram-loading-spin 1.4s linear infinite; }
+.markdown-body .mermaid-loading-canvas { display: grid; place-items: center; height: min(200px, 65dvh); padding: 24px 32px; }
+.markdown-body .mermaid-loading-map { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: 32px 30px 34px; column-gap: 28px; width: min(340px, 100%); animation: diagram-loading-pulse 2s ease-in-out infinite; }
+.markdown-body .mermaid-loading-map::before { content: ''; position: absolute; top: 47px; left: calc((100% - 56px) / 6); right: calc((100% - 56px) / 6); height: 1px; background: var(--border-color); }
+.markdown-body .mermaid-loading-map::after { content: ''; position: absolute; top: 32px; left: 50%; width: 1px; height: 15px; background: var(--border-color); }
+.markdown-body .mermaid-loading-node { position: relative; display: flex; grid-row: 3; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-soft); }
+.markdown-body .mermaid-loading-node::before { content: ''; position: absolute; top: -16px; left: 50%; width: 1px; height: 15px; background: var(--border-color); }
+.markdown-body .mermaid-loading-node.is-root { grid-area: 1 / 2; }
+.markdown-body .mermaid-loading-node.is-root::before { display: none; }
+.markdown-body .mermaid-loading-node > span { width: 58%; height: 4px; border-radius: 2px; background: var(--border-color); }
+.markdown-body .mermaid-loading-node > span + span { width: 36%; opacity: .7; }
+@keyframes diagram-loading-spin { to { transform: rotate(360deg); } }
+@keyframes diagram-loading-pulse { 0%, 100% { opacity: .45; } 50% { opacity: .85; } }
 .markdown-body .mermaid-error { padding: 28px 20px; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); text-align: center; font-size: 14px; }
 .markdown-body .mermaid-output { display: flex; flex-direction: column; justify-content: safe center; max-width: 100%; height: min(var(--diagram-view-height, 320px), 560px, 65dvh); overflow: auto; padding: 16px 0; }
+.markdown-body .mermaid-output.is-pannable { cursor: grab; overscroll-behavior: contain; user-select: none; -webkit-user-select: none; }
+.markdown-body .mermaid-output.is-dragging { cursor: grabbing; }
+.markdown-body .mermaid-output a { cursor: pointer; }
 .markdown-body .mermaid-output svg { display: block; flex-shrink: 0; max-width: none; margin-inline: auto; }
 .markdown-body :is(.mermaid-source, .mermaid-loading, .mermaid-output, .mermaid-error, .mermaid-toolbar)[hidden] { display: none; }
 .markdown-body .katex { font-size: 1.1em; overflow-wrap: normal; }

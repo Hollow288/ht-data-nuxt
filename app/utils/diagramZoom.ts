@@ -16,8 +16,61 @@ interface DiagramView {
 /** Size the SVG itself so native scrolling and touch gestures follow the zoom. */
 export function createDiagramZoom(root: HTMLElement) {
   const views = new Map<HTMLElement, DiagramView>()
+  let drag: {
+    view: DiagramView
+    pointerId: number
+    x: number
+    y: number
+  } | null = null
   const fitScale = (view: DiagramView) => Math.min(1, view.viewport.clientWidth / view.width)
   const minScale = (view: DiagramView) => Math.min(MIN_SCALE, fitScale(view))
+
+  function stopDrag() {
+    const current = drag
+    if (!current) return
+    drag = null
+    current.view.viewport.classList.remove('is-dragging')
+    if (current.view.viewport.hasPointerCapture(current.pointerId)) {
+      current.view.viewport.releasePointerCapture(current.pointerId)
+    }
+  }
+
+  function onPointerDown(event: PointerEvent) {
+    // Touch already pans the native scroll container, including browser pinch zoom.
+    if (event.pointerType === 'touch' || event.button !== 0 || !event.isPrimary) return
+    const target = event.target instanceof Element ? event.target : null
+    if (target?.closest('a, button, input, select, textarea, [contenteditable="true"]')) return
+    const block = target?.closest<HTMLElement>('.mermaid-block')
+    const view = block && views.get(block)
+    if (!view || !view.viewport.contains(target) || !view.viewport.classList.contains('is-pannable')) return
+    const bounds = view.viewport.getBoundingClientRect()
+    // Leave the native scrollbar gutters available for their usual interactions.
+    if (event.clientX >= bounds.left + view.viewport.clientWidth || event.clientY >= bounds.top + view.viewport.clientHeight) return
+
+    stopDrag()
+    event.preventDefault()
+    view.viewport.focus({ preventScroll: true })
+    view.viewport.setPointerCapture(event.pointerId)
+    view.viewport.classList.add('is-dragging')
+    drag = { view, pointerId: event.pointerId, x: event.clientX, y: event.clientY }
+  }
+
+  function onPointerMove(event: PointerEvent) {
+    if (!drag || drag.pointerId !== event.pointerId) return
+    event.preventDefault()
+    drag.view.viewport.scrollLeft -= event.clientX - drag.x
+    drag.view.viewport.scrollTop -= event.clientY - drag.y
+    drag.x = event.clientX
+    drag.y = event.clientY
+  }
+
+  function onPointerEnd(event: PointerEvent) {
+    if (drag?.pointerId === event.pointerId) stopDrag()
+  }
+
+  function onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Escape') stopDrag()
+  }
 
   function paint(view: DiagramView, scale: number, keepCenter = false) {
     const viewportBounds = view.viewport.getBoundingClientRect()
@@ -33,6 +86,8 @@ export function createDiagramZoom(root: HTMLElement) {
       const verticalMargin = Math.max(16, (view.viewport.clientHeight - view.height * scale) / 2)
       view.viewport.scrollTop = centerY * scale + verticalMargin - view.viewport.clientHeight / 2
     }
+    const pannable = view.viewport.scrollWidth > view.viewport.clientWidth + 1 || view.viewport.scrollHeight > view.viewport.clientHeight + 1
+    view.viewport.classList.toggle('is-pannable', pannable)
     view.toolbar.querySelector('output')!.textContent = `${Math.round(scale * 100)}%`
     view.toolbar.querySelector<HTMLButtonElement>('[data-diagram-action="out"]')!.disabled = scale <= minScale(view) + 0.0001
     view.toolbar.querySelector<HTMLButtonElement>('[data-diagram-action="in"]')!.disabled = scale >= MAX_SCALE - 0.0001
@@ -76,8 +131,16 @@ export function createDiagramZoom(root: HTMLElement) {
     }
   }
   root.addEventListener('click', onClick)
+  root.addEventListener('pointerdown', onPointerDown)
+  root.addEventListener('pointermove', onPointerMove)
+  root.addEventListener('pointerup', onPointerEnd)
+  root.addEventListener('pointercancel', onPointerEnd)
+  root.addEventListener('lostpointercapture', onPointerEnd)
+  root.addEventListener('keydown', onKeyDown)
+  window.addEventListener('blur', stopDrag)
 
   function clear() {
+    stopDrag()
     observer.disconnect()
     views.clear()
   }
@@ -91,6 +154,7 @@ export function createDiagramZoom(root: HTMLElement) {
         return
       }
       const previous = views.get(block)
+      if (drag?.view === previous) stopDrag()
       const view: DiagramView = {
         viewport: block.querySelector<HTMLElement>('.mermaid-output')!, svg, toolbar,
         width, height, scale: previous?.scale ?? 1, mode: previous?.mode ?? 'fit', viewportWidth: 0,
@@ -103,6 +167,13 @@ export function createDiagramZoom(root: HTMLElement) {
     destroy() {
       clear()
       root.removeEventListener('click', onClick)
+      root.removeEventListener('pointerdown', onPointerDown)
+      root.removeEventListener('pointermove', onPointerMove)
+      root.removeEventListener('pointerup', onPointerEnd)
+      root.removeEventListener('pointercancel', onPointerEnd)
+      root.removeEventListener('lostpointercapture', onPointerEnd)
+      root.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('blur', stopDrag)
     },
   }
 }

@@ -22,6 +22,15 @@ const diagramToolbar = `<div class="mermaid-toolbar" role="toolbar" aria-label="
 <button type="button" data-diagram-action="reset" aria-label="流程图恢复原始大小" title="原始大小（100%）"><i class="ri-refresh-line" aria-hidden="true"></i></button>
 </div>`
 
+const diagramSkeleton = `<div class="mermaid-loading" role="status" aria-label="正在加载流程图">
+<div class="mermaid-loading-toolbar" aria-hidden="true"><span>流程图</span><i class="ri-loader-4-line"></i></div>
+<div class="mermaid-loading-canvas" aria-hidden="true"><div class="mermaid-loading-map">
+<span class="mermaid-loading-node is-root"><span></span><span></span></span>
+<span class="mermaid-loading-node"><span></span><span></span></span>
+<span class="mermaid-loading-node"><span></span><span></span></span>
+<span class="mermaid-loading-node"><span></span><span></span></span>
+</div></div></div>`
+
 /** Recognize GitHub alert markers only on the first line of a blockquote. */
 function githubAlerts(md: MarkdownIt) {
   md.core.ruler.after('block', 'github_alerts', state => {
@@ -68,7 +77,7 @@ export function createArticleMarkdown() {
       return defaultFence(tokens, index, options, env, self)
     }
     // Hide source from the first paint while the client loads the diagram renderer.
-    return `<div class="mermaid-block" aria-busy="true">${diagramToolbar}<div class="mermaid-loading" role="status" aria-label="正在加载流程图"><span class="skeleton-line" aria-hidden="true"></span><span class="skeleton-line" aria-hidden="true"></span><span class="skeleton-line" aria-hidden="true"></span></div><div class="mermaid-output" role="region" aria-label="文章流程图" tabindex="0" hidden></div><div class="mermaid-error" role="status" hidden>流程图加载失败，请刷新页面重试。</div><pre class="mermaid-source" hidden><code>${md.utils.escapeHtml(token.content)}</code></pre></div>\n`
+    return `<div class="mermaid-block" aria-busy="true">${diagramToolbar}${diagramSkeleton}<div class="mermaid-output" role="region" aria-label="文章流程图" tabindex="0" hidden></div><div class="mermaid-error" role="status" hidden>流程图加载失败，请刷新页面重试。</div><pre class="mermaid-source" hidden><code>${md.utils.escapeHtml(token.content)}</code></pre></div>\n`
   }
   return md
 }
