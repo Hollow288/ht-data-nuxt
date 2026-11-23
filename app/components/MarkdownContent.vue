@@ -221,6 +221,20 @@ onUnmounted(() => {
 .markdown-body .heading-anchor:focus-visible { opacity: 1; }
 .markdown-body blockquote { margin: 24px 0; padding: 1px 0 1px 20px; color: var(--text-secondary); border-left: 2px solid var(--accent); }
 .markdown-body blockquote > :last-child { margin-bottom: 0; }
+.markdown-body .article-alert { margin: 24px 0; padding: 14px 18px; border-left: 4px solid var(--alert-color); background: color-mix(in srgb, var(--alert-color) 6%, var(--bg-body)); color: var(--text-main); }
+.markdown-body .article-alert > :last-child { margin-bottom: 0; }
+.markdown-body .article-alert .article-alert-title { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; color: var(--alert-color); font-weight: 600; line-height: 1.5; }
+.markdown-body .article-alert-title > i { flex-shrink: 0; font-size: 20px; font-weight: 400; line-height: 1; }
+.markdown-body .article-alert-note { --alert-color: #0969da; }
+.markdown-body .article-alert-tip { --alert-color: #1a7f37; }
+.markdown-body .article-alert-important { --alert-color: #8250df; }
+.markdown-body .article-alert-warning { --alert-color: #8a6100; }
+.markdown-body .article-alert-caution { --alert-color: #cf222e; }
+html.dark .markdown-body .article-alert-note { --alert-color: #79b8ff; }
+html.dark .markdown-body .article-alert-tip { --alert-color: #7bc98c; }
+html.dark .markdown-body .article-alert-important { --alert-color: #c4a7ff; }
+html.dark .markdown-body .article-alert-warning { --alert-color: #e3b341; }
+html.dark .markdown-body .article-alert-caution { --alert-color: #ff8e94; }
 .markdown-body :not(pre) > code { padding: .15em .35em; border-radius: 3px; background: var(--bg-soft); color: var(--accent); font-size: .87em; overflow-wrap: anywhere; }
 .markdown-body img { display: block; max-width: 100%; height: auto; margin: 24px auto; border-radius: 4px; background: transparent; }
 .markdown-body hr { height: 1px; margin: 36px 0; background: var(--border-color); border: 0; }

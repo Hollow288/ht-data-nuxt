@@ -3,6 +3,63 @@ import test from 'node:test'
 import { createArticleMarkdown } from '../app/utils/articleMarkdown.ts'
 import { markdownHeadingId, markdownHeadingText } from '../app/utils/markdown.ts'
 
+test('renders all five GitHub alerts with a title and formatted content', () => {
+  const md = createArticleMarkdown()
+  for (const [type, title] of Object.entries({ NOTE: '注意', TIP: '提示', IMPORTANT: '重要', WARNING: '警告', CAUTION: '危险' })) {
+    const html = md.render(`> [!${type}]\n> **问题**\n> 包含 \`code\` 和 [链接](https://example.com)。\n>\n> - 列表内容`)
+    assert.match(html, new RegExp(`class="article-alert article-alert-${type.toLowerCase()}" role="note"`))
+    assert.ok(html.includes(`aria-hidden="true"></i>${title}</p>`))
+    assert.ok(!html.includes(`[!${type}]`))
+    assert.match(html, /<strong>问题<\/strong><br>\n包含 <code>code<\/code>/)
+    assert.match(html, /<a href="https:\/\/example.com">链接<\/a>/)
+    assert.match(html, /<ul>\n<li>列表内容<\/li>\n<\/ul>\n<\/div>/)
+  }
+})
+
+test('alert-only marker paragraphs do not leave empty paragraphs or breaks', () => {
+  const html = createArticleMarkdown().render('> [!TIP]  \n>\n> 下一段\n\n> [!NOTE]')
+  assert.equal((html.match(/class="article-alert /g) ?? []).length, 2)
+  assert.match(html, /<p>下一段<\/p>/)
+  assert.ok(!html.includes('<p></p>'))
+  assert.ok(!html.includes('<br>'))
+})
+
+test('alerts support nested quotes and list items without swallowing following content', () => {
+  const html = createArticleMarkdown().render('> [!TIP]\n> 外层\n>\n> > [!WARNING]\n> > 内层\n\n- 列表\n\n  > [!NOTE]\n  > 列表提示\n\n后续正文')
+  assert.equal((html.match(/class="article-alert /g) ?? []).length, 3)
+  assert.equal((html.match(/<div /g) ?? []).length, (html.match(/<\/div>/g) ?? []).length)
+  assert.match(html, /内层<\/p>\n<\/div>\n<\/div>/)
+  assert.match(html, /列表提示<\/p>\n<\/div>\n<\/li>/)
+  assert.ok(html.endsWith('<p>后续正文</p>\n'))
+})
+
+test('ordinary quotes, unknown markers and literal alert examples stay unchanged', () => {
+  const md = createArticleMarkdown()
+  for (const source of [
+    '> 普通引用', '> [!UNKNOWN]\n> 正文', '> 先有正文\n> [!TIP]',
+    '> [!TIP] 同一行的普通文本', '> \\[!TIP]\n> 正文', '> `[!TIP]`\n> 正文',
+    '```markdown\n> [!TIP]\n> 原始示例\n```', '[!TIP]\n普通正文',
+  ]) {
+    assert.ok(!md.render(source).includes('article-alert'), source)
+  }
+  assert.match(md.render('> 普通引用'), /^<blockquote>\n<p>普通引用<\/p>\n<\/blockquote>/)
+})
+
+test('source newlines render in paragraphs, quotes and numbered list items', () => {
+  const html = createArticleMarkdown().render('第一行\n第二行\n\n1. **锁分离为什么能提升并发？**\n   在 `ArrayBlockingQueue` 里。\n2. **第二问**  \n   回答\n\n> **问题**\n> 解释')
+  assert.match(html, /<p>第一行<br>\n第二行<\/p>/)
+  assert.match(html, /<li><strong>锁分离为什么能提升并发？<\/strong><br>\n在 <code>ArrayBlockingQueue<\/code> 里。<\/li>/)
+  assert.match(html, /<li><strong>第二问<\/strong><br>\n回答<\/li>/)
+  assert.match(html, /<blockquote>\n<p><strong>问题<\/strong><br>\n解释<\/p>/)
+})
+
+test('preserving prose line breaks does not insert breaks into code or diagrams', () => {
+  const html = createArticleMarkdown().render('```java\nline1();\nline2();\n```\n\n`literal code`\n\n```mermaid\nflowchart LR\nA --> B\n```')
+  assert.match(html, /line1\(\);\nline2\(\);/)
+  assert.match(html, /flowchart LR\nA --&gt; B/)
+  assert.ok(!html.includes('<br>'))
+})
+
 test('Chinese emphasis works next to full-width punctuation and surrounding words', () => {
   const html = createArticleMarkdown().render('在**特定硬件介质（内存 vs 磁盘）**或**特定访问模式（读写）**下，和**磁盘页（Page）**对齐。')
   assert.equal((html.match(/<strong>/g) ?? []).length, 3)
