@@ -15,10 +15,8 @@ const alertTypes = {
 
 const diagramToolbar = `<div class="mermaid-toolbar" role="toolbar" aria-label="流程图缩放" hidden>
 <span class="mermaid-label">流程图</span>
-<button type="button" data-diagram-action="out" aria-label="缩小流程图" title="缩小流程图"><i class="ri-zoom-out-line" aria-hidden="true"></i></button>
 <output class="mermaid-zoom" aria-label="流程图缩放比例" aria-live="polite">100%</output>
-<button type="button" data-diagram-action="in" aria-label="放大流程图" title="放大流程图"><i class="ri-zoom-in-line" aria-hidden="true"></i></button>
-<button type="button" data-diagram-action="fit" aria-label="流程图适应宽度" title="适应宽度" aria-pressed="true"><i class="ri-expand-width-line" aria-hidden="true"></i></button>
+<button type="button" data-diagram-action="fit" aria-label="流程图适应宽度" title="适应宽度"><i class="ri-expand-width-line" aria-hidden="true"></i></button>
 <button type="button" data-diagram-action="reset" aria-label="流程图恢复原始大小" title="原始大小（100%）"><i class="ri-refresh-line" aria-hidden="true"></i></button>
 </div>`
 

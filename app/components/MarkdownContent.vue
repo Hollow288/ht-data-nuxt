@@ -251,8 +251,7 @@ html.dark .markdown-body .article-alert-caution { --alert-color: #ff8e94; }
 .markdown-body .mermaid-toolbar { display: flex; align-items: center; gap: 4px; min-height: 45px; padding: 5px 10px; border-bottom: 1px solid var(--border-color); background: var(--bg-soft); color: var(--text-secondary); }
 .markdown-body .mermaid-label { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; }
 .markdown-body .mermaid-toolbar button { display: grid; flex-shrink: 0; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 4px; background: transparent; color: inherit; font-size: 19px; }
-.markdown-body .mermaid-toolbar button:hover:not(:disabled), .markdown-body .mermaid-toolbar button[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); }
-.markdown-body .mermaid-toolbar button:disabled { opacity: .35; cursor: default; }
+.markdown-body .mermaid-toolbar button:hover { color: var(--accent); background: var(--accent-soft); }
 .markdown-body .mermaid-toolbar button:focus-visible, .markdown-body .mermaid-output:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .markdown-body .mermaid-zoom { flex-shrink: 0; width: 52px; text-align: center; font-size: 13px; font-variant-numeric: tabular-nums; }
 .markdown-body .mermaid-loading-toolbar { display: flex; align-items: center; justify-content: space-between; min-height: 45px; padding: 8px 16px; border-bottom: 1px solid var(--border-color); background: var(--bg-soft); color: var(--text-muted); font-size: 13px; font-weight: 600; }
@@ -270,11 +269,11 @@ html.dark .markdown-body .article-alert-caution { --alert-color: #ff8e94; }
 @keyframes diagram-loading-spin { to { transform: rotate(360deg); } }
 @keyframes diagram-loading-pulse { 0%, 100% { opacity: .45; } 50% { opacity: .85; } }
 .markdown-body .mermaid-error { padding: 28px 20px; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); text-align: center; font-size: 14px; }
-.markdown-body .mermaid-output { display: flex; flex-direction: column; justify-content: safe center; max-width: 100%; height: min(var(--diagram-view-height, 320px), 560px, 65dvh); overflow: auto; padding: 16px 0; }
-.markdown-body .mermaid-output.is-pannable { cursor: grab; overscroll-behavior: contain; user-select: none; -webkit-user-select: none; }
+.markdown-body .mermaid-output { position: relative; max-width: 100%; height: min(var(--diagram-view-height, 320px), 560px, 65dvh); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+.markdown-body .mermaid-output.is-pannable { cursor: grab; }
 .markdown-body .mermaid-output.is-dragging { cursor: grabbing; }
 .markdown-body .mermaid-output a { cursor: pointer; }
-.markdown-body .mermaid-output svg { display: block; flex-shrink: 0; max-width: none; margin-inline: auto; }
+.markdown-body .mermaid-output svg { position: absolute; top: 0; left: 0; display: block; max-width: none; margin: 0; transform-origin: 0 0; }
 .markdown-body :is(.mermaid-source, .mermaid-loading, .mermaid-output, .mermaid-error, .mermaid-toolbar)[hidden] { display: none; }
 .markdown-body .katex { font-size: 1.1em; overflow-wrap: normal; }
 .markdown-body .katex-block { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding-block: 4px; }
